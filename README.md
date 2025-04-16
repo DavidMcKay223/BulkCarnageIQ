@@ -1,4 +1,4 @@
-# ![BulkCarnageIQ](https://github.com/user-attachments/assets/915817e5-b62e-454b-8266-c7c1313bf255)
+![BulkCarnageIQ-1](https://github.com/user-attachments/assets/7dffabd6-6b48-4fea-974c-d2a5b9ff9b75)
 🧠💪 BulkCarnageIQ
 
 > **Brute Force Meets Smart Fuel**  
