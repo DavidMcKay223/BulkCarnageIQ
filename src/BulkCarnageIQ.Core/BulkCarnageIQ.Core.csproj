@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BulkCarnageIQ.Core\BulkCarnageIQ.Core.csproj" />
-    <ProjectReference Include="..\BulkCarnageIQ.Infrastructure\BulkCarnageIQ.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="OwnedTypes\" />
   </ItemGroup>
 
 </Project>

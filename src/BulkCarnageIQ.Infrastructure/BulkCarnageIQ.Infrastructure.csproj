@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BulkCarnageIQ.Core\BulkCarnageIQ.Core.csproj" />
-    <ProjectReference Include="..\BulkCarnageIQ.Infrastructure\BulkCarnageIQ.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>
