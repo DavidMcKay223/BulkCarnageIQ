@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BulkCarnageIQ.Core.Carnage
+{
+    public class FoodItem
+    {
+        [Key]
+        public required string RecipeName { get; set; } // Unique key, e.g., "Banana" or "Double Double Protein Style"
+
+        public string BrandType { get; set; } = "Generic"; // "Generic" or "Brand"
+
+        public float TotalCalories => Servings * CaloriesPerServing;
+
+        public float Servings { get; set; }             // Number of servings
+        public float CaloriesPerServing { get; set; }
+
+        public float MeasurementServings { get; set; }  // e.g., 0.25
+        public required string MeasurementType { get; set; }     // e.g., "Cup", "Part", "Ounces", etc.
+
+        public float Protein { get; set; }
+        public float Carbs { get; set; }
+        public float Fats { get; set; }
+        public float Fiber { get; set; }
+
+        // Meal flags — super easy to filter
+        public bool IsBreakfast { get; set; }
+        public bool IsLunch { get; set; }
+        public bool IsDinner { get; set; }
+        public bool IsSnack { get; set; }
+
+        public string? Link { get; set; } // Optional, nutrition or source URL
+    }
+}

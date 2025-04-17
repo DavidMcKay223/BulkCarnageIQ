@@ -1,4 +1,5 @@
-﻿using BulkCarnageIQ.Core.Identity;
+﻿using BulkCarnageIQ.Core.Carnage;
+using BulkCarnageIQ.Core.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,11 +14,14 @@ namespace BulkCarnageIQ.Infrastructure.Persistence
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
+        DbSet<FoodItem> FoodItems { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-
+            modelBuilder.Entity<FoodItem>()
+                .HasKey(f => f.RecipeName);
         }
     }
 }
