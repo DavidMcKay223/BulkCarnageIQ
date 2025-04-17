@@ -55,3 +55,7 @@
 ---
 
 ## 📦 Getting Started
+
+### Database Migrations EF
+- Add-Migration Description
+- Update-Database
