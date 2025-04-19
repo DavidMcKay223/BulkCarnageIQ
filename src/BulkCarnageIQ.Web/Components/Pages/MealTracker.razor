@@ -32,7 +32,7 @@
                         @foreach (var suggestion in suggestions)
                         {
                             <li class="list-group-item list-group-item-action"
-                                @onclick="() => SelectSuggestion(suggestion)">
+                            @onclick="() => SelectSuggestion(suggestion)">
                                 @suggestion
                             </li>
                         }
@@ -59,39 +59,55 @@ else if (!entries.Any())
 else
 {
     <table class="table table-hover table-bordered small align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Date</th>
-                <th>Day</th>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Portion</th>
-                <th>Calories</th>
-                <th>Protein</th>
-                <th>Carbs</th>
-                <th>Fats</th>
-                <th>Fiber</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var meal in entries.OrderByDescending(e => e.Date))
-            {
-                <tr>
-                    <td>@meal.Date</td>
-                    <td>@meal.Day</td>
-                    <td>@meal.MealType</td>
-                    <td>@meal.MealName</td>
-                    <td>@meal.PortionEaten</td>
-                    <td>@meal.Calories</td>
-                    <td>@meal.Protein</td>
-                    <td>@meal.Carbs</td>
-                    <td>@meal.Fats</td>
-                    <td>@meal.Fiber</td>
-                    <td class="fw-bold">@meal.TotalCalories</td>
+        @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
+        {
+            <tbody class="table-group-divider">
+                <!-- Day Header -->
+                <tr class="table-secondary fw-bold">
+                    <td colspan="10">@dateGroup.Key.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)</td>
                 </tr>
-            }
-        </tbody>
+
+                <!-- Per-Day Column Headers (NOT a <thead>) -->
+                <tr class="table-light">
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Portion</th>
+                    <th>Calories</th>
+                    <th>Protein</th>
+                    <th>Carbs</th>
+                    <th>Fats</th>
+                    <th>Fiber</th>
+                </tr>
+
+                @foreach (var meal in dateGroup)
+                {
+                    <tr>
+                        <td>@meal.Date</td>
+                        <td>@meal.Day</td>
+                        <td>@meal.MealType</td>
+                        <td>@meal.MealName</td>
+                        <td>@meal.PortionEaten</td>
+                        <td>@meal.Calories</td>
+                        <td>@meal.Protein</td>
+                        <td>@meal.Carbs</td>
+                        <td>@meal.Fats</td>
+                        <td>@meal.Fiber</td>
+                    </tr>
+                }
+
+                <!-- Totals Row -->
+                <tr class="table-warning fw-bold">
+                    <td colspan="5" class="text-end">Total</td>
+                    <td>@dateGroup.Sum(e => e.Calories)</td>
+                    <td>@dateGroup.Sum(e => e.Protein)</td>
+                    <td>@dateGroup.Sum(e => e.Carbs)</td>
+                    <td>@dateGroup.Sum(e => e.Fats)</td>
+                    <td>@dateGroup.Sum(e => e.Fiber)</td>
+                </tr>
+            </tbody>
+        }
     </table>
 }
 
@@ -126,18 +142,22 @@ else
                 newEntry.Fats = item.Fats * newEntry.PortionEaten;
                 newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
             }
-            
+
             newEntry.Day = newEntry.Date.DayOfWeek.ToString();
             await MealEntryService.AddAsync(newEntry);
 
+            string mealType = newEntry.MealType;
+            DateOnly dateOnly = newEntry.Date;
+
             newEntry = new MealEntry
                 {
-                    Date = DateOnly.FromDateTime(DateTime.Today),
-                    Day = DateTime.Today.DayOfWeek.ToString(),
+                    Date = dateOnly,
+                    Day = dateOnly.DayOfWeek.ToString(),
                     MealName = string.Empty,
-                    MealType = "Breakfast",
+                    MealType = mealType,
                     UserId = string.Empty
                 };
+
             entries = await MealEntryService.GetAllAsync("");
         }
     }
