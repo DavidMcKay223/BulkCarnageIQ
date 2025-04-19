@@ -1,0 +1,170 @@
+﻿@page "/MealTracker"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Contracts
+@inject IMealEntryService MealEntryService
+
+@using BulkCarnageIQ.Core.Carnage
+
+<h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
+
+<div class="mb-4">
+    <EditForm Model="@newEntry" OnValidSubmit="SaveMeal">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row g-2">
+            <div class="col-md-2">
+                <InputDate class="form-control" @bind-Value="newEntry.Date" />
+            </div>
+            <div class="col-md-2">
+                <InputSelect class="form-control" @bind-Value="newEntry.MealType" placeholder="Meal Type">
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Snack">Snack</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-3">
+                <InputText class="form-control" @bind-Value="newEntry.MealName" @oninput="OnMealNameChanged" placeholder="Meal Name" />
+                @if (suggestions.Any())
+                {
+                    <ul class="list-group position-absolute z-index-100">
+                        @foreach (var suggestion in suggestions)
+                        {
+                            <li class="list-group-item list-group-item-action"
+                                @onclick="() => SelectSuggestion(suggestion)">
+                                @suggestion
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-plus-circle"></i> Add
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@if (entries is null)
+{
+    <p><em>Loading meals...</em></p>
+}
+else if (!entries.Any())
+{
+    <p>No meals tracked yet.</p>
+}
+else
+{
+    <table class="table table-hover table-bordered small align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Portion</th>
+                <th>Calories</th>
+                <th>Protein</th>
+                <th>Carbs</th>
+                <th>Fats</th>
+                <th>Fiber</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var meal in entries.OrderByDescending(e => e.Date))
+            {
+                <tr>
+                    <td>@meal.Date</td>
+                    <td>@meal.Day</td>
+                    <td>@meal.MealType</td>
+                    <td>@meal.MealName</td>
+                    <td>@meal.PortionEaten</td>
+                    <td>@meal.Calories</td>
+                    <td>@meal.Protein</td>
+                    <td>@meal.Carbs</td>
+                    <td>@meal.Fats</td>
+                    <td>@meal.Fiber</td>
+                    <td class="fw-bold">@meal.TotalCalories</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<string> suggestions = new();
+    private List<MealEntry>? entries;
+    private MealEntry newEntry = new()
+        {
+            Date = DateOnly.FromDateTime(DateTime.Today),
+            Day = DateTime.Today.DayOfWeek.ToString(),
+            MealType = "Breakfast",
+            MealName = string.Empty,
+            UserId = string.Empty
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        entries = await MealEntryService.GetAllAsync("");
+    }
+
+    private async Task SaveMeal()
+    {
+        if (!string.IsNullOrWhiteSpace(newEntry.MealName))
+        {
+            // Ensure its populated:
+            var item = await MealEntryService.GetFoodItemByNameAsync(newEntry.MealName);
+            if (item is not null)
+            {
+                newEntry.Calories = item.CaloriesPerServing * newEntry.PortionEaten;
+                newEntry.Protein = item.Protein * newEntry.PortionEaten;
+                newEntry.Carbs = item.Carbs * newEntry.PortionEaten;
+                newEntry.Fats = item.Fats * newEntry.PortionEaten;
+                newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
+            }
+            
+            newEntry.Day = newEntry.Date.DayOfWeek.ToString();
+            await MealEntryService.AddAsync(newEntry);
+
+            newEntry = new MealEntry
+                {
+                    Date = DateOnly.FromDateTime(DateTime.Today),
+                    Day = DateTime.Today.DayOfWeek.ToString(),
+                    MealName = string.Empty,
+                    MealType = "Breakfast",
+                    UserId = string.Empty
+                };
+            entries = await MealEntryService.GetAllAsync("");
+        }
+    }
+
+    private async Task OnMealNameChanged(ChangeEventArgs e)
+    {
+        var input = e.Value?.ToString() ?? string.Empty;
+
+        if (input.Length >= 2) // Optional: only start searching after 2 characters
+        {
+            suggestions = await MealEntryService.SearchFoodNamesAsync(input);
+        }
+        else
+        {
+            suggestions.Clear();
+        }
+    }
+
+    private async void SelectSuggestion(string selected)
+    {
+        newEntry.MealName = selected;
+        suggestions.Clear();
+
+        var item = await MealEntryService.GetFoodItemByNameAsync(selected);
+        if (item is not null)
+        {
+            newEntry.PortionEaten = item.Servings;
+        }
+    }
+}

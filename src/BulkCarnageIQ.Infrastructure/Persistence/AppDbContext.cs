@@ -14,7 +14,8 @@ namespace BulkCarnageIQ.Infrastructure.Persistence
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
-        DbSet<FoodItem> FoodItems { get; set; } = null!;
+        public DbSet<FoodItem> FoodItems { get; set; } = null!;
+        public DbSet<MealEntry> MealEntries { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

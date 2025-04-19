@@ -5,6 +5,8 @@ using BulkCarnageIQ.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BulkCarnageIQ.Core.Contracts;
+using BulkCarnageIQ.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+// DI:
+builder.Services.AddScoped<IMealEntryService, MealEntryService>();
 
 var app = builder.Build();
 
