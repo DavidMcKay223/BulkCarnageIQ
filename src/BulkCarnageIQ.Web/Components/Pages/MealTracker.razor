@@ -61,51 +61,57 @@ else
     <table class="table table-hover table-bordered small align-middle">
         @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
         {
+            var date = dateGroup.Key;
+
             <tbody class="table-group-divider">
-                <!-- Day Header -->
-                <tr class="table-secondary fw-bold">
-                    <td colspan="10">@dateGroup.Key.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)</td>
+                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleDate(date))" style="cursor: pointer;">
+                    <td colspan="7">
+                        <i class="bi @(IsExpanded(date) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
+                        @date.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)
+                    </td>
                 </tr>
 
-                <!-- Per-Day Column Headers (NOT a <thead>) -->
-                <tr class="table-light">
-                    <th>Date</th>
-                    <th>Day</th>
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Portion</th>
-                    <th>Calories</th>
-                    <th>Protein</th>
-                    <th>Carbs</th>
-                    <th>Fats</th>
-                    <th>Fiber</th>
-                </tr>
-
-                @foreach (var meal in dateGroup)
+                @if (IsExpanded(date))
                 {
-                    <tr>
-                        <td>@meal.Date</td>
-                        <td>@meal.Day</td>
-                        <td>@meal.MealType</td>
-                        <td>@meal.MealName</td>
-                        <td>@meal.PortionEaten</td>
-                        <td>@meal.Calories</td>
-                        <td>@meal.Protein</td>
-                        <td>@meal.Carbs</td>
-                        <td>@meal.Fats</td>
-                        <td>@meal.Fiber</td>
+                    @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType))
+                    {
+                        <tr class="fw-bold table-info">
+                            <td colspan="7">@mealGroup.Key</td>
+                        </tr>
+
+                        <tr class="table-light">
+                            <th>Name</th>
+                            <th>Portion</th>
+                            <th>Calories</th>
+                            <th>Protein</th>
+                            <th>Carbs</th>
+                            <th>Fats</th>
+                            <th>Fiber</th>
+                        </tr>
+
+                        @foreach (var meal in mealGroup)
+                        {
+                            <tr>
+                                <td>@meal.MealName</td>
+                                <td>@meal.PortionEaten</td>
+                                <td>@meal.Calories</td>
+                                <td>@meal.Protein</td>
+                                <td>@meal.Carbs</td>
+                                <td>@meal.Fats</td>
+                                <td>@meal.Fiber</td>
+                            </tr>
+                        }
+                    }
+
+                    <tr class="table-warning fw-bold">
+                        <td colspan="2" class="text-end">Total</td>
+                        <td>@dateGroup.Sum(e => e.Calories)</td>
+                        <td>@dateGroup.Sum(e => e.Protein)</td>
+                        <td>@dateGroup.Sum(e => e.Carbs)</td>
+                        <td>@dateGroup.Sum(e => e.Fats)</td>
+                        <td>@dateGroup.Sum(e => e.Fiber)</td>
                     </tr>
                 }
-
-                <!-- Totals Row -->
-                <tr class="table-warning fw-bold">
-                    <td colspan="5" class="text-end">Total</td>
-                    <td>@dateGroup.Sum(e => e.Calories)</td>
-                    <td>@dateGroup.Sum(e => e.Protein)</td>
-                    <td>@dateGroup.Sum(e => e.Carbs)</td>
-                    <td>@dateGroup.Sum(e => e.Fats)</td>
-                    <td>@dateGroup.Sum(e => e.Fiber)</td>
-                </tr>
             </tbody>
         }
     </table>
@@ -187,4 +193,16 @@ else
             newEntry.PortionEaten = item.Servings;
         }
     }
+}
+
+@code {
+    private HashSet<DateOnly> expandedDates = new();
+
+    private void ToggleDate(DateOnly date)
+    {
+        if (!expandedDates.Add(date))
+            expandedDates.Remove(date);
+    }
+
+    private bool IsExpanded(DateOnly date) => !expandedDates.Contains(date);
 }
