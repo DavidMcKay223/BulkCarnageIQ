@@ -76,11 +76,7 @@ else
                     @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType))
                     {
                         <tr class="fw-bold table-info">
-                            <td colspan="7">@mealGroup.Key</td>
-                        </tr>
-
-                        <tr class="table-light">
-                            <th>Name</th>
+                            <td>@mealGroup.Key</td>
                             <th>Portion</th>
                             <th>Calories</th>
                             <th>Protein</th>
