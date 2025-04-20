@@ -29,10 +29,11 @@ else
                 <div class="card h-100 shadow rounded-4 border-0">
                     @if (!string.IsNullOrEmpty(item.PictureLink))
                     {
-                        <img src="@item.PictureLink"
-                             alt="@item.RecipeName"
-                             class="card-img-top img-fluid rounded-top"
-                             style="max-height: 300px; width: 100%; height: auto; object-fit: contain;" />
+                        <img src="@item.PictureLink" alt="@item.RecipeName" class="card-img-top img-fluid rounded-top" style="max-height: 300px; width: 100%; height: auto; object-fit: contain;" />
+                    }
+                    else
+                    {
+                        <img src="photos/FoodItemPlaceHolder.jpg" alt="@item.RecipeName" class="card-img-top img-fluid rounded-top" style="max-height: 300px; width: 100%; height: auto; object-fit: contain;" />
                     }
 
                     <div class="card-body d-flex flex-column">
@@ -40,6 +41,29 @@ else
                             @item.RecipeName
                             <span class="badge bg-secondary">@item.BrandType</span>
                         </h5>
+
+                        <p class="text-muted small mb-2">
+                            @item.Servings x @item.MeasurementServings @item.MeasurementType
+                        </p>
+
+                        <div class="mb-2">
+                            @if (item.IsBreakfast)
+                            {
+                                <span class="badge bg-warning text-dark me-1"><i class="bi bi-sunrise"></i> Breakfast</span>
+                            }
+                            @if (item.IsLunch)
+                            {
+                                <span class="badge bg-success text-white me-1"><i class="bi bi-box"></i> Lunch</span>
+                            }
+                            @if (item.IsDinner)
+                            {
+                                <span class="badge bg-dark text-white me-1"><i class="bi bi-moon"></i> Dinner</span>
+                            }
+                            @if (item.IsSnack)
+                            {
+                                <span class="badge bg-info text-dark me-1"><i class="bi bi-cookie"></i> Snack</span>
+                            }
+                        </div>
 
                         <div class="mb-2">
                             @if (item.IsHighProtein)
