@@ -1,7 +1,91 @@
 ﻿@page "/FoodList"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IFoodItemService FoodItemService
 
 <PageTitle>Food List</PageTitle>
 
-@code {
+<h2 class="my-4 text-center">
+    <i class="bi bi-egg-fried"></i> Food Items
+</h2>
 
+@if (foodItems == null)
+{
+    <div class="text-center my-5">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else if (foodItems.Count == 0)
+{
+    <p>No food items found.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var item in foodItems)
+        {
+            <div class="col">
+                <div class="card h-100 shadow rounded-4 border-0">
+                    @if (!string.IsNullOrEmpty(item.PictureLink))
+                    {
+                        <img src="@item.PictureLink"
+                             alt="@item.RecipeName"
+                             class="card-img-top img-fluid rounded-top"
+                             style="max-height: 300px; width: 100%; height: auto; object-fit: contain;" />
+                    }
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title d-flex justify-content-between align-items-center">
+                            @item.RecipeName
+                            <span class="badge bg-secondary">@item.BrandType</span>
+                        </h5>
+
+                        <div class="mb-2">
+                            @if (item.IsHighProtein)
+                            {
+                                <span class="badge bg-success me-1"><i class="bi bi-fire"></i> High Protein</span>
+                            }
+                            @if (item.IsKeto)
+                            {
+                                <span class="badge bg-warning text-dark me-1"><i class="bi bi-droplet-half"></i> Keto</span>
+                            }
+                            @if (item.IsLowCarb)
+                            {
+                                <span class="badge bg-info text-dark me-1"><i class="bi bi-arrow-down-circle"></i> Low Carb</span>
+                            }
+                            @if (item.IsBulkMeal)
+                            {
+                                <span class="badge bg-danger me-1"><i class="bi bi-graph-up"></i> Bulk</span>
+                            }
+                        </div>
+
+                        <ul class="list-group list-group-flush small mb-3">
+                            <li class="list-group-item"><i class="bi bi-lightning-charge"></i> <strong>Calories:</strong> @item.TotalCalories</li>
+                            <li class="list-group-item"><i class="bi bi-bar-chart-line"></i> <strong>Protein:</strong> @item.Protein g</li>
+                            <li class="list-group-item"><i class="bi bi-cup-straw"></i> <strong>Carbs:</strong> @item.Carbs g</li>
+                            <li class="list-group-item"><i class="bi bi-droplet"></i> <strong>Fats:</strong> @item.Fats g</li>
+                            <li class="list-group-item"><i class="bi bi-flower3"></i> <strong>Fiber:</strong> @item.Fiber g</li>
+                        </ul>
+
+                        @if (!string.IsNullOrEmpty(item.Link))
+                        {
+                            <a href="@item.Link" class="btn btn-outline-primary btn-sm mt-auto" target="_blank">
+                                <i class="bi bi-box-arrow-up-right"></i> Nutrition Info
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<FoodItem>? foodItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        foodItems = await FoodItemService.GetAllAsync();
+    }
 }

@@ -40,6 +40,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 // DI:
 builder.Services.AddScoped<IMealEntryService, MealEntryService>();
+builder.Services.AddScoped<IFoodItemService, FoodItemService>();
 
 var app = builder.Build();
 
