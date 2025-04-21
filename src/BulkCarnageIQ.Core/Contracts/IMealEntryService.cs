@@ -14,5 +14,7 @@ namespace BulkCarnageIQ.Core.Contracts
 
         Task<FoodItem?> GetFoodItemByNameAsync(string foodName);
         Task<List<string>> SearchFoodNamesAsync(string query);
+
+        Task<Dictionary<string, float>> GetCaloriesByDayAsync(string userId, int daysBack = 7);
     }
 }

@@ -63,5 +63,21 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             _db.MealEntries.Add(entry);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<Dictionary<string, float>> GetCaloriesByDayAsync(string userId, int daysBack = 7)
+        {
+            var since = DateOnly.FromDateTime(DateTime.Today.AddDays(-daysBack));
+
+            var entries = await _db.MealEntries
+                .Where(me => me.UserId == userId && me.Date >= since)
+                .ToListAsync();
+
+            return entries
+                .GroupBy(me => me.Day)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Sum(me => me.Calories)
+                );
+        }
     }
 }

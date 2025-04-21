@@ -1,5 +1,48 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IMealEntryService MealService
+@inject AuthenticationStateProvider AuthProvider
 
-<PageTitle>Home</PageTitle>
+<h3>Calories This Week</h3>
 
+@if (labels != null && calories != null)
+{
+    <BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart @ref="CalorieBarChart" Labels="labels" Data="calories" ChartLabel="Calories Eaten" />
+}
+else
+{
+    <p>Loading...</p>
+}
 
+@code {
+    private List<string>? labels;
+    private List<int>? calories;
+
+    private BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart? CalorieBarChart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            var data = await MealService.GetCaloriesByDayAsync(userId);
+
+            // Sort by weekday order
+            string[] weekdayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            labels = weekdayOrder.Where(day => data.ContainsKey(day)).ToList();
+            calories = labels.Select(day => (int)data[day]).ToList();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (CalorieBarChart != null)
+        {
+            await CalorieBarChart.InitializeChart();
+        }
+    }
+}

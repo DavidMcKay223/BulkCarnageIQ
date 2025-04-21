@@ -26,8 +26,6 @@ namespace BulkCarnageIQ.Core.Carnage
         public float Fats { get; set; }
         public float Fiber { get; set; }
 
-        public float TotalCalories => PortionEaten * Calories;
-
         public required string UserId { get; set; } // User ID for the meal entry
     }
 }

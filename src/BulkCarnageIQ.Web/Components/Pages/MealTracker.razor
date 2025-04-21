@@ -3,6 +3,7 @@
 @using BulkCarnageIQ.Core.Carnage
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
+@inject AuthenticationStateProvider AuthProvider
 
 <h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
 
@@ -126,12 +127,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        entries = await MealEntryService.GetAllAsync("");
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+
+        entries = await MealEntryService.GetAllAsync(userId);
     }
 
     private async Task SaveMeal()
     {
-        if (!string.IsNullOrWhiteSpace(newEntry.MealName))
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+
+        if (!string.IsNullOrWhiteSpace(newEntry.MealName) && !string.IsNullOrWhiteSpace(userId))
         {
             // Ensure its populated:
             var item = await MealEntryService.GetFoodItemByNameAsync(newEntry.MealName);
@@ -145,6 +152,7 @@ else
             }
 
             newEntry.Day = newEntry.Date.DayOfWeek.ToString();
+            newEntry.UserId = userId;
             await MealEntryService.AddAsync(newEntry);
 
             string mealType = newEntry.MealType;
@@ -159,7 +167,7 @@ else
                     UserId = string.Empty
                 };
 
-            entries = await MealEntryService.GetAllAsync("");
+            entries = await MealEntryService.GetAllAsync(userId);
         }
     }
 

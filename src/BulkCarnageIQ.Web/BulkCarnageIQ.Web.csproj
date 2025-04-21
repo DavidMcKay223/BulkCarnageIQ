@@ -21,8 +21,4 @@
     <ProjectReference Include="..\BulkCarnageIQ.Application\BulkCarnageIQ.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Carnage\" />
-  </ItemGroup>
-
 </Project>

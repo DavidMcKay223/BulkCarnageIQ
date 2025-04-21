@@ -1,0 +1,23 @@
+﻿@using Microsoft.JSInterop
+@using Microsoft.Extensions.Hosting
+@inject IJSRuntime JSRuntime
+
+<canvas id="calorieChart"></canvas>
+
+@code {
+    [Parameter] public List<string> Labels { get; set; }
+    [Parameter] public List<int> Data { get; set; }
+    [Parameter] public string ChartLabel { get; set; }
+
+    public async Task InitializeChart()
+    {
+        var chartData = new
+        {
+            labels = Labels,
+            values = Data,
+            datasetLabel = ChartLabel
+        };
+
+        await JSRuntime.InvokeVoidAsync("renderBarChart", "calorieChart", chartData);
+    }
+}
