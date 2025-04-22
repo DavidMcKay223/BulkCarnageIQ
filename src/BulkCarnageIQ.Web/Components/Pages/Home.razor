@@ -5,10 +5,9 @@
 @inject IMealEntryService MealService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3>Calories This Week</h3>
-
 @if (labels != null && calories != null)
 {
+    <h3>Calories This Week</h3>
     <BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart @ref="CalorieBarChart" Labels="labels" Data="calories" ChartLabel="Calories Eaten" />
 }
 

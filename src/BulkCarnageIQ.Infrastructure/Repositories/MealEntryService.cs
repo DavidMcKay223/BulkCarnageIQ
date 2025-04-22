@@ -64,7 +64,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             await _db.SaveChangesAsync();
         }
 
-        public async Task<Dictionary<string, float>> GetCaloriesByDayAsync(string userId, int daysBack = 7)
+        public async Task<Dictionary<string, float>> GetCaloriesByDayAsync(string userId, int daysBack = 6)
         {
             var since = DateOnly.FromDateTime(DateTime.Today.AddDays(-daysBack));
 

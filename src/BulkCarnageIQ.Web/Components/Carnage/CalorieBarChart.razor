@@ -5,9 +5,9 @@
 <canvas id="calorieChart"></canvas>
 
 @code {
-    [Parameter] public List<string> Labels { get; set; }
-    [Parameter] public List<int> Data { get; set; }
-    [Parameter] public string ChartLabel { get; set; }
+    [Parameter] public List<string>? Labels { get; set; }
+    [Parameter] public List<int>? Data { get; set; }
+    [Parameter] public string? ChartLabel { get; set; }
 
     public async Task InitializeChart()
     {
