@@ -1,4 +1,5 @@
 ﻿using BulkCarnageIQ.Core.Carnage;
+using BulkCarnageIQ.Core.Carnage.Report;
 using BulkCarnageIQ.Core.Contracts;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -78,6 +79,51 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                     g => g.Key,
                     g => g.Sum(me => me.Calories)
                 );
+        }
+
+        public async Task<MacroSummary> GetMacroSummaryAsync(DateOnly date, string userId)
+        {
+            var entries = await _db.MealEntries
+                .Where(m => m.UserId == userId && m.Date == date)
+                .ToListAsync();
+
+            return new MacroSummary
+            {
+                Protein = entries.Sum(e => e.Protein),
+                Carbs = entries.Sum(e => e.Carbs),
+                Fats = entries.Sum(e => e.Fats),
+                Fiber = entries.Sum(e => e.Fiber)
+            };
+        }
+
+        public async Task<Dictionary<string, MacroSummary>> GetMacroSummariesByDateRangeAsync(DateOnly start, DateOnly end, string userId)
+        {
+            var entries = await _db.MealEntries
+                .Where(m => m.UserId == userId && m.Date >= start && m.Date <= end)
+                .ToListAsync();
+
+            var grouped = entries
+                .GroupBy(m => m.Day)
+                .ToDictionary(
+                    g => g.Key,
+                    g => new MacroSummary
+                    {
+                        Protein = g.Sum(m => m.Protein),
+                        Carbs = g.Sum(m => m.Carbs),
+                        Fats = g.Sum(m => m.Fats),
+                        Fiber = g.Sum(m => m.Fiber),
+                    });
+
+            // Define the full week in order
+            var weekdayOrder = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+            // Return a sorted dictionary with all 7 days
+            var result = weekdayOrder.ToDictionary(
+                day => day,
+                day => grouped.ContainsKey(day) ? grouped[day] : new MacroSummary()
+            );
+
+            return result;
         }
     }
 }

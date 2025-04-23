@@ -1,0 +1,69 @@
+﻿@using BulkCarnageIQ.Core.Carnage.Report
+
+<div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Day</th>
+                @foreach (var macro in MacroNames)
+                {
+                    <th>@macro</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @if (WeeklyData != null)
+            {
+                foreach (var day in WeeklyData)
+                {
+                    <tr>
+                        <td class="fw-bold">@day.Key</td>
+                        @foreach (var macro in MacroNames)
+                        {
+                            var value = GetMacroValue(day.Value, macro);
+                            var goal = GetGoal(macro);
+                            var css = GetCellClass(value, goal);
+                            <td class="@css">@value g / @goal g</td>
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter] public Dictionary<string, MacroSummary> WeeklyData { get; set; } = new();
+    [Parameter] public float ProteinGoal { get; set; } = 120f;
+    [Parameter] public float CarbsGoal { get; set; } = 220f;
+    [Parameter] public float FatsGoal { get; set; } = 80f;
+    [Parameter] public float FiberGoal { get; set; } = 25f;
+
+    private readonly string[] MacroNames = ["Protein", "Carbs", "Fats", "Fiber"];
+
+    private float GetMacroValue(MacroSummary summary, string macro) => macro switch
+    {
+        "Protein" => summary.Protein,
+        "Carbs" => summary.Carbs,
+        "Fats" => summary.Fats,
+        "Fiber" => summary.Fiber,
+        _ => 0f
+    };
+
+    private float GetGoal(string macro) => macro switch
+    {
+        "Protein" => ProteinGoal,
+        "Carbs" => CarbsGoal,
+        "Fats" => FatsGoal,
+        "Fiber" => FiberGoal,
+        _ => 0f
+    };
+
+    private string GetCellClass(float value, float goal)
+    {
+        var ratio = value / goal;
+        if (ratio > 1.0) return "bg-danger text-white";
+        if (ratio >= 0.85f) return "bg-warning";
+        return "bg-success text-white";
+    }
+}

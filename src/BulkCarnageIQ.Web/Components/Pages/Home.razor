@@ -1,19 +1,48 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Carnage.Report
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealService
 @inject AuthenticationStateProvider AuthProvider
 
-@if (labels != null && calories != null)
-{
-    <h3>Calories This Week</h3>
-    <BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart @ref="CalorieBarChart" Labels="labels" Data="calories" ChartLabel="Calories Eaten" />
-}
+<div class="container mt-4">
+    @if (DailyMacros != null)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3"><i class="bi bi-nut me-2"></i> Macros Today</h4>
+                <BulkCarnageIQ.Web.Components.Carnage.MacroAlertPanel DailyMacros="DailyMacros" />
+            </div>
+        </div>
+    }
+
+    @if (WeeklyMacros != null)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3"><i class="bi bi-graph-up-arrow me-2"></i> Macro Heatmap This Week</h4>
+                <BulkCarnageIQ.Web.Components.Carnage.WeeklyMacroHeatmap WeeklyData="WeeklyMacros" />
+            </div>
+        </div>
+    }
+
+    @if (labels != null && calories != null)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3"><i class="bi bi-graph-up-arrow me-2"></i> Calories This Week</h4>
+                <BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart @ref="CalorieBarChart" Labels="labels" Data="calories" ChartLabel="Calories Eaten" />
+            </div>
+        </div>
+    }
+</div>
 
 @code {
     private List<string>? labels;
     private List<int>? calories;
+    private MacroSummary? DailyMacros;
+    private Dictionary<string, MacroSummary>? WeeklyMacros;
 
     private BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart? CalorieBarChart;
 
@@ -30,6 +59,16 @@
             string[] weekdayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
             labels = weekdayOrder.Where(day => data.ContainsKey(day)).ToList();
             calories = labels.Select(day => (int)data[day]).ToList();
+
+            // Daily Macros:
+            DailyMacros = await MealService.GetMacroSummaryAsync(DateOnly.FromDateTime(DateTime.Today), userId);
+
+            // Weekly Macros:
+            WeeklyMacros = await MealService.GetMacroSummariesByDateRangeAsync(
+                DateOnly.FromDateTime(DateTime.Today.AddDays(-6)),
+                DateOnly.FromDateTime(DateTime.Today),
+                userId
+            );
         }
     }
 

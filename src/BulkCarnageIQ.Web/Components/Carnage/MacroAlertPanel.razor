@@ -1,0 +1,62 @@
+﻿@using BulkCarnageIQ.Core.Carnage.Report
+
+@if (DailyMacros != null)
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+        @foreach (var macro in GetMacros())
+        {
+            <div class="col">
+                <div class="p-4 border rounded-xl shadow-md bg-white">
+                    <div class="d-flex justify-content-between font-weight-bold">
+                        <span>@macro.Name</span>
+                        <span>@macro.Current g / @macro.Goal g</span>
+                    </div>
+                    <div class="w-100 h-3 bg-secondary rounded-3 overflow-hidden mt-2">
+                        <div class="@GetBarColor(macro.Current, macro.Goal) h-100" style="width:@GetBarWidth(macro.Current, macro.Goal)"></div>
+                    </div>
+                    <p class="text-muted mt-1">@GetStatus(macro.Current, macro.Goal)</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public MacroSummary? DailyMacros { get; set; }
+
+    // Method to return the macro values
+    private IEnumerable<(string Name, float Current, float Goal)> GetMacros()
+    {
+        if (DailyMacros == null) return[];
+
+        return new[]
+        {
+            ("Protein", DailyMacros.Protein, 120f),
+            ("Carbs", DailyMacros.Carbs, 220f),
+            ("Fats", DailyMacros.Fats, 80f),
+            ("Fiber", DailyMacros.Fiber, 25f)
+        };
+    }
+
+    private string GetStatus(float current, float goal)
+    {
+        var ratio = current / goal;
+        if (ratio > 1.0) return $"🔴 Over Limit by {current - goal:F1}g";
+        if (ratio >= 0.85) return "🟡 Getting Close";
+        return "🟢 On Track";
+    }
+
+    private string GetBarColor(float current, float goal)
+    {
+        var ratio = current / goal;
+        if (ratio > 1.0) return "bg-red-500";
+        if (ratio >= 0.85) return "bg-yellow-400";
+        return "bg-green-500";
+    }
+
+    private string GetBarWidth(float current, float goal)
+    {
+        var width = Math.Min(current / goal * 100, 100);
+        return $"{width}%";
+    }
+}
