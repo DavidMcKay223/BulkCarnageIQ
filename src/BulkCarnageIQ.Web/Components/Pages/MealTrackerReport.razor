@@ -1,0 +1,170 @@
+﻿@page "/MealTrackerReport"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IMealEntryService MealEntryService
+@inject AuthenticationStateProvider AuthProvider
+
+<h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
+
+@if (entries is null)
+{
+    <p><em>Loading meals...</em></p>
+}
+else if (!entries.Any())
+{
+    <p>No meals tracked yet.</p>
+}
+else
+{
+    <table class="table table-hover table-bordered small align-middle">
+        @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
+        {
+            var date = dateGroup.Key;
+
+            <tbody class="table-group-divider">
+                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleDate(date))" style="cursor: pointer;">
+                    <td colspan="7">
+                        <i class="bi @(IsExpanded(date) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
+                        @date.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)
+                    </td>
+                </tr>
+
+                @if (IsExpanded(date))
+                {
+                    @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType))
+                    {
+                        <tr class="fw-bold table-info">
+                            <td>@mealGroup.Key</td>
+                            <th>Portion</th>
+                            <th>Calories</th>
+                            <th>Protein</th>
+                            <th>Carbs</th>
+                            <th>Fats</th>
+                            <th>Fiber</th>
+                        </tr>
+
+                        @foreach (var meal in mealGroup)
+                        {
+                            <tr>
+                                <td>@meal.MealName</td>
+                                <td>@meal.PortionEaten</td>
+                                <td>@meal.Calories</td>
+                                <td>@meal.Protein</td>
+                                <td>@meal.Carbs</td>
+                                <td>@meal.Fats</td>
+                                <td>@meal.Fiber</td>
+                            </tr>
+                        }
+                    }
+
+                    <tr class="table-warning fw-bold">
+                        <td colspan="2" class="text-end">Total</td>
+                        <td>@dateGroup.Sum(e => e.Calories)</td>
+                        <td>@dateGroup.Sum(e => e.Protein)</td>
+                        <td>@dateGroup.Sum(e => e.Carbs)</td>
+                        <td>@dateGroup.Sum(e => e.Fats)</td>
+                        <td>@dateGroup.Sum(e => e.Fiber)</td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+}
+
+@code {
+    private List<string> suggestions = new();
+    private List<MealEntry>? entries;
+    private MealEntry newEntry = new()
+        {
+            Date = DateOnly.FromDateTime(DateTime.Today),
+            Day = DateTime.Today.DayOfWeek.ToString(),
+            MealType = "Breakfast",
+            MealName = string.Empty,
+            UserId = string.Empty
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+
+        entries = await MealEntryService.GetAllAsync(userId);
+    }
+
+    private async Task SaveMeal()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+
+        if (!string.IsNullOrWhiteSpace(newEntry.MealName) && !string.IsNullOrWhiteSpace(userId))
+        {
+            // Ensure its populated:
+            var item = await MealEntryService.GetFoodItemByNameAsync(newEntry.MealName);
+            if (item is not null)
+            {
+                newEntry.Calories = item.CaloriesPerServing * newEntry.PortionEaten;
+                newEntry.Protein = item.Protein * newEntry.PortionEaten;
+                newEntry.Carbs = item.Carbs * newEntry.PortionEaten;
+                newEntry.Fats = item.Fats * newEntry.PortionEaten;
+                newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
+            }
+
+            newEntry.Day = newEntry.Date.DayOfWeek.ToString();
+            newEntry.UserId = userId;
+            await MealEntryService.AddAsync(newEntry);
+
+            string mealType = newEntry.MealType;
+            DateOnly dateOnly = newEntry.Date;
+
+            newEntry = new MealEntry
+                {
+                    Date = dateOnly,
+                    Day = dateOnly.DayOfWeek.ToString(),
+                    MealName = string.Empty,
+                    MealType = mealType,
+                    UserId = string.Empty
+                };
+
+            entries = await MealEntryService.GetAllAsync(userId);
+        }
+    }
+
+    private async Task OnMealNameChanged(ChangeEventArgs e)
+    {
+        var input = e.Value?.ToString() ?? string.Empty;
+
+        if (input.Length >= 2) // Optional: only start searching after 2 characters
+        {
+            suggestions = await MealEntryService.SearchFoodNamesAsync(input);
+        }
+        else
+        {
+            suggestions.Clear();
+        }
+    }
+
+    private async void SelectSuggestion(string selected)
+    {
+        newEntry.MealName = selected;
+        suggestions.Clear();
+
+        var item = await MealEntryService.GetFoodItemByNameAsync(selected);
+        if (item is not null)
+        {
+            newEntry.PortionEaten = item.Servings;
+        }
+    }
+}
+
+@code {
+    private HashSet<DateOnly> expandedDates = new();
+
+    private void ToggleDate(DateOnly date)
+    {
+        if (!expandedDates.Add(date))
+            expandedDates.Remove(date);
+    }
+
+    private bool IsExpanded(DateOnly date) => !expandedDates.Contains(date);
+}
