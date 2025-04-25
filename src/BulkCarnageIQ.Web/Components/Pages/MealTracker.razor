@@ -66,7 +66,7 @@ else
     {
         <div class="mb-4">
             <h5 class="text-primary mb-3">
-                <span role="button" @onclick="@(() => ToggleDate(dateGroup.Key))"><i class="bi @(IsExpanded(dateGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>@dateGroup.Key.ToString("MMMM dd, yyyy")</span>
+                <span role="button" @onclick="@(() => ToggleDate(dateGroup.Key))"><i class="bi @(IsExpanded(dateGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>@dateGroup.Key.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)</span>
             </h5>
 
             @if (IsExpanded(dateGroup.Key))
@@ -90,7 +90,7 @@ else
                                     <li class="list-group-item">
                                         <div class="row align-items-center g-2">
                                             <div class="col-lg-3 col-md-12 fw-bold">
-                                                @meal.MealName
+                                                @meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)
                                             </div>
                                             <div class="col-lg-2 col-md-3">
                                                 <label class="form-label visually-hidden">Portion for @meal.MealName</label>
@@ -273,6 +273,8 @@ else
             meal.Carbs = item.Carbs * meal.PortionEaten;
             meal.Fats = item.Fats * meal.PortionEaten;
             meal.Fiber = item.Fiber * meal.PortionEaten;
+            meal.MeasurementServings = item.MeasurementServings * meal.PortionEaten;
+            meal.MeasurementType = item.MeasurementType;
 
             try
             {

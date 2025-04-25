@@ -47,7 +47,7 @@ else
                         @foreach (var meal in mealGroup)
                         {
                             <tr>
-                                <td>@meal.MealName</td>
+                                <td>@meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)</td>
                                 <td>@meal.PortionEaten</td>
                                 <td>@meal.Calories</td>
                                 <td>@meal.Protein</td>

@@ -18,6 +18,8 @@ namespace BulkCarnageIQ.Core.Carnage
         public required string MealName { get; set; } // Must not be empty to save
 
         public float PortionEaten { get; set; } = 1f;
+        public float? MeasurementServings { get; set; }  // e.g., 0.25
+        public string? MeasurementType { get; set; }     // e.g., "Cup", "Part", "Ounces", etc.
 
         // Optional nutrition info per portion
         public float Calories { get; set; }

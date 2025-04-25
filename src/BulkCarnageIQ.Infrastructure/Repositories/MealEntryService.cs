@@ -80,6 +80,9 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                 existingEntry.Carbs = entry.Carbs;
                 existingEntry.Fats = entry.Fats;
                 existingEntry.Fiber = entry.Fiber;
+                existingEntry.MeasurementServings = entry.MeasurementServings;
+                existingEntry.MeasurementType = entry.MeasurementType;
+                
                 await _db.SaveChangesAsync();
             }
         }
