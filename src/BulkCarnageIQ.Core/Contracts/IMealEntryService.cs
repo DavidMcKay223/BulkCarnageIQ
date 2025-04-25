@@ -12,6 +12,8 @@ namespace BulkCarnageIQ.Core.Contracts
     {
         Task<List<MealEntry>> GetAllAsync(string userID);
         Task AddAsync(MealEntry entry);
+        Task UpdateAsync(MealEntry entry);
+        Task DeleteAsync(int Id);
 
         Task<FoodItem?> GetFoodItemByNameAsync(string foodName);
         Task<List<string>> SearchFoodNamesAsync(string query);

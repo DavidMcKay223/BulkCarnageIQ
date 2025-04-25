@@ -4,6 +4,7 @@
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
 @inject AuthenticationStateProvider AuthProvider
+@using System.Linq
 
 <h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
 
@@ -12,34 +13,37 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="row g-2">
+        <div class="row g-2 align-items-end">
             <div class="col-md-2">
+                <label class="form-label">Date</label>
                 <InputDate class="form-control" @bind-Value="newEntry.Date" />
             </div>
             <div class="col-md-2">
-                <InputSelect class="form-control" @bind-Value="newEntry.MealType" placeholder="Meal Type">
+                <label class="form-label">Meal Type</label>
+                <InputSelect class="form-control" @bind-Value="newEntry.MealType">
                     <option value="Breakfast">Breakfast</option>
                     <option value="Lunch">Lunch</option>
                     <option value="Dinner">Dinner</option>
                     <option value="Snack">Snack</option>
                 </InputSelect>
             </div>
-            <div class="col-md-3">
-                <InputText class="form-control" @bind-Value="newEntry.MealName" @oninput="OnMealNameChanged" placeholder="Meal Name" />
+            <div class="col-md position-relative">
+                <label class="form-label">Meal Name</label>
+                <InputText class="form-control" @bind-Value="newEntry.MealName" @oninput="OnMealNameChanged" placeholder="Type to search..." />
                 @if (suggestions.Any())
                 {
-                    <ul class="list-group position-absolute z-index-100">
+                    <ul class="list-group position-absolute w-100" style="z-index: 1050;">
                         @foreach (var suggestion in suggestions)
                         {
                             <li class="list-group-item list-group-item-action"
-                            @onclick="() => SelectSuggestion(suggestion)">
+                                @onclick="() => SelectSuggestion(suggestion)" role="button">
                                 @suggestion
                             </li>
                         }
                     </ul>
                 }
             </div>
-            <div class="col-md-2 text-end">
+            <div class="col-md-auto">
                 <button type="submit" class="btn btn-success w-100">
                     <i class="bi bi-plus-circle"></i> Add
                 </button>
@@ -58,124 +62,184 @@ else if (!entries.Any())
 }
 else
 {
-    <table class="table table-hover table-bordered small align-middle">
-        @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
-        {
-            var date = dateGroup.Key;
+    @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
+    {
+        <div class="mb-4">
+            <h5 class="text-primary mb-3">
+                <span role="button" @onclick="@(() => ToggleDate(dateGroup.Key))"><i class="bi @(IsExpanded(dateGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>@dateGroup.Key.ToString("MMMM dd, yyyy")</span>
+            </h5>
 
-            <tbody class="table-group-divider">
-                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleDate(date))" style="cursor: pointer;">
-                    <td colspan="7">
-                        <i class="bi @(IsExpanded(date) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
-                        @date.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)
-                    </td>
-                </tr>
-
-                @if (IsExpanded(date))
+            @if (IsExpanded(dateGroup.Key))
+            {
+                @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType).OrderBy(mg => GetMealTypeOrder(mg.Key)))
                 {
-                    @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType))
-                    {
-                        <tr class="fw-bold table-info">
-                            <td>@mealGroup.Key</td>
-                            <th>Portion</th>
-                            <th>Calories</th>
-                            <th>Protein</th>
-                            <th>Carbs</th>
-                            <th>Fats</th>
-                            <th>Fiber</th>
-                        </tr>
-
-                        @foreach (var meal in mealGroup)
-                        {
-                            <tr>
-                                <td>@meal.MealName</td>
-                                <td>@meal.PortionEaten</td>
-                                <td>@meal.Calories</td>
-                                <td>@meal.Protein</td>
-                                <td>@meal.Carbs</td>
-                                <td>@meal.Fats</td>
-                                <td>@meal.Fiber</td>
-                            </tr>
-                        }
-                    }
-
-                    <tr class="table-warning fw-bold">
-                        <td colspan="2" class="text-end">Total</td>
-                        <td>@dateGroup.Sum(e => e.Calories)</td>
-                        <td>@dateGroup.Sum(e => e.Protein)</td>
-                        <td>@dateGroup.Sum(e => e.Carbs)</td>
-                        <td>@dateGroup.Sum(e => e.Fats)</td>
-                        <td>@dateGroup.Sum(e => e.Fiber)</td>
-                    </tr>
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0 me-3"><i class="bi bi-egg-fried me-2"></i>@mealGroup.Key</h6>
+                            <small class="text-muted text-nowrap">
+                                Total: @mealGroup.Sum(m => m.Calories).ToString("N0") Cal
+                                | P:@mealGroup.Sum(m => m.Protein).ToString("N1")g
+                                | C:@mealGroup.Sum(m => m.Carbs).ToString("N1")g
+                                | F:@mealGroup.Sum(m => m.Fats).ToString("N1")g
+                            </small>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                @foreach (var meal in mealGroup)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="row align-items-center g-2">
+                                            <div class="col-lg-3 col-md-12 fw-bold">
+                                                @meal.MealName
+                                            </div>
+                                            <div class="col-lg-2 col-md-3">
+                                                <label class="form-label visually-hidden">Portion for @meal.MealName</label>
+                                                <div class="input-group input-group-sm">
+                                                    <InputNumber class="form-control" @bind-Value="meal.PortionEaten" />
+                                                    <button class="btn btn-outline-secondary" @onclick="() => UpdateMealMacros(meal)" title="Update Macros">
+                                                        <i class="bi bi-calculator"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-7 small text-muted">
+                                                <span class="me-2" title="Calories"><i class="bi bi-fire me-1"></i>@meal.Calories.ToString("N0")</span>
+                                                <span class="me-2" title="Protein"><i class="bi bi-egg me-1"></i>@meal.Protein.ToString("N1")g</span>
+                                                <span class="me-2" title="Carbs"><i class="bi bi-basket me-1"></i>@meal.Carbs.ToString("N1")g</span>
+                                                <span class="me-2" title="Fats"><i class="bi bi-droplet me-1"></i>@meal.Fats.ToString("N1")g</span>
+                                                <span title="Fiber"><i class="bi bi-flower2 me-1"></i>@meal.Fiber.ToString("N1")g</span>
+                                            </div>
+                                            <div class="col-lg-1 col-md-2 text-end">
+                                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteMeal(meal)" title="Delete Item">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
                 }
-            </tbody>
-        }
-    </table>
+
+                <div class="mt-3 pt-3 border-top">
+                    <h6 class="text-secondary">Daily Totals (@dateGroup.Key.ToString("MMMM dd"))</h6>
+                    <div class="d-flex justify-content-around flex-wrap small">
+                        <span class="mx-2"><strong>Calories:</strong> @dateGroup.Sum(m => m.Calories).ToString("N0")</span>
+                        <span class="mx-2"><strong>Protein:</strong> @dateGroup.Sum(m => m.Protein).ToString("N1") g</span>
+                        <span class="mx-2"><strong>Carbs:</strong> @dateGroup.Sum(m => m.Carbs).ToString("N1") g</span>
+                        <span class="mx-2"><strong>Fats:</strong> @dateGroup.Sum(m => m.Fats).ToString("N1") g</span>
+                        <span class="mx-2"><strong>Fiber:</strong> @dateGroup.Sum(m => m.Fiber).ToString("N1") g</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 }
 
 @code {
     private List<string> suggestions = new();
     private List<MealEntry>? entries;
-    private MealEntry newEntry = new()
-        {
-            Date = DateOnly.FromDateTime(DateTime.Today),
-            Day = DateTime.Today.DayOfWeek.ToString(),
-            MealType = "Breakfast",
-            MealName = string.Empty,
-            UserId = string.Empty
-        };
+    private string currentUserId = string.Empty;
+    private MealEntry newEntry;
+    private HashSet<DateOnly> expandedDates = new();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var userId = authState.User?.Identity?.Name;
+        currentUserId = authState.User?.Identity?.Name ?? string.Empty;
 
-        entries = await MealEntryService.GetAllAsync(userId);
+        InitializeNewEntry(); // Set defaults including UserId
+
+        if (!string.IsNullOrEmpty(currentUserId))
+        {
+            entries = await MealEntryService.GetAllAsync(currentUserId);
+            // Optionally pre-expand today's date
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            if (entries?.Any(e => e.Date == today) == true)
+            {
+                expandedDates.Add(today);
+            }
+        }
+        else
+        {
+            entries = new List<MealEntry>();
+        }
+    }
+
+    private void InitializeNewEntry(DateOnly? date = null, string? mealType = null)
+    {
+        var targetDate = date ?? DateOnly.FromDateTime(DateTime.Today);
+        newEntry = new MealEntry
+            {
+                Date = targetDate,
+                Day = targetDate.DayOfWeek.ToString(),
+                MealType = mealType ?? "Breakfast",
+                MealName = string.Empty,
+                PortionEaten = 1.0F, // Default portion
+                UserId = currentUserId
+            };
+        suggestions.Clear();
     }
 
     private async Task SaveMeal()
     {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var userId = authState.User?.Identity?.Name;
-
-        if (!string.IsNullOrWhiteSpace(newEntry.MealName) && !string.IsNullOrWhiteSpace(userId))
+        if (string.IsNullOrWhiteSpace(newEntry.MealName) || string.IsNullOrWhiteSpace(currentUserId))
         {
-            // Ensure its populated:
-            var item = await MealEntryService.GetFoodItemByNameAsync(newEntry.MealName);
-            if (item is not null)
-            {
-                newEntry.Calories = item.CaloriesPerServing * newEntry.PortionEaten;
-                newEntry.Protein = item.Protein * newEntry.PortionEaten;
-                newEntry.Carbs = item.Carbs * newEntry.PortionEaten;
-                newEntry.Fats = item.Fats * newEntry.PortionEaten;
-                newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
-            }
+            return; // Add validation message if needed
+        }
 
-            newEntry.Day = newEntry.Date.DayOfWeek.ToString();
-            newEntry.UserId = userId;
+        var item = await MealEntryService.GetFoodItemByNameAsync(newEntry.MealName);
+        if (item is not null)
+        {
+            newEntry.Calories = item.CaloriesPerServing * newEntry.PortionEaten;
+            newEntry.Protein = item.Protein * newEntry.PortionEaten;
+            newEntry.Carbs = item.Carbs * newEntry.PortionEaten;
+            newEntry.Fats = item.Fats * newEntry.PortionEaten;
+            newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
+        }
+        else
+        {
+            // Handle case where food item details aren't found - maybe clear macros or log warning
+            newEntry.Calories = 0;
+            newEntry.Protein = 0;
+            newEntry.Carbs = 0;
+            newEntry.Fats = 0;
+            newEntry.Fiber = 0;
+        }
+
+        newEntry.Day = newEntry.Date.DayOfWeek.ToString();
+        newEntry.UserId = currentUserId; // Ensure UserId is set
+
+        try
+        {
             await MealEntryService.AddAsync(newEntry);
 
-            string mealType = newEntry.MealType;
-            DateOnly dateOnly = newEntry.Date;
+            // Keep Date and Meal Type for the next entry, reset others
+            DateOnly savedDate = newEntry.Date;
+            string savedMealType = newEntry.MealType;
 
-            newEntry = new MealEntry
-                {
-                    Date = dateOnly,
-                    Day = dateOnly.DayOfWeek.ToString(),
-                    MealName = string.Empty,
-                    MealType = mealType,
-                    UserId = string.Empty
-                };
+            InitializeNewEntry(savedDate, savedMealType);
 
-            entries = await MealEntryService.GetAllAsync(userId);
+            entries = await MealEntryService.GetAllAsync(currentUserId); // Reload entries
+            if (!expandedDates.Contains(savedDate)) // Expand the date if it was collapsed
+            {
+                expandedDates.Add(savedDate);
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving meal: {ex.Message}");
+            // Show error message to user
         }
     }
 
     private async Task OnMealNameChanged(ChangeEventArgs e)
     {
-        var input = e.Value?.ToString() ?? string.Empty;
+        newEntry.MealName = e.Value?.ToString() ?? string.Empty; // Update bound value explicitly
+        var input = newEntry.MealName;
 
-        if (input.Length >= 2) // Optional: only start searching after 2 characters
+        if (input.Length >= 2)
         {
             suggestions = await MealEntryService.SearchFoodNamesAsync(input);
         }
@@ -183,9 +247,10 @@ else
         {
             suggestions.Clear();
         }
+        StateHasChanged(); // Needed to update suggestion list UI
     }
 
-    private async void SelectSuggestion(string selected)
+    private async Task SelectSuggestion(string selected)
     {
         newEntry.MealName = selected;
         suggestions.Clear();
@@ -195,17 +260,82 @@ else
         {
             newEntry.PortionEaten = item.Servings;
         }
+        StateHasChanged(); // Update UI with selected name and portion
     }
-}
 
-@code {
-    private HashSet<DateOnly> expandedDates = new();
+    private async Task UpdateMealMacros(MealEntry meal)
+    {
+        var item = await MealEntryService.GetFoodItemByNameAsync(meal.MealName);
+        if (item is not null)
+        {
+            meal.Calories = item.CaloriesPerServing * meal.PortionEaten;
+            meal.Protein = item.Protein * meal.PortionEaten;
+            meal.Carbs = item.Carbs * meal.PortionEaten;
+            meal.Fats = item.Fats * meal.PortionEaten;
+            meal.Fiber = item.Fiber * meal.PortionEaten;
+
+            try
+            {
+                await MealEntryService.UpdateAsync(meal);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating meal: {ex.Message}");
+                // Show error message to user
+            }
+        }
+        else
+        {
+            // Handle case where food item details aren't found for update - maybe show warning
+            Console.WriteLine($"Could not find item details for '{meal.MealName}' during update.");
+        }
+    }
+
+    private async Task DeleteMeal(MealEntry mealToDelete)
+    {
+        // Optional: Add JS confirmation dialog here
+        bool confirmed = true;
+
+        if (confirmed && entries != null && mealToDelete.Id > 0) // Check for valid Id
+        {
+            try
+            {
+                await MealEntryService.DeleteAsync(mealToDelete.Id);
+                entries.Remove(mealToDelete);
+                StateHasChanged(); // Refresh UI after removal
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting meal: {ex.Message}");
+                // Show error message to user
+            }
+        }
+        else if (mealToDelete.Id <= 0)
+        {
+            Console.WriteLine("Error: Meal entry has invalid Id for deletion.");
+        }
+    }
 
     private void ToggleDate(DateOnly date)
     {
         if (!expandedDates.Add(date))
+        {
             expandedDates.Remove(date);
+        }
     }
 
-    private bool IsExpanded(DateOnly date) => !expandedDates.Contains(date);
+    private bool IsExpanded(DateOnly date) => expandedDates.Contains(date);
+
+    private int GetMealTypeOrder(string mealType)
+    {
+        return mealType switch
+        {
+            "Breakfast" => 1,
+            "Lunch" => 2,
+            "Dinner" => 3,
+            "Snack" => 4,
+            _ => 5,
+        };
+    }
 }

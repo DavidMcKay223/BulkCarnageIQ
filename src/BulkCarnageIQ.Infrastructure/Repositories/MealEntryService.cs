@@ -65,6 +65,35 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             await _db.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(MealEntry entry)
+        {
+            var existingEntry = await _db.MealEntries.FindAsync(entry.Id);
+            if (existingEntry != null)
+            {
+                //existingEntry.Date = entry.Date;
+                //existingEntry.Day = entry.Day;
+                //existingEntry.MealType = entry.MealType;
+                //existingEntry.MealName = entry.MealName;
+                existingEntry.PortionEaten = entry.PortionEaten;
+                existingEntry.Calories = entry.Calories;
+                existingEntry.Protein = entry.Protein;
+                existingEntry.Carbs = entry.Carbs;
+                existingEntry.Fats = entry.Fats;
+                existingEntry.Fiber = entry.Fiber;
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var entry = await _db.MealEntries.FindAsync(id);
+            if (entry != null)
+            {
+                _db.MealEntries.Remove(entry);
+                await _db.SaveChangesAsync();
+            }
+        }
+
         public async Task<Dictionary<string, float>> GetCaloriesByDayAsync(string userId, int daysBack = 6)
         {
             var since = DateOnly.FromDateTime(DateTime.Today.AddDays(-daysBack));
