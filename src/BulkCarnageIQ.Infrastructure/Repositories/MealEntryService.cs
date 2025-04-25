@@ -23,7 +23,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
         public async Task<FoodItem?> GetFoodItemByNameAsync(string foodName)
         {
             return await _db.FoodItems
-                .Where(f => f.RecipeName.Contains(foodName))
+                .Where(f => f.RecipeName.Equals(foodName))
                 .FirstOrDefaultAsync();
         }
 
