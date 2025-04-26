@@ -1,0 +1,424 @@
+﻿@page "/GroceryList"
+@rendermode InteractiveServer
+@using System.Threading
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IGroceryListService GroceryListService
+@inject IMealEntryService MealEntryService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILogger<GroceryList> Logger
+
+<h1 class="mb-4">Grocery List</h1>
+
+@if (initialLoadComplete) // Use a flag for initial load indication
+{
+    <div class="mb-3">
+        <div class="col-md position-relative">
+            <label class="form-label">Search and Add Item</label>
+            <InputText class="form-control" @bind-Value="newItemName" @bind-Value:after="() => { newItemName ??= string.Empty; TriggerSearchDebounced(); }" placeholder="Type to search..." @onfocusout="ClearSuggestions" />
+
+            @if (isSearching)
+            {
+                <span class="spinner-border spinner-border-sm position-absolute end-0 top-50 translate-middle-y me-2" role="status" aria-hidden="true" style="margin-top: 1.2rem;"></span>
+            }
+
+            @if (suggestions.Any())
+            {
+                <ul class="list-group position-absolute w-100 mt-1" style="z-index: 1050;">
+                    @foreach (var suggestion in suggestions)
+                    {
+                        <li class="list-group-item list-group-item-action" @onclick="() => SelectSuggestion(suggestion)" role="button">
+                            @suggestion
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+    @if (!items.Any())
+    {
+        <p>No items yet.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in items)
+            {
+                // Use @key for efficient list updates
+                <div class="col-md-6 col-lg-4 mb-3" @key="item.Id">
+                    <div class="card @(item.IsCompleted ? "opacity-50" : "") @(item.IsSaving ? "opacity-75" : "")">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <input type="checkbox" class="form-check-input me-2"
+                                       checked="@item.IsCompleted"
+                                       disabled="@item.IsSaving"
+                                       @onchange="@(() => ToggleCompleted(item))" />
+                                <strong>@item.RecipeName</strong><br />
+                                <small>@item.MeasurementServings @item.MeasurementType</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary me-2 @(item.IsSaving ? "disabled" : "")" @onclick="() => ToggleFavorite(item)">
+                                    @if (item.IsSaving && item.LastAction == ItemAction.ToggleFavorite)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi @(item.IsFavorite ? "bi-star-fill text-warning" : "bi-star")"></i>
+                                    }
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger @(item.IsSaving ? "disabled" : "")" @onclick="() => Remove(item)">
+                                    @if (item.IsSaving && item.LastAction == ItemAction.Remove)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-trash"></i>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="mt-3">
+        <button class="btn btn-outline-success me-2" @onclick="GenerateFromMeals" disabled="@isGenerating">
+            @if (isGenerating)
+            {
+                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            }
+            <i class="bi bi-arrow-repeat"></i> Auto-generate from Meals
+        </button>
+        <button class="btn btn-outline-danger" @onclick="ClearCompleted" disabled="@isClearing || !items.Any(i => i.IsCompleted)">
+            @if (isClearing)
+            {
+                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            }
+            <i class="bi bi-trash"></i> Clear Completed
+        </button>
+    </div>
+}
+else
+{
+    <p><em>Loading grocery list...</em> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></p>
+}
+
+@code {
+    // Use a wrapper class for UI state flags
+    private class GroceryListItemUI : GroceryListItem
+    {
+        public bool IsSaving { get; set; }
+        public ItemAction? LastAction { get; set; } // Track which action is saving
+
+        public static GroceryListItemUI FromGroceryListItem(GroceryListItem item)
+        {
+            // Consider using a mapping library like AutoMapper for complex objects
+            return new GroceryListItemUI
+                {
+                    Id = item.Id,
+                    UserId = item.UserId,
+                    RecipeName = item.RecipeName,
+                    MeasurementType = item.MeasurementType,
+                    MeasurementServings = item.MeasurementServings,
+                    IsCompleted = item.IsCompleted,
+                    IsFavorite = item.IsFavorite,
+                    CreatedDate = item.CreatedDate,
+                    IsSaving = false,
+                    LastAction = null
+                };
+        }
+    }
+
+    private enum ItemAction { ToggleFavorite, ToggleComplete, Remove }
+
+    private List<GroceryListItemUI> items = new();
+    private string? newItemName;
+    private bool initialLoadComplete = false; // Changed from isLoading for clarity
+    private string userId = "";
+    private List<string> suggestions = new();
+    private string? errorMessage; // For displaying errors
+
+    // --- State flags for async operations ---
+    private bool isAdding = false;
+    private bool isGenerating = false;
+    private bool isClearing = false;
+    private bool isSearching = false;
+
+    // --- Debouncing for Search ---
+    private CancellationTokenSource? _searchCts;
+    private const int DebounceDelayMilliseconds = 300; // Adjust as needed
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+            // Use a claim or a more robust way to get the unique user ID if available
+            userId = auth.User?.Identity?.Name ?? string.Empty;
+
+            await LoadItems();
+            initialLoadComplete = true; // Mark initial load as complete
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error during component initialization for user {UserId}", userId);
+            errorMessage = "Failed to initialize the grocery list. Please try refreshing.";
+            initialLoadComplete = true; // Allow UI to render the error
+        }
+    }
+
+    private async Task LoadItems()
+    {
+        errorMessage = null; // Clear previous errors
+        try
+        {
+            var fetchedItems = await GroceryListService.GetListForUserAsync(userId);
+            // Map to UI model
+            items = fetchedItems.Select(GroceryListItemUI.FromGroceryListItem).ToList();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading grocery list items for user {UserId}", userId);
+            errorMessage = "Failed to load items. Please try again later.";
+            items = new(); // Ensure items list is empty on error
+        }
+    }
+
+    private async Task Add()
+    {
+        if (string.IsNullOrWhiteSpace(newItemName) || isAdding) return;
+
+        isAdding = true;
+        errorMessage = null;
+        StateHasChanged(); // Update UI to show spinner/disable button
+
+        var itemToAdd = new GroceryListItem
+            {
+                RecipeName = newItemName.Trim(),
+                UserId = userId,
+                CreatedDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                IsFavorite = false,
+                IsCompleted = false,
+                MeasurementType = "Unit", // Consider making these configurable or derived from search
+                MeasurementServings = 1f
+            };
+
+        try
+        {
+            var addedItem = await GroceryListService.AddItemAsync(itemToAdd);
+
+            if (addedItem != null)
+            {
+                items.Insert(0, GroceryListItemUI.FromGroceryListItem(addedItem)); // Add to the top of the list locally
+                newItemName = ""; // Clear input
+                suggestions.Clear(); // Clear suggestions
+            }
+            else
+            {
+                Logger.LogWarning("AddItemAsync returned null for user {UserId}, item name {ItemName}. Reloading list as fallback.", userId, itemToAdd.RecipeName);
+                await LoadItems(); // Reload list if add fails unexpectedly
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding item to grocery list for user {UserId}, item name {ItemName}", userId, newItemName);
+            errorMessage = "Failed to add item. Please try again.";
+        }
+        finally
+        {
+            isAdding = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearSuggestions()
+    {
+        // Clear suggestions when focus is lost
+        suggestions.Clear();
+    }
+
+    private async Task ToggleFavorite(GroceryListItemUI item)
+    {
+        if (item.IsSaving) return;
+
+        item.IsSaving = true;
+        item.LastAction = ItemAction.ToggleFavorite;
+        StateHasChanged();
+
+        try
+        {
+            item.IsFavorite = !item.IsFavorite;
+            await GroceryListService.ToggleFavoriteAsync(item.Id, userId);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error toggling favorite for item {ItemId}", item.Id);
+            // Revert change on error
+            item.IsFavorite = !item.IsFavorite;
+            errorMessage = "Failed to update favorite status. Please try again.";
+        }
+        finally
+        {
+            item.IsSaving = false;
+            item.LastAction = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleCompleted(GroceryListItemUI item)
+    {
+        if (item.IsSaving) return;
+
+        item.IsSaving = true;
+        item.LastAction = ItemAction.ToggleComplete;
+        StateHasChanged();
+
+        try
+        {
+            item.IsCompleted = !item.IsCompleted;
+            await GroceryListService.ToggleCompletedAsync(item.Id, userId);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error toggling completion for item {ItemId}", item.Id);
+            // Revert change on error
+            item.IsCompleted = !item.IsCompleted;
+            errorMessage = "Failed to update completion status. Please try again.";
+        }
+        finally
+        {
+            item.IsSaving = false;
+            item.LastAction = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Remove(GroceryListItemUI item)
+    {
+        if (item.IsSaving) return;
+
+        item.IsSaving = true;
+        item.LastAction = ItemAction.Remove;
+        StateHasChanged();
+
+        try
+        {
+            await GroceryListService.RemoveItemAsync(item.Id, userId);
+            items.Remove(item);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error removing item {ItemId} from grocery list", item.Id);
+            errorMessage = "Failed to remove item. Please try again.";
+        }
+        finally
+        {
+            item.IsSaving = false;
+            item.LastAction = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task GenerateFromMeals()
+    {
+        if (isGenerating) return;
+
+        isGenerating = true;
+        StateHasChanged();
+
+        try
+        {
+            await GroceryListService.AutoGenerateFromRecentMealsAsync(userId);
+            await LoadItems(); // Refresh the list after generation
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error generating grocery list from meals for user {UserId}", userId);
+            errorMessage = "Failed to generate grocery list from meals. Please try again.";
+        }
+        finally
+        {
+            isGenerating = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ClearCompleted()
+    {
+        if (isClearing) return;
+
+        isClearing = true;
+        StateHasChanged();
+
+        try
+        {
+            var completedItems = items.Where(i => i.IsCompleted).ToList();
+            foreach (var completedItem in completedItems)
+            {
+                await Remove(completedItem);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error clearing completed items for user {UserId}", userId);
+            errorMessage = "Failed to clear completed items. Please try again.";
+        }
+        finally
+        {
+            isClearing = false;
+            StateHasChanged();
+        }
+    }
+
+    // --- Search & Debounce ---
+    private async void TriggerSearchDebounced()
+    {
+        if (_searchCts != null)
+        {
+            _searchCts.Cancel();
+        }
+
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+
+        try
+        {
+            await Task.Delay(DebounceDelayMilliseconds, token);
+
+            if (string.IsNullOrWhiteSpace(newItemName)) return;
+
+            isSearching = true;
+            StateHasChanged();
+
+            suggestions = await MealEntryService.SearchFoodNamesAsync(newItemName);
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignore if canceled due to debounce
+        }
+        finally
+        {
+            isSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SelectSuggestion(string suggestion)
+    {
+        newItemName = suggestion;
+        suggestions.Clear();
+        await Add();
+    }
+}
