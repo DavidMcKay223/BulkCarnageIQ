@@ -8,9 +8,9 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILogger<GroceryList> Logger
 
-<h1 class="mb-4">Grocery List</h1>
+<h3><i class="bi bi-cart"></i> Grocery List</h3>
 
-@if (initialLoadComplete) // Use a flag for initial load indication
+@if (initialLoadComplete)
 {
     <div class="mb-3">
         <div class="col-md position-relative">
@@ -109,15 +109,13 @@ else
 }
 
 @code {
-    // Use a wrapper class for UI state flags
     private class GroceryListItemUI : GroceryListItem
     {
         public bool IsSaving { get; set; }
-        public ItemAction? LastAction { get; set; } // Track which action is saving
+        public ItemAction? LastAction { get; set; }
 
         public static GroceryListItemUI FromGroceryListItem(GroceryListItem item)
         {
-            // Consider using a mapping library like AutoMapper for complex objects
             return new GroceryListItemUI
                 {
                     Id = item.Id,
@@ -138,10 +136,10 @@ else
 
     private List<GroceryListItemUI> items = new();
     private string? newItemName;
-    private bool initialLoadComplete = false; // Changed from isLoading for clarity
+    private bool initialLoadComplete = false;
     private string userId = "";
     private List<string> suggestions = new();
-    private string? errorMessage; // For displaying errors
+    private string? errorMessage;
 
     // --- State flags for async operations ---
     private bool isAdding = false;
@@ -149,16 +147,11 @@ else
     private bool isClearing = false;
     private bool isSearching = false;
 
-    // --- Debouncing for Search ---
-    private CancellationTokenSource? _searchCts;
-    private const int DebounceDelayMilliseconds = 300; // Adjust as needed
-
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-            // Use a claim or a more robust way to get the unique user ID if available
             userId = auth.User?.Identity?.Name ?? string.Empty;
 
             await LoadItems();

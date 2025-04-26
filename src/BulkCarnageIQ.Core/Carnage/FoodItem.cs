@@ -14,6 +14,8 @@ namespace BulkCarnageIQ.Core.Carnage
 
         public string BrandType { get; set; } = "Generic"; // "Generic" or "Brand"
 
+        public string? GroupName { get; set; }
+
         public float TotalCalories => Servings * CaloriesPerServing;
 
         public float Servings { get; set; }             // Number of servings
