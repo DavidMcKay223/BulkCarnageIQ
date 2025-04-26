@@ -24,6 +24,6 @@ namespace BulkCarnageIQ.Core.Carnage
         [Required]
         public string UserId { get; set; } = string.Empty; // For multi-user support
 
-        public DateOnly CreatedDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow); // Just the date, no time
+        public DateOnly CreatedDate { get; set; } = DateOnly.FromDateTime(DateTime.Now); // Just the date, no time
     }
 }
