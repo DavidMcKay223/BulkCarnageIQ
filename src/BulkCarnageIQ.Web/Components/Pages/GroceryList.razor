@@ -43,47 +43,57 @@
     }
     else
     {
-        <div class="row">
-            @foreach (var item in items)
-            {
-                <div class="col-md-6 col-lg-4 mb-3" @key="item.Id">
-                    <div class="card @(item.IsCompleted ? "opacity-50" : "") @(item.IsSaving ? "opacity-75" : "")">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <div>
-                                <input type="checkbox" class="form-check-input me-2"
-                                       checked="@item.IsCompleted"
-                                       disabled="@item.IsSaving"
-                                       @onchange="@(() => ToggleCompleted(item))" />
-                                <strong>@item.RecipeName</strong><br />
-                                <small>@item.MeasurementServings @item.MeasurementType</small>
+        @foreach (var group in items.GroupBy(x => x.GroupName))
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white rounded-top">
+                    <h5 class="mb-0">@(!string.IsNullOrEmpty(group.Key) ? group.Key : "Ungrouped")</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var item in group)
+                        {
+                            <div class="col-md-6 col-lg-4 mb-3" @key="item.Id">
+                                <div class="card @(item.IsCompleted ? "opacity-50" : "") @(item.IsSaving ? "opacity-75" : "")">
+                                    <div class="card-body d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <input type="checkbox" class="form-check-input me-2"
+                                                   checked="@item.IsCompleted"
+                                                   disabled="@item.IsSaving"
+                                                   @onchange="@(() => ToggleCompleted(item))" />
+                                            <strong>@item.RecipeName</strong><br />
+                                            <small>@item.MeasurementServings @item.MeasurementType</small>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-secondary me-2 @(item.IsSaving ? "disabled" : "")" @onclick="() => ToggleFavorite(item)">
+                                                @if (item.IsSaving && item.LastAction == ItemAction.ToggleFavorite)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi @(item.IsFavorite ? "bi-star-fill text-warning" : "bi-star")"></i>
+                                                }
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger @(item.IsSaving ? "disabled" : "")" @onclick="() => Remove(item)">
+                                                @if (item.IsSaving && item.LastAction == ItemAction.Remove)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-trash"></i>
+                                                }
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <button class="btn btn-sm btn-outline-secondary me-2 @(item.IsSaving ? "disabled" : "")" @onclick="() => ToggleFavorite(item)">
-                                    @if (item.IsSaving && item.LastAction == ItemAction.ToggleFavorite)
-                                    {
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi @(item.IsFavorite ? "bi-star-fill text-warning" : "bi-star")"></i>
-                                    }
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger @(item.IsSaving ? "disabled" : "")" @onclick="() => Remove(item)">
-                                    @if (item.IsSaving && item.LastAction == ItemAction.Remove)
-                                    {
-                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-trash"></i>
-                                    }
-                                </button>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
-            }
-        </div>
+            </div>
+        }
     }
 
     <div class="mt-3">
@@ -94,7 +104,7 @@
             }
             <i class="bi bi-arrow-repeat"></i> Auto-generate from Meals
         </button>
-        <button class="btn btn-outline-danger" @onclick="ClearCompleted" disabled="@isClearing || !items.Any(i => i.IsCompleted)">
+        <button class="btn btn-outline-danger" @onclick="ClearCompleted" disabled="@isClearing">
             @if (isClearing)
             {
                 <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
@@ -121,6 +131,7 @@ else
                     Id = item.Id,
                     UserId = item.UserId,
                     RecipeName = item.RecipeName,
+                    GroupName = item.GroupName,
                     MeasurementType = item.MeasurementType,
                     MeasurementServings = item.MeasurementServings,
                     IsCompleted = item.IsCompleted,
@@ -141,7 +152,6 @@ else
     private List<string> suggestions = new();
     private string? errorMessage;
 
-    // --- State flags for async operations ---
     private bool isAdding = false;
     private bool isGenerating = false;
     private bool isClearing = false;
@@ -155,30 +165,29 @@ else
             userId = auth.User?.Identity?.Name ?? string.Empty;
 
             await LoadItems();
-            initialLoadComplete = true; // Mark initial load as complete
+            initialLoadComplete = true;
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error during component initialization for user {UserId}", userId);
             errorMessage = "Failed to initialize the grocery list. Please try refreshing.";
-            initialLoadComplete = true; // Allow UI to render the error
+            initialLoadComplete = true;
         }
     }
 
     private async Task LoadItems()
     {
-        errorMessage = null; // Clear previous errors
+        errorMessage = null;
         try
         {
             var fetchedItems = await GroceryListService.GetListForUserAsync(userId);
-            // Map to UI model
             items = fetchedItems.Select(GroceryListItemUI.FromGroceryListItem).ToList();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error loading grocery list items for user {UserId}", userId);
             errorMessage = "Failed to load items. Please try again later.";
-            items = new(); // Ensure items list is empty on error
+            items = new();
         }
     }
 
@@ -188,7 +197,7 @@ else
 
         isAdding = true;
         errorMessage = null;
-        StateHasChanged(); // Update UI to show spinner/disable button
+        StateHasChanged();
 
         var item = await MealEntryService.GetFoodItemByNameAsync(newItemName);
 
@@ -203,6 +212,7 @@ else
         var itemToAdd = new GroceryListItem
             {
                 RecipeName = newItemName.Trim(),
+                GroupName = item.GroupName,
                 UserId = userId,
                 CreatedDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 IsFavorite = false,
@@ -217,14 +227,14 @@ else
 
             if (addedItem != null)
             {
-                items.Insert(0, GroceryListItemUI.FromGroceryListItem(addedItem)); // Add to the top of the list locally
-                newItemName = ""; // Clear input
-                suggestions.Clear(); // Clear suggestions
+                items.Insert(0, GroceryListItemUI.FromGroceryListItem(addedItem));
+                newItemName = "";
+                suggestions.Clear();
             }
             else
             {
                 Logger.LogWarning("AddItemAsync returned null for user {UserId}, item name {ItemName}. Reloading list as fallback.", userId, itemToAdd.RecipeName);
-                await LoadItems(); // Reload list if add fails unexpectedly
+                await LoadItems();
             }
         }
         catch (Exception ex)
@@ -337,7 +347,7 @@ else
         try
         {
             await GroceryListService.AutoGenerateFromRecentMealsAsync(userId);
-            await LoadItems(); // Refresh the list after generation
+            await LoadItems();
         }
         catch (Exception ex)
         {
@@ -378,10 +388,9 @@ else
         }
     }
 
-    // --- Search & Debounce ---
     private async Task OnMealNameChanged(ChangeEventArgs e)
     {
-        newItemName = e.Value?.ToString() ?? string.Empty; // Update bound value explicitly
+        newItemName = e.Value?.ToString() ?? string.Empty;
         var input = newItemName;
 
         if (input.Length >= 2)
@@ -392,7 +401,7 @@ else
         {
             suggestions.Clear();
         }
-        StateHasChanged(); // Needed to update suggestion list UI
+        StateHasChanged();
     }
 
     private async Task SelectSuggestion(string suggestion)

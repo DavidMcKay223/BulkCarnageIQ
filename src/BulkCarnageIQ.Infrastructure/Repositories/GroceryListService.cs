@@ -103,9 +103,13 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
 
                 if (!exists)
                 {
+                    var tempItem = await _db.FoodItems
+                        .FirstOrDefaultAsync(x => x.RecipeName == meal.MealName);
+
                     _db.GroceryListItems.Add(new GroceryListItem
                     {
                         RecipeName = meal.MealName,
+                        GroupName = tempItem?.GroupName,
                         UserId = userId,
                         CreatedDate = DateOnly.FromDateTime(DateTime.UtcNow),
                         MeasurementType = meal.MeasurementType,

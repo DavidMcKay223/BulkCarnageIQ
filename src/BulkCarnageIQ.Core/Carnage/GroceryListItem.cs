@@ -15,6 +15,8 @@ namespace BulkCarnageIQ.Core.Carnage
         [Required]
         public string RecipeName { get; set; } = string.Empty; // Matches FoodItem.RecipeName
 
+        public string? GroupName { get; set; }
+
         public bool IsFavorite { get; set; } = false;     // Pinned or quick-add item
         public bool IsCompleted { get; set; } = false;    // Checked off in the UI
 
