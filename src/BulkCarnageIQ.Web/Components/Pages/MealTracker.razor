@@ -36,7 +36,7 @@
                         @foreach (var suggestion in suggestions)
                         {
                             <li class="list-group-item list-group-item-action"
-                                @onclick="() => SelectSuggestion(suggestion)" role="button">
+                            @onclick="() => SelectSuggestion(suggestion)" role="button">
                                 @suggestion
                             </li>
                         }
@@ -62,75 +62,95 @@ else if (!entries.Any())
 }
 else
 {
-    @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
+    @foreach (var monthGroup in entries.GroupBy(e => new { Year = e.Date.Year, Month = e.Date.Month }).OrderByDescending(g => g.Key.Year).ThenByDescending(g => g.Key.Month))
     {
         <div class="mb-4">
-            <h5 class="text-primary mb-3">
-                <span role="button" @onclick="@(() => ToggleDate(dateGroup.Key))"><i class="bi @(IsExpanded(dateGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>@dateGroup.Key.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)</span>
-            </h5>
+            <h4 class="text-primary mb-3">
+                <span role="button" @onclick="@(() => ToggleMonth(monthGroup.Key))">
+                    <i class="bi @(IsMonthExpanded(monthGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>
+                    @(new DateTime(monthGroup.Key.Year, monthGroup.Key.Month, 1).ToString("MMMM yyyy"))
+                </span>
+            </h4>
 
-            @if (IsExpanded(dateGroup.Key))
+            @if (IsMonthExpanded(monthGroup.Key))
             {
-                @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType).OrderBy(mg => GetMealTypeOrder(mg.Key)))
+                foreach (var dateGroup in monthGroup.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
                 {
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap">
-                            <h6 class="mb-0 me-3"><i class="bi bi-egg-fried me-2"></i>@mealGroup.Key</h6>
-                            <small class="text-muted text-nowrap">
-                                Total: @mealGroup.Sum(m => m.Calories).ToString("N0") Cal
-                                | P:@mealGroup.Sum(m => m.Protein).ToString("N1")g
-                                | C:@mealGroup.Sum(m => m.Carbs).ToString("N1")g
-                                | F:@mealGroup.Sum(m => m.Fats).ToString("N1")g
-                            </small>
-                        </div>
-                        <div class="card-body p-0">
-                            <ul class="list-group list-group-flush">
-                                @foreach (var meal in mealGroup)
-                                {
-                                    <li class="list-group-item">
-                                        <div class="row align-items-center g-2">
-                                            <div class="col-lg-3 col-md-12 fw-bold">
-                                                @meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)
-                                            </div>
-                                            <div class="col-lg-2 col-md-3">
-                                                <label class="form-label visually-hidden">Portion for @meal.MealName</label>
-                                                <div class="input-group input-group-sm">
-                                                    <InputNumber class="form-control" @bind-Value="meal.PortionEaten" />
-                                                    <button class="btn btn-outline-secondary" @onclick="() => UpdateMealMacros(meal)" title="Update Macros">
-                                                        <i class="bi bi-calculator"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-7 small text-muted">
-                                                <span class="me-2" title="Calories"><i class="bi bi-fire me-1"></i>@meal.Calories.ToString("N0")</span>
-                                                <span class="me-2" title="Protein"><i class="bi bi-egg me-1"></i>@meal.Protein.ToString("N1")g</span>
-                                                <span class="me-2" title="Carbs"><i class="bi bi-basket me-1"></i>@meal.Carbs.ToString("N1")g</span>
-                                                <span class="me-2" title="Fats"><i class="bi bi-droplet me-1"></i>@meal.Fats.ToString("N1")g</span>
-                                                <span title="Fiber"><i class="bi bi-flower2 me-1"></i>@meal.Fiber.ToString("N1")g</span>
-                                            </div>
-                                            <div class="col-lg-1 col-md-2 text-end">
-                                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteMeal(meal)" title="Delete Item">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                    <div class="ms-3 mb-4">
+                        <h5 class="text-secondary mb-2">
+                            <span role="button" @onclick="@(() => ToggleDate(dateGroup.Key))">
+                                <i class="bi @(IsExpanded(dateGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>
+                                @dateGroup.Key.ToString("MMMM dd, yyyy")
+                            </span>
+                        </h5>
+
+                        @if (IsExpanded(dateGroup.Key))
+                        {
+                            @* Your inner mealGroup logic stays the same *@
+                            @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType).OrderBy(mg => GetMealTypeOrder(mg.Key)))
+                            {
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap">
+                                        <h6 class="mb-0 me-3">
+                                            <i class="bi bi-egg-fried me-2"></i>@mealGroup.Key
+                                        </h6>
+                                        <small class="text-muted text-nowrap">
+                                            Total: @mealGroup.Sum(m => m.Calories).ToString("N0") Cal
+                                            | P:@mealGroup.Sum(m => m.Protein).ToString("N1")g
+                                            | C:@mealGroup.Sum(m => m.Carbs).ToString("N1")g
+                                            | F:@mealGroup.Sum(m => m.Fats).ToString("N1")g
+                                        </small>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <ul class="list-group list-group-flush">
+                                            @foreach (var meal in mealGroup)
+                                            {
+                                                <li class="list-group-item">
+                                                    <div class="row align-items-center g-2">
+                                                        <div class="col-lg-3 col-md-12 fw-bold">
+                                                            @meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-3">
+                                                            <div class="input-group input-group-sm">
+                                                                <InputNumber class="form-control" @bind-Value="meal.PortionEaten" />
+                                                                <button class="btn btn-outline-secondary" @onclick="() => UpdateMealMacros(meal)" title="Update Macros">
+                                                                    <i class="bi bi-calculator"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-7 small text-muted">
+                                                            <span class="me-2" title="Calories"><i class="bi bi-fire me-1"></i>@meal.Calories.ToString("N0")</span>
+                                                            <span class="me-2" title="Protein"><i class="bi bi-egg me-1"></i>@meal.Protein.ToString("N1")g</span>
+                                                            <span class="me-2" title="Carbs"><i class="bi bi-basket me-1"></i>@meal.Carbs.ToString("N1")g</span>
+                                                            <span class="me-2" title="Fats"><i class="bi bi-droplet me-1"></i>@meal.Fats.ToString("N1")g</span>
+                                                            <span title="Fiber"><i class="bi bi-flower2 me-1"></i>@meal.Fiber.ToString("N1")g</span>
+                                                        </div>
+                                                        <div class="col-lg-1 col-md-2 text-end">
+                                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteMeal(meal)" title="Delete Item">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="mt-3 pt-3 border-top">
+                                <h6 class="text-secondary">Daily Totals (@dateGroup.Key.ToString("MMMM dd"))</h6>
+                                <div class="d-flex justify-content-around flex-wrap small">
+                                    <span class="mx-2"><strong>Calories:</strong> @dateGroup.Sum(m => m.Calories).ToString("N0")</span>
+                                    <span class="mx-2"><strong>Protein:</strong> @dateGroup.Sum(m => m.Protein).ToString("N1")g</span>
+                                    <span class="mx-2"><strong>Carbs:</strong> @dateGroup.Sum(m => m.Carbs).ToString("N1")g</span>
+                                    <span class="mx-2"><strong>Fats:</strong> @dateGroup.Sum(m => m.Fats).ToString("N1")g</span>
+                                    <span class="mx-2"><strong>Fiber:</strong> @dateGroup.Sum(m => m.Fiber).ToString("N1")g</span>
+                                </div>
+                            </div>
+                        }
                     </div>
                 }
-
-                <div class="mt-3 pt-3 border-top">
-                    <h6 class="text-secondary">Daily Totals (@dateGroup.Key.ToString("MMMM dd"))</h6>
-                    <div class="d-flex justify-content-around flex-wrap small">
-                        <span class="mx-2"><strong>Calories:</strong> @dateGroup.Sum(m => m.Calories).ToString("N0")</span>
-                        <span class="mx-2"><strong>Protein:</strong> @dateGroup.Sum(m => m.Protein).ToString("N1") g</span>
-                        <span class="mx-2"><strong>Carbs:</strong> @dateGroup.Sum(m => m.Carbs).ToString("N1") g</span>
-                        <span class="mx-2"><strong>Fats:</strong> @dateGroup.Sum(m => m.Fats).ToString("N1") g</span>
-                        <span class="mx-2"><strong>Fiber:</strong> @dateGroup.Sum(m => m.Fiber).ToString("N1") g</span>
-                    </div>
-                </div>
             }
         </div>
     }
@@ -159,6 +179,8 @@ else
             {
                 expandedDates.Add(today);
             }
+
+            ToggleMonth(new { Year = today.Year, Month = today.Month });
         }
         else
         {
@@ -330,6 +352,16 @@ else
     }
 
     private bool IsExpanded(DateOnly date) => expandedDates.Contains(date);
+
+    private HashSet<object> expandedMonths = new();
+
+    private void ToggleMonth(object monthKey)
+    {
+        if (!expandedMonths.Add(monthKey))
+            expandedMonths.Remove(monthKey);
+    }
+
+    private bool IsMonthExpanded(object monthKey) => expandedMonths.Contains(monthKey);
 
     private int GetMealTypeOrder(string mealType)
     {
