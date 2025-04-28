@@ -89,7 +89,7 @@ else
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var userId = authState.User?.Identity?.Name;
 
-        entries = await MealEntryService.GetAllAsync(userId);
+        entries = await MealEntryService.GetAllAsync(userId!);
     }
 
     private async Task SaveMeal()
