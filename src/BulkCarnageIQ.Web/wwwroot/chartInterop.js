@@ -32,3 +32,33 @@ window.renderBarChart = (canvasId, chartData) => {
 
     window.chartInstances[canvasId] = newChart;
 };
+
+window.renderLineChart = (chartId, title, labels, data, dataLabel, lineColor, xLabel, yLabel) => {
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: dataLabel,
+                data: data,
+                borderColor: lineColor,
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: xLabel } },
+                y: { title: { display: true, text: yLabel } }
+            }
+        }
+    });
+};

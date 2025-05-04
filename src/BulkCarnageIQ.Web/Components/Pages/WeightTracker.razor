@@ -1,0 +1,90 @@
+﻿@page "/WeightTracker"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IWeightLogService WeightService
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Weight Tracker</PageTitle>
+
+<h3>Weight Tracker</h3>
+
+<EditForm Model="@weightEntry" OnValidSubmit="SaveWeight">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Date</label>
+            <InputDate @bind-Value="weightEntry.Date" class="form-control" />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Weight (lbs)</label>
+            <InputNumber @bind-Value="weightEntry.WeightLbs" class="form-control" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mb-3">Save</button>
+</EditForm>
+
+@if (weightLogs.Any())
+{
+    <BulkCarnageIQ.Web.Components.Charts.LineChart Title="Weight Over Time"
+        Labels="@weightLogs.Select(w => w.Date.ToShortDateString()).ToList()"
+        Data="@weightLogs.Select(w => w.WeightLbs).ToList()"
+        DataLabel="Weight (kg)"
+        LineColor="rgba(54, 162, 235, 1)"
+        xLabel="Date"
+        yLabel="Weight (lbs)" />
+
+    <h5 class="mt-4">Past Weights</h5>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Weight (kg)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in weightLogs.OrderByDescending(w => w.Date))
+            {
+                <tr>
+                    <td>@log.Date.ToShortDateString()</td>
+                    <td>@log.WeightLbs</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<WeightLog> weightLogs = new();
+    private WeightLog weightEntry = new WeightLog() { Date = DateOnly.FromDateTime(DateTime.Today) };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await GetUserIdAsync();
+
+        weightLogs = await WeightService.GetUserLogsAsync(userId);
+
+        // Pre-fill today's weight if exists
+        var todayLog = weightLogs.FirstOrDefault(w => w.Date == DateOnly.FromDateTime(DateTime.Today));
+        if (todayLog != null)
+        {
+            weightEntry.WeightLbs = todayLog.WeightLbs;
+        }
+    }
+
+    private async Task SaveWeight()
+    {
+        var userId = await GetUserIdAsync();
+        await WeightService.AddOrUpdateLogAsync(userId, weightEntry.Date, weightEntry.WeightLbs);
+        Nav.NavigateTo(Nav.Uri, forceLoad: true);
+    }
+
+    private async Task<string> GetUserIdAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+        return userId!;
+    }
+}

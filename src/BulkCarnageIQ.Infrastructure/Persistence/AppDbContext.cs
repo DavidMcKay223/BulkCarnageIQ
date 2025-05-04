@@ -19,6 +19,7 @@ namespace BulkCarnageIQ.Infrastructure.Persistence
         public DbSet<GroceryListItem> GroceryListItems { get; set; } = null!;
         public DbSet<GroupFoodItem> GroupFoodItems { get; set; } = null!;
         public DbSet<GroupFoodItemEntry> GroupFoodItemEntries { get; set; } = null!;
+        public DbSet<WeightLog> WeightLogs { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
