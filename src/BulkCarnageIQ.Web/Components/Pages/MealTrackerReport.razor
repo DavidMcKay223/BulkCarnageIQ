@@ -49,22 +49,22 @@ else
                             <tr>
                                 <td>@meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)</td>
                                 <td>@meal.PortionEaten</td>
-                                <td>@meal.Calories</td>
-                                <td>@meal.Protein</td>
-                                <td>@meal.Carbs</td>
-                                <td>@meal.Fats</td>
-                                <td>@meal.Fiber</td>
+                                <td>@meal.Calories.ToString("N2")</td>
+                                <td>@meal.Protein.ToString("N2")</td>
+                                <td>@meal.Carbs.ToString("N2")</td>
+                                <td>@meal.Fats.ToString("N2")</td>
+                                <td>@meal.Fiber.ToString("N2")</td>
                             </tr>
                         }
                     }
 
                     <tr class="table-warning fw-bold">
                         <td colspan="2" class="text-end">Total</td>
-                        <td>@dateGroup.Sum(e => e.Calories)</td>
-                        <td>@dateGroup.Sum(e => e.Protein)</td>
-                        <td>@dateGroup.Sum(e => e.Carbs)</td>
-                        <td>@dateGroup.Sum(e => e.Fats)</td>
-                        <td>@dateGroup.Sum(e => e.Fiber)</td>
+                        <td>@dateGroup.Sum(e => e.Calories).ToString("N2")</td>
+                        <td>@dateGroup.Sum(e => e.Protein).ToString("N2")</td>
+                        <td>@dateGroup.Sum(e => e.Carbs).ToString("N2")</td>
+                        <td>@dateGroup.Sum(e => e.Fats).ToString("N2")</td>
+                        <td>@dateGroup.Sum(e => e.Fiber).ToString("N2")</td>
                     </tr>
                 }
             </tbody>
