@@ -28,20 +28,27 @@
 
 @if (weightLogs.Any())
 {
-    <BulkCarnageIQ.Web.Components.Charts.LineChart Title="Weight Over Time"
-        Labels="@weightLogs.Select(w => w.Date.ToShortDateString()).ToList()"
-        Data="@weightLogs.Select(w => w.WeightLbs).ToList()"
-        DataLabel="Weight (kg)"
-        LineColor="rgba(54, 162, 235, 1)"
-        xLabel="Date"
-        yLabel="Weight (lbs)" />
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <i class="bi bi-graph-up me-2"></i> Weight Over Time
+        </div>
+        <div class="card-body">
+            <BulkCarnageIQ.Web.Components.Charts.LineChart Title="Weight Over Time"
+                Labels="@weightLogs.Select(w => w.Date.ToShortDateString()).ToList()"
+                Data="@weightLogs.Select(w => w.WeightLbs).ToList()"
+                DataLabel="Weight (kg)"
+                LineColor="rgba(54, 162, 235, 1)"
+                xLabel="Date"
+                yLabel="Weight (lbs)" />
+        </div>
+    </div>
 
     <h5 class="mt-4">Past Weights</h5>
     <table class="table table-sm table-bordered">
         <thead>
             <tr>
                 <th>Date</th>
-                <th>Weight (kg)</th>
+                <th>Weight (lbs)</th>
             </tr>
         </thead>
         <tbody>
@@ -49,7 +56,7 @@
             {
                 <tr>
                     <td>@log.Date.ToShortDateString()</td>
-                    <td>@log.WeightLbs</td>
+                    <td>@log.WeightLbs.ToString("N2")</td>
                 </tr>
             }
         </tbody>
@@ -64,7 +71,7 @@
     {
         var userId = await GetUserIdAsync();
 
-        weightLogs = await WeightService.GetUserLogsAsync(userId);
+        weightLogs = await WeightService.GetUserLogsAsync(userId, true);
 
         // Pre-fill today's weight if exists
         var todayLog = weightLogs.FirstOrDefault(w => w.Date == DateOnly.FromDateTime(DateTime.Today));

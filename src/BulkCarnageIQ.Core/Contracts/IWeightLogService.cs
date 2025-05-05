@@ -9,7 +9,7 @@ namespace BulkCarnageIQ.Core.Contracts
 {
     public interface IWeightLogService
     {
-        Task<List<WeightLog>> GetUserLogsAsync(string userId);
+        Task<List<WeightLog>> GetUserLogsAsync(string userId, bool showProjectionWeight);
         Task AddOrUpdateLogAsync(string userId, DateOnly date, float weightLbs);
     }
 }
