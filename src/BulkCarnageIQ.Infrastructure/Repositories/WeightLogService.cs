@@ -50,7 +50,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                     var currentWeight = results.Last().WeightLbs;
 
                     // Project weights
-                    int numberOfWeeksToProject = 10;
+                    int numberOfWeeksToProject = 2;
                     var random = new Random();
 
                     for (int week = 1; week <= numberOfWeeksToProject; week++)

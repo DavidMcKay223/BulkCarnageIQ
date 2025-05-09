@@ -36,7 +36,7 @@
             <BulkCarnageIQ.Web.Components.Charts.LineChart Title="Weight Over Time"
                 Labels="@weightLogs.Select(w => w.Date.ToShortDateString()).ToList()"
                 Data="@weightLogs.Select(w => w.WeightLbs).ToList()"
-                DataLabel="Weight (kg)"
+                DataLabel="Weight (lbs)"
                 LineColor="rgba(54, 162, 235, 1)"
                 xLabel="Date"
                 yLabel="Weight (lbs)" />
