@@ -29,7 +29,7 @@ else
 
             <tbody class="table-group-divider">
                 <tr class="table-secondary fw-bold" @onclick="@(() => ToggleMonth(monthGroup.Key))" style="cursor: pointer;">
-                    <td colspan="8">
+                    <td colspan="7">
                         <i class="bi @(IsExpanded(monthGroup.Key) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
                         @monthName
                     </td>
@@ -113,6 +113,6 @@ else
     private bool IsExpanded(dynamic key)
     {
         var tupleKey = (Year: (int)key.Year, Month: (int)key.Month);
-        return expandedMonths.Contains(tupleKey);
+        return !expandedMonths.Contains(tupleKey);
     }
 }
