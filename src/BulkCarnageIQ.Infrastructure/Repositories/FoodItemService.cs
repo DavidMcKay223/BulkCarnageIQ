@@ -24,5 +24,21 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             return await _db.FoodItems
                 .ToListAsync();
         }
+
+        public async Task<Dictionary<string, FoodItem>> GetAllDictionaryAsync(List<string> recipeNames)
+        {
+            if (recipeNames == null || !recipeNames.Any())
+            {
+                return new Dictionary<string, FoodItem>();
+            }
+
+            var foodItems = await _db.FoodItems
+                .Where(f => recipeNames.Contains(f.RecipeName))
+                .ToListAsync();
+
+            var foodItemsDictionary = foodItems.ToDictionary(f => f.RecipeName, f => f);
+
+            return foodItemsDictionary;
+        }
     }
 }

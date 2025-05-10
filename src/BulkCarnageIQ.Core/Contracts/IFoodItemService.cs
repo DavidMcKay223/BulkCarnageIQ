@@ -10,5 +10,6 @@ namespace BulkCarnageIQ.Core.Contracts
     public interface IFoodItemService
     {
         Task<List<FoodItem>> GetAllAsync();
+        Task<Dictionary<string, FoodItem>> GetAllDictionaryAsync(List<string> recipeName);
     }
 }

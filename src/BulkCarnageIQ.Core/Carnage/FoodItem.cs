@@ -38,10 +38,15 @@ namespace BulkCarnageIQ.Core.Carnage
         public string? Link { get; set; } // Optional, nutrition or source URL
         public string? PictureLink { get; set; } // Optional, picture URL
 
-        // Derived nutrition flags — hardcoded for now
+        // Derived nutrition flags (positive and risk)
         public bool IsHighProtein => Protein >= 20f;
         public bool IsLowCarb => Carbs < 10f;
         public bool IsKeto => Fats > (Carbs * 3f);
         public bool IsBulkMeal => TotalCalories > 600f;
+        public bool IsHighSugar => Carbs >= 25f && Fiber < 3f;
+        public bool IsLowFiber => Fiber < 2f;
+        public bool IsHighFat => Fats >= 20f;
+        public bool IsCalorieDense => TotalCalories >= 400f && Servings < 1f;
+        public bool IsLowProtein => Protein < 5f;
     }
 }
