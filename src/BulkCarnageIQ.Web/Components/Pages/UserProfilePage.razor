@@ -1,0 +1,151 @@
+﻿@page "/UserProfile"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IUserProfileService UserProfileService
+@inject AuthenticationStateProvider AuthProvider
+
+<h3><i class="bi bi-person-circle"></i> My Profile</h3>
+
+@if (isLoading)
+{
+    <p><em>Loading profile...</em></p>
+}
+else if (userProfile is null)
+{
+    <p class="text-danger"><i class="bi bi-exclamation-circle me-2"></i> No profile found.</p>
+}
+else
+{
+    <EditForm Model="userProfile" OnValidSubmit="HandleSaveProfile">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-person-lines-fill me-2"></i> Personal Info
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label for="userName" class="form-label">User Name</label>
+                            <input type="text" id="userName" class="form-control" @bind="userProfile.UserName" disabled />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" id="age" class="form-control" @bind="userProfile.Age" min="1" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="height" class="form-label">Height (in inches)</label>
+                            <input type="number" id="height" class="form-control" @bind="userProfile.HeightInches" min="1" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="weight" class="form-label">Weight (in pounds)</label>
+                            <input type="number" id="weight" class="form-control" @bind="userProfile.WeightPounds" min="1" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="activityLevel" class="form-label">Activity Level</label>
+                            <select id="activityLevel" class="form-select" @bind="userProfile.ActivityLevel">
+                                <option value="sedentary">Sedentary</option>
+                                <option value="lightly active">Lightly Active</option>
+                                <option value="moderately active">Moderately Active</option>
+                                <option value="very active">Very Active</option>
+                                <option value="super active">Super Active</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="goalType" class="form-label">Goal Type</label>
+                            <select id="goalType" class="form-select" @bind="userProfile.GoalType">
+                                <option value="maintain">Maintain weight</option>
+                                <option value="lose0.5">Lose 0.5 lb/week (~250 cal deficit)</option>
+                                <option value="lose1">Lose 1 lb/week (~500 cal deficit)</option>
+                                <option value="lose2">Lose 2 lb/week (~1000 cal deficit)</option>
+                                <option value="gain0.5">Gain 0.5 lb/week (~250 cal surplus)</option>
+                                <option value="gain1">Gain 1 lb/week (~500 cal surplus)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-graph-up-arrow me-2"></i> Nutrition Goals
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label for="calories" class="form-label">Calories</label>
+                            <input type="number" id="calories" class="form-control" @bind="userProfile.CalorieGoal" disabled />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="protein" class="form-label">Protein (g)</label>
+                            <input type="number" id="protein" class="form-control" @bind="userProfile.ProteinGoal" disabled />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="carbs" class="form-label">Carbs (g)</label>
+                            <input type="number" id="carbs" class="form-control" @bind="userProfile.CarbsGoal" disabled />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="fat" class="form-label">Fats (g)</label>
+                            <input type="number" id="fat" class="form-control" @bind="userProfile.FatGoal" disabled />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="fiber" class="form-label">Fiber (g)</label>
+                            <input type="number" id="fiber" class="form-control" @bind="userProfile.FiberGoal" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </EditForm>
+}
+
+@code {
+    private UserProfile? userProfile;
+    private string currentUserName = string.Empty;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        currentUserName = authState.User?.Identity?.Name ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(currentUserName))
+        {
+            userProfile = await UserProfileService.GetUserProfile(currentUserName);
+
+            // Optional: if goals are not calculated yet (0), calculate them
+            if (userProfile is not null && userProfile.CalorieGoal == 0)
+            {
+                userProfile.CalculateGoals();
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private async Task HandleSaveProfile()
+    {
+        // Recalculate goals when profile is saved
+        userProfile?.CalculateGoals();
+
+        // Save the updated profile
+        if (userProfile != null)
+        {
+            await UserProfileService.SaveUserProfile(userProfile);
+        }
+    }
+}

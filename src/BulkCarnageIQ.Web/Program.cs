@@ -43,6 +43,7 @@ builder.Services.AddScoped<IMealEntryService, MealEntryService>();
 builder.Services.AddScoped<IFoodItemService, FoodItemService>();
 builder.Services.AddScoped<IGroceryListService, GroceryListService>();
 builder.Services.AddScoped<IWeightLogService, WeightLogService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
 var app = builder.Build();
 

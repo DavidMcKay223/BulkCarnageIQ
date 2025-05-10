@@ -4,6 +4,7 @@ using BulkCarnageIQ.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkCarnageIQ.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250510171940_UserProfile")]
+    partial class UserProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,33 +234,26 @@ namespace BulkCarnageIQ.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("Age")
-                        .HasColumnType("real");
+                    b.Property<double>("Age")
+                        .HasColumnType("float");
 
-                    b.Property<float>("CalorieGoal")
-                        .HasColumnType("real");
+                    b.Property<double>("CalorieGoal")
+                        .HasColumnType("float");
 
-                    b.Property<float>("CarbsGoal")
-                        .HasColumnType("real");
+                    b.Property<double>("CarbsGoal")
+                        .HasColumnType("float");
 
-                    b.Property<float>("FatGoal")
-                        .HasColumnType("real");
+                    b.Property<double>("FatGoal")
+                        .HasColumnType("float");
 
-                    b.Property<float>("FiberGoal")
-                        .HasColumnType("real");
+                    b.Property<double>("HeightInches")
+                        .HasColumnType("float");
 
-                    b.Property<string>("GoalType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("ProteinGoal")
+                        .HasColumnType("float");
 
-                    b.Property<float>("HeightInches")
-                        .HasColumnType("real");
-
-                    b.Property<float>("ProteinGoal")
-                        .HasColumnType("real");
-
-                    b.Property<float>("WeightPounds")
-                        .HasColumnType("real");
+                    b.Property<double>("WeightPounds")
+                        .HasColumnType("float");
 
                     b.HasKey("UserName");
 

@@ -20,6 +20,7 @@ namespace BulkCarnageIQ.Infrastructure.Persistence
         public DbSet<GroupFoodItem> GroupFoodItems { get; set; } = null!;
         public DbSet<GroupFoodItemEntry> GroupFoodItemEntries { get; set; } = null!;
         public DbSet<WeightLog> WeightLogs { get; set; } = null!;
+        public DbSet<UserProfile> UserProfiles { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +34,9 @@ namespace BulkCarnageIQ.Infrastructure.Persistence
                 .WithMany(g => g.Entries)
                 .HasForeignKey(e => e.GroupFoodItemId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserProfile>()
+                .HasKey(f => f.UserName);
         }
     }
 }
