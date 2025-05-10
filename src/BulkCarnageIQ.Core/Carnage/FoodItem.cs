@@ -46,7 +46,7 @@ namespace BulkCarnageIQ.Core.Carnage
         public bool IsHighSugar => Carbs >= 25f && Fiber < 3f;
         public bool IsLowFiber => Fiber < 2f;
         public bool IsHighFat => Fats >= 20f;
-        public bool IsCalorieDense => TotalCalories >= 400f && Servings < 1f;
+        public bool IsBalancedMeal => Protein >= 15f && Carbs <= 60f && Fats <= 20f;
         public bool IsLowProtein => Protein < 5f;
     }
 }

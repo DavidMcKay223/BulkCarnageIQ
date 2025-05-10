@@ -1,6 +1,7 @@
 ﻿@page "/FoodList"
 @rendermode InteractiveServer
 @using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Carnage.Report
 @using BulkCarnageIQ.Core.Contracts
 @inject IFoodItemService FoodItemService
 
@@ -9,6 +10,94 @@
 <h2 class="my-4 text-center">
     <i class="bi bi-egg-fried"></i> Food Items
 </h2>
+
+<!-- Filters Section in a Card -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-funnel"></i> Filters
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap mb-3">
+            <!-- Recipe Name Dropdown -->
+            <div class="me-3">
+                <label for="recipeName">Recipe Name</label>
+                <select class="form-select" id="recipeName" @bind="filter.SelectedRecipeName">
+                    <option value="">Select Recipe</option>
+                    @foreach (var recipe in recipeNames)
+                    {
+                        <option value="@recipe">@recipe</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Group Name Dropdown -->
+            <div class="me-3">
+                <label for="groupName">Group Name</label>
+                <select class="form-select" id="groupName" @bind="filter.SelectedGroupName">
+                    <option value="">Select Group</option>
+                    @foreach (var group in groupNames)
+                    {
+                        <option value="@group">@group</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Brand Type Dropdown -->
+            <div class="me-3">
+                <label for="brandType">Brand Type</label>
+                <select class="form-select" id="brandType" @bind="filter.SelectedBrandType">
+                    <option value="">Select Brand</option>
+                    @foreach (var brand in brandTypes)
+                    {
+                        <option value="@brand">@brand</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap">
+            <!-- Flags Section -->
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="highProtein" @bind="filter.IsHighProtein" />
+                <label class="form-check-label" for="highProtein">High Protein</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="lowCarb" @bind="filter.IsLowCarb" />
+                <label class="form-check-label" for="lowCarb">Low Carb</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="keto" @bind="filter.IsKeto" />
+                <label class="form-check-label" for="keto">Keto</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="bulkMeal" @bind="filter.IsBulkMeal" />
+                <label class="form-check-label" for="bulkMeal">Bulk Meal</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="highSugar" @bind="filter.IsHighSugar" />
+                <label class="form-check-label" for="highSugar">High Sugar</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="lowFiber" @bind="filter.IsLowFiber" />
+                <label class="form-check-label" for="lowFiber">Low Fiber</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="highFat" @bind="filter.IsHighFat" />
+                <label class="form-check-label" for="highFat">High Fat</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="balancedMeal" @bind="filter.IsBalancedMeal" />
+                <label class="form-check-label" for="balancedMeal">Balanced Meal</label>
+            </div>
+            <div class="form-check me-3">
+                <input type="checkbox" class="form-check-input" id="lowProtein" @bind="filter.IsLowProtein" />
+                <label class="form-check-label" for="lowProtein">Low Protein</label>
+            </div>
+        </div>
+    </div>
+</div>
 
 @if (foodItems == null)
 {
@@ -22,7 +111,8 @@ else if (foodItems.Count == 0)
 }
 else
 {
-    var groupedItems = foodItems.GroupBy(item => item.GroupName ?? "Ungrouped");
+    var filteredItems = filter.ApplyFilters(foodItems);
+    var groupedItems = filteredItems.GroupBy(item => item.GroupName ?? "Ungrouped");
 
     foreach (var group in groupedItems)
     {
@@ -81,17 +171,37 @@ else
                                         {
                                             <span class="badge bg-success me-1"><i class="bi bi-fire"></i> High Protein</span>
                                         }
-                                        @if (item.IsKeto)
-                                        {
-                                            <span class="badge bg-warning text-dark me-1"><i class="bi bi-droplet-half"></i> Keto</span>
-                                        }
                                         @if (item.IsLowCarb)
                                         {
                                             <span class="badge bg-info text-dark me-1"><i class="bi bi-arrow-down-circle"></i> Low Carb</span>
                                         }
+                                        @if (item.IsKeto)
+                                        {
+                                            <span class="badge bg-warning text-dark me-1"><i class="bi bi-droplet-half"></i> Keto</span>
+                                        }
                                         @if (item.IsBulkMeal)
                                         {
                                             <span class="badge bg-danger me-1"><i class="bi bi-graph-up"></i> Bulk</span>
+                                        }
+                                        @if (item.IsHighSugar)
+                                        {
+                                            <span class="badge bg-danger text-white me-1"><i class="bi bi-cup-straw"></i> High Sugar</span>
+                                        }
+                                        @if (item.IsLowFiber)
+                                        {
+                                            <span class="badge bg-secondary me-1"><i class="bi bi-flower3"></i> Low Fiber</span>
+                                        }
+                                        @if (item.IsHighFat)
+                                        {
+                                            <span class="badge bg-dark text-white me-1"><i class="bi bi-droplet"></i> High Fat</span>
+                                        }
+                                        @if (item.IsBalancedMeal)
+                                        {
+                                            <span class="badge bg-primary me-1"><i class="bi bi-lightning-charge"></i> Balanced Meal</span>
+                                        }
+                                        @if (item.IsLowProtein)
+                                        {
+                                            <span class="badge bg-info me-1"><i class="bi bi-egg"></i> Low Protein</span>
                                         }
                                     </div>
 
@@ -120,10 +230,20 @@ else
 }
 
 @code {
-    private List<FoodItem>? foodItems;
+    private List<FoodItem> foodItems;
+    private List<string> recipeNames = [];
+    private List<string> groupNames = [];
+    private List<string> brandTypes = [];
+    private FoodItemFilter filter = new FoodItemFilter();
 
     protected override async Task OnInitializedAsync()
     {
+        // Fetch food items from service
         foodItems = await FoodItemService.GetAllAsync();
+
+        // Get the distinct values for RecipeName, GroupName, and BrandType for the dropdowns
+        recipeNames = foodItems.Select(f => f.RecipeName).Distinct().ToList();
+        groupNames = foodItems.Select(f => f.GroupName ?? "Ungrouped").Distinct().ToList();
+        brandTypes = foodItems.Select(f => f.BrandType).Distinct().ToList();
     }
 }
