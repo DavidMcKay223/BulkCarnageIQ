@@ -23,7 +23,7 @@
                             var value = GetMacroValue(day.Value, macro);
                             var goal = GetGoal(macro);
                             var css = GetCellClass(value, goal);
-                            <td class="@css">@value g / @goal g</td>
+                            <td class="@css">@value.ToString("N2") g / @goal.ToString("N2") g</td>
                         }
                     </tr>
                 }

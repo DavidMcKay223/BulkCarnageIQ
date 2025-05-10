@@ -4,6 +4,7 @@
 @using BulkCarnageIQ.Core.Carnage.Report
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealService
+@inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
 
 <div class="container mt-4">
@@ -12,7 +13,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h4 class="card-title mb-3"><i class="bi bi-nut me-2"></i> Macros Today</h4>
-                <BulkCarnageIQ.Web.Components.Carnage.MacroAlertPanel DailyMacros="DailyMacros" />
+                <BulkCarnageIQ.Web.Components.Carnage.MacroAlertPanel DailyMacros="DailyMacros" UserProfile="UserProfile" />
             </div>
         </div>
     }
@@ -22,7 +23,12 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h4 class="card-title mb-3"><i class="bi bi-graph-up-arrow me-2"></i> Macro Heatmap This Week</h4>
-                <BulkCarnageIQ.Web.Components.Carnage.WeeklyMacroHeatmap WeeklyData="WeeklyMacros" />
+                <BulkCarnageIQ.Web.Components.Carnage.WeeklyMacroHeatmap 
+                    WeeklyData="WeeklyMacros"
+                    ProteinGoal="UserProfile!.ProteinGoal"
+                    CarbsGoal="UserProfile!.CarbsGoal"
+                    FatsGoal="UserProfile!.FatGoal"
+                    FiberGoal="UserProfile!.FiberGoal" />
             </div>
         </div>
     }
@@ -43,6 +49,7 @@
     private List<int>? calories;
     private MacroSummary? DailyMacros;
     private Dictionary<string, MacroSummary>? WeeklyMacros;
+    private UserProfile? UserProfile;
 
     private BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart? CalorieBarChart;
 
@@ -69,6 +76,9 @@
                 DateOnly.FromDateTime(DateTime.Today),
                 userId
             );
+
+            // Fetch UserProfile
+            UserProfile = await UserProfileService.GetUserProfile(userId);
         }
     }
 

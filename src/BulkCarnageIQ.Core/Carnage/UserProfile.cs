@@ -35,7 +35,7 @@ namespace BulkCarnageIQ.Core.Carnage
             CalorieGoal = adjustedCalories;
 
             float weightKg = PoundsToKg(WeightPounds);
-            ProteinGoal = weightKg * 2.0f;
+            ProteinGoal = Math.Min(weightKg * 1.5f, 170f);
             FatGoal = CalorieGoal * 0.25f / 9f;
             CarbsGoal = (CalorieGoal - (ProteinGoal * 4f + FatGoal * 9f)) / 4f;
             FiberGoal = (CalorieGoal / 1000.0f) * 14.0f;

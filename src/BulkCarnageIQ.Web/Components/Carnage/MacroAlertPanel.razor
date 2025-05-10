@@ -1,4 +1,5 @@
-﻿@using BulkCarnageIQ.Core.Carnage.Report
+﻿@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Carnage.Report
 
 @if (DailyMacros != null)
 {
@@ -9,7 +10,7 @@
                 <div class="p-4 border rounded-xl shadow-md bg-white">
                     <div class="d-flex justify-content-between font-weight-bold">
                         <span>@macro.Name</span>
-                        <span>@macro.Current g / @macro.Goal g</span>
+                        <span>@macro.Current.ToString("N2") g / @macro.Goal.ToString("N2") g</span>
                     </div>
                     <div class="w-100 h-3 bg-secondary rounded-3 overflow-hidden mt-2">
                         <div class="@GetBarColor(macro.Current, macro.Goal) h-100" style="width:@GetBarWidth(macro.Current, macro.Goal)"></div>
@@ -23,18 +24,22 @@
 
 @code {
     [Parameter] public MacroSummary? DailyMacros { get; set; }
+    [Parameter] public UserProfile? UserProfile { get; set; }
 
     // Method to return the macro values
     private IEnumerable<(string Name, float Current, float Goal)> GetMacros()
     {
-        if (DailyMacros == null) return[];
+        if (DailyMacros == null || UserProfile == null) return [];
+
+        float SafeGoal(float? value, float fallback) =>
+            (value.HasValue && value.Value > 0) ? value.Value : fallback;
 
         return new[]
         {
-            ("Protein", DailyMacros.Protein, 120f),
-            ("Carbs", DailyMacros.Carbs, 220f),
-            ("Fats", DailyMacros.Fats, 80f),
-            ("Fiber", DailyMacros.Fiber, 25f)
+            ("Protein", DailyMacros.Protein, SafeGoal(UserProfile.ProteinGoal, 120f)),
+            ("Carbs", DailyMacros.Carbs, SafeGoal(UserProfile.CarbsGoal, 220f)),
+            ("Fats", DailyMacros.Fats, SafeGoal(UserProfile.FatGoal, 80f)),
+            ("Fiber", DailyMacros.Fiber, SafeGoal(UserProfile.FiberGoal, 25f))
         };
     }
 
