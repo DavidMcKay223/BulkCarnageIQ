@@ -18,33 +18,32 @@
                 <span>Home</span>
             </NavLink>
         </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerTopFoods">
-                <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Meal Top Foods</span>
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerReport">
-                <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Meal Tracker Report</span>
-            </NavLink>
-        </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTracker">
-                <i class="bi bi-journal-text fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
+                <i class="bi bi-clipboard-data fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
                 <span>Meal Tracker</span>
             </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/WeightTracker">
-                <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Weight Tracker</span>
-            </NavLink>
+            <div class="collapse show" id="foodTrackerMenu">
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerReport">
+                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
+                        Meal Report
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerTopFoods">
+                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
+                        Top Foods
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerReportMacro">
+                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
+                        Report Macro
+                    </NavLink>
+                </div>
+            </div>
         </div>
 
         <div class="nav-item px-3">
@@ -66,6 +65,14 @@
                 <i class="bi bi-person-circle fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
                 <span>User Profile</span>
             </NavLink>
+            <div class="collapse show" id="userProfileMenu">
+                <div class="nav-item px-3 ms-3">
+                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/WeightTracker">
+                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
+                        Weight
+                    </NavLink>
+                </div>
+            </div>
         </div>
     </nav>
 </div>

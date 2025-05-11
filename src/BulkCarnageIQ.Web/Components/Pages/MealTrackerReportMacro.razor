@@ -1,0 +1,178 @@
+﻿@page "/MealTrackerReportMacro"
+@rendermode InteractiveServer
+@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+@inject IMealEntryService MealEntryService
+@inject IUserProfileService UserProfileService
+@inject AuthenticationStateProvider AuthProvider
+
+<h3><i class="bi bi-bar-chart-line"></i> Meal Tracker Report by Macro (Grouped by Month)</h3>
+
+@if (entries is null)
+{
+    <p><em>Loading meals...</em></p>
+}
+else if (!entries.Any())
+{
+    <p>No meals tracked yet.</p>
+}
+else
+{
+    <table class="table table-hover table-bordered small align-middle">
+        @foreach (var monthGroup in entries
+       .GroupBy(e => new { e.Date.Year, e.Date.Month })
+       .OrderByDescending(g => g.Key.Year)
+       .ThenByDescending(g => g.Key.Month))
+        {
+            var year = monthGroup.Key.Year;
+            var month = monthGroup.Key.Month;
+            var monthName = new DateTime(year, month, 1).ToString("MMMM yyyy");
+
+            <tbody class="table-group-divider">
+                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleMonth(monthGroup.Key))" style="cursor: pointer;">
+                    <td colspan="6">
+                        <i class="bi @(IsExpanded(monthGroup.Key) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
+                        @monthName
+                    </td>
+                </tr>
+
+                @if (IsExpanded(monthGroup.Key))
+                {
+                    <!-- Headers for the Month Group -->
+                    <tr class="table-info fw-bold">
+                        <th>Date</th>
+                        <th>Total Calories</th>
+                        <th>Total Protein</th>
+                        <th>Total Carbs</th>
+                        <th>Total Fats</th>
+                        <th>Total Fiber</th>
+                    </tr>
+
+                    var dayGroups = monthGroup
+                    .GroupBy(m => m.Date)
+                    .Select(g => new
+                    {
+                        Date = g.Key,
+                        TotalCalories = g.Sum(m => m.Calories),
+                        TotalProtein = g.Sum(m => m.Protein),
+                        TotalCarbs = g.Sum(m => m.Carbs),
+                        TotalFats = g.Sum(m => m.Fats),
+                        TotalFiber = g.Sum(m => m.Fiber)
+                    })
+                    .OrderByDescending(d => d.Date)
+                    .ToList();
+
+                    @foreach (var day in dayGroups)
+                    {
+                        <tr>
+                            <td>@day.Date.ToString("MMMM dd, yyyy")</td>
+                            <td class="@GetMacroClass(day.TotalCalories, userProfile?.CalorieGoal)">
+                                @day.TotalCalories.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalCalories, userProfile?.CalorieGoal))
+                            </td>
+                            <td class="@GetMacroClass(day.TotalProtein, userProfile?.ProteinGoal)">
+                                @day.TotalProtein.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalProtein, userProfile?.ProteinGoal))
+                            </td>
+                            <td class="@GetMacroClass(day.TotalCarbs, userProfile?.CarbsGoal)">
+                                @day.TotalCarbs.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalCarbs, userProfile?.CarbsGoal))
+                            </td>
+                            <td class="@GetMacroClass(day.TotalFats, userProfile?.FatGoal)">
+                                @day.TotalFats.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalFats, userProfile?.FatGoal))
+                            </td>
+                            <td class="@GetMacroClass(day.TotalFiber, userProfile?.FiberGoal)">
+                                @day.TotalFiber.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalFiber, userProfile?.FiberGoal))
+                            </td>
+                        </tr>
+                    }
+
+                    <tr class="table-warning fw-bold">
+                        <td class="text-end">Monthly Total</td>
+                        <td>@monthGroup.Sum(e => e.Calories).ToString("N2")</td>
+                        <td>@monthGroup.Sum(e => e.Protein).ToString("N2")</td>
+                        <td>@monthGroup.Sum(e => e.Carbs).ToString("N2")</td>
+                        <td>@monthGroup.Sum(e => e.Fats).ToString("N2")</td>
+                        <td>@monthGroup.Sum(e => e.Fiber).ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+}
+
+@code {
+    private List<MealEntry>? entries;
+    private HashSet<(int Year, int Month)> expandedMonths = new();
+    private UserProfile? userProfile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User?.Identity?.Name;
+
+        entries = await MealEntryService.GetAllAsync(userId!);
+        userProfile = await UserProfileService.GetUserProfile(userId!);
+    }
+
+    private void ToggleMonth(dynamic key)
+    {
+        var tupleKey = (Year: (int)key.Year, Month: (int)key.Month);
+
+        if (!expandedMonths.Add(tupleKey))
+            expandedMonths.Remove(tupleKey);
+    }
+
+    private bool IsExpanded(dynamic key)
+    {
+        var tupleKey = (Year: (int)key.Year, Month: (int)key.Month);
+        return !expandedMonths.Contains(tupleKey);
+    }
+
+    private string GetMacroClass(float actual, float? goal)
+    {
+        if (goal == null)
+        {
+            return string.Empty; // No profile, no highlight
+        }
+
+        const float tolerance = 0.1f; // 10% tolerance
+        var isOk = Math.Abs(actual - goal.Value) / goal.Value <= tolerance;
+
+        // Logic to apply color based on proximity to the goal
+        if (isOk)
+        {
+            return "table-success"; // Green for within goal
+        }
+        else if (Math.Abs(actual - goal.Value) < goal.Value * 0.2) // Example for "yellow" condition
+        {
+            return "table-warning"; // Yellow for somewhat within goal
+        }
+        else
+        {
+            return "table-danger"; // Red for exceeding or falling far from the goal
+        }
+    }
+
+    private MarkupString GetArrowIcon(float actual, float? goal)
+    {
+        if (goal == null)
+        {
+            return new MarkupString(string.Empty); // No goal, no icon
+        }
+
+        // Logic to decide whether to show an up or down arrow
+        if (Math.Abs(actual - goal.Value) / goal.Value <= 0.1f) // Within 10% tolerance
+        {
+            return new MarkupString(string.Empty); // No arrow if within goal range
+        }
+
+        if (actual < goal) // Below the goal
+        {
+            return new MarkupString("<i class='bi bi-arrow-down text-danger'></i>"); // Down arrow, red
+        }
+        else if (actual > goal) // Above the goal
+        {
+            return new MarkupString("<i class='bi bi-arrow-up text-success'></i>"); // Up arrow, green
+        }
+
+        return new MarkupString(string.Empty); // No icon
+    }
+}
