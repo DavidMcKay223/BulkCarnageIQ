@@ -6,7 +6,7 @@
 @inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3><i class="bi bi-bar-chart-line"></i> Meal Tracker Report by Macro (Grouped by Month)</h3>
+<h3><i class="bi bi-bar-chart-line"></i> Meal Tracker Report by Macro</h3>
 
 @if (entries is null)
 {
@@ -133,21 +133,29 @@ else
             return string.Empty; // No profile, no highlight
         }
 
-        const float tolerance = 0.1f; // 10% tolerance
-        var isOk = Math.Abs(actual - goal.Value) / goal.Value <= tolerance;
+        const float toleranceGreen = 0.05f;  // 5% over is still Green
+        const float toleranceYellow = 0.20f; // 20% over is Yellow
 
-        // Logic to apply color based on proximity to the goal
-        if (isOk)
+        float difference = actual - goal.Value;
+
+        if (difference <= 0)
         {
-            return "table-success"; // Green for within goal
+            return "table-success"; // Under or exactly at goal = Green
         }
-        else if (Math.Abs(actual - goal.Value) < goal.Value * 0.2) // Example for "yellow" condition
+
+        float percentOver = difference / goal.Value;
+
+        if (percentOver <= toleranceGreen)
         {
-            return "table-warning"; // Yellow for somewhat within goal
+            return "table-success"; // Up to 5% over = Green
+        }
+        else if (percentOver <= toleranceYellow)
+        {
+            return "table-warning"; // 5%-20% over = Yellow
         }
         else
         {
-            return "table-danger"; // Red for exceeding or falling far from the goal
+            return "table-danger"; // >20% over = Red
         }
     }
 
