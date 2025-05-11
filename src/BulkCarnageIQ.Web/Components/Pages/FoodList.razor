@@ -96,6 +96,14 @@
                 <label class="form-check-label" for="lowProtein">Low Protein</label>
             </div>
         </div>
+
+        <div class="d-flex flex-wrap mb-3 mt-3">
+            <div class="me-3">
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle"></i> Reset Filters
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -245,5 +253,11 @@ else
         recipeNames = foodItems.Select(f => f.RecipeName).Distinct().ToList();
         groupNames = foodItems.Select(f => f.GroupName ?? "Ungrouped").Distinct().ToList();
         brandTypes = foodItems.Select(f => f.BrandType).Distinct().ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filter = new FoodItemFilter();
+        StateHasChanged();
     }
 }
