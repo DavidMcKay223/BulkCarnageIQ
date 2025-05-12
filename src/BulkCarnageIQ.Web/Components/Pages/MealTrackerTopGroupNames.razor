@@ -1,11 +1,11 @@
-﻿@page "/MealTrackerTopFoods"
+﻿@page "/MealTrackerTopGroupNames"
 @rendermode InteractiveServer
 @using BulkCarnageIQ.Core.Carnage
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3><i class="bi bi-bar-chart-line"></i> Top Foods by Month</h3>
+<h3><i class="bi bi-bar-chart-line"></i> Top Groups by Month</h3>
 
 @if (entries is null)
 {
@@ -29,7 +29,7 @@ else
 
             <tbody class="table-group-divider">
                 <tr class="table-secondary fw-bold" @onclick="@(() => ToggleMonth(monthGroup.Key))" style="cursor: pointer;">
-                    <td colspan="8">
+                    <td colspan="7">
                         <i class="bi @(IsExpanded(monthGroup.Key) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
                         @monthName
                     </td>
@@ -37,12 +37,11 @@ else
 
                 @if (IsExpanded(monthGroup.Key))
                 {
-                    var foodGroups = monthGroup
-                    .GroupBy(m => m.MealName)
+                    var groupGroups = monthGroup
+                    .GroupBy(m => m.GroupName ?? "Unknown")
                     .Select(g => new
                     {
-                        MealName = String.Format("{0} ({1} x {2})", g.Key, g.Sum(m => m.MeasurementServings)?.ToString("N2"), g.First().MeasurementType),
-                        GroupName = g.First().GroupName ?? "Unknown",
+                        GroupName = String.Format("{0} ({1} items)", g.Key, g.Count()),
                         TotalPortion = g.Sum(m => m.PortionEaten),
                         TotalCalories = g.Sum(m => m.Calories),
                         TotalProtein = g.Sum(m => m.Protein),
@@ -55,7 +54,6 @@ else
 
                     <tr class="fw-bold table-info">
                         <td>Group Name</td>
-                        <td>Meal Name</td>
                         <th>Total Portion</th>
                         <th>Total Calories</th>
                         <th>Total Protein</th>
@@ -64,22 +62,21 @@ else
                         <th>Total Fiber</th>
                     </tr>
 
-                    @foreach (var food in foodGroups)
+                    @foreach (var group in groupGroups)
                     {
                         <tr>
-                            <td>@food.GroupName</td>
-                            <td>@food.MealName</td>
-                            <td>@food.TotalPortion.ToString("N2")</td>
-                            <td>@food.TotalCalories.ToString("N2")</td>
-                            <td>@food.TotalProtein.ToString("N2")</td>
-                            <td>@food.TotalCarbs.ToString("N2")</td>
-                            <td>@food.TotalFats.ToString("N2")</td>
-                            <td>@food.TotalFiber.ToString("N2")</td>
+                            <td>@group.GroupName</td>
+                            <td>@group.TotalPortion.ToString("N2")</td>
+                            <td>@group.TotalCalories.ToString("N2")</td>
+                            <td>@group.TotalProtein.ToString("N2")</td>
+                            <td>@group.TotalCarbs.ToString("N2")</td>
+                            <td>@group.TotalFats.ToString("N2")</td>
+                            <td>@group.TotalFiber.ToString("N2")</td>
                         </tr>
                     }
 
                     <tr class="table-warning fw-bold">
-                        <td colspan="2" class="text-end">Monthly Total</td>
+                        <td class="text-end">Monthly Total</td>
                         <td>@monthGroup.Sum(e => e.PortionEaten).ToString("N2")</td>
                         <td>@monthGroup.Sum(e => e.Calories).ToString("N2")</td>
                         <td>@monthGroup.Sum(e => e.Protein).ToString("N2")</td>

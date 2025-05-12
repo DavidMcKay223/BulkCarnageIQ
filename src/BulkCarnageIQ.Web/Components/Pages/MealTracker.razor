@@ -197,6 +197,7 @@ else
                 Day = targetDate.DayOfWeek.ToString(),
                 MealType = mealType ?? "Breakfast",
                 MealName = string.Empty,
+                GroupName = string.Empty,
                 PortionEaten = 1.0F, // Default portion
                 UserId = currentUserId
             };
@@ -220,6 +221,7 @@ else
             newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
             newEntry.MeasurementServings = item.MeasurementServings * newEntry.PortionEaten;
             newEntry.MeasurementType = item.MeasurementType;
+            newEntry.GroupName = item.GroupName;
         }
         else
         {
@@ -299,6 +301,7 @@ else
             meal.Fiber = item.Fiber * meal.PortionEaten;
             meal.MeasurementServings = item.MeasurementServings * meal.PortionEaten;
             meal.MeasurementType = item.MeasurementType;
+            meal.GroupName = item.GroupName;
 
             try
             {

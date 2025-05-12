@@ -16,6 +16,7 @@ namespace BulkCarnageIQ.Core.Carnage
         public required string Day { get; set; }      // "Monday", "Tuesday", etc.
         public required string MealType { get; set; } // "Breakfast", "Lunch", etc.
         public required string MealName { get; set; } // Must not be empty to save
+        public string? GroupName { get; set; }
 
         public float PortionEaten { get; set; } = 1f;
         public float? MeasurementServings { get; set; }  // e.g., 0.25

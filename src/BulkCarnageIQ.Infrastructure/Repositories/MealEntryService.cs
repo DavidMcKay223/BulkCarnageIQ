@@ -74,6 +74,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                 //existingEntry.Day = entry.Day;
                 //existingEntry.MealType = entry.MealType;
                 //existingEntry.MealName = entry.MealName;
+                //existingEntry.GroupName = entry.GroupName;
                 existingEntry.PortionEaten = entry.PortionEaten;
                 existingEntry.Calories = entry.Calories;
                 existingEntry.Protein = entry.Protein;
