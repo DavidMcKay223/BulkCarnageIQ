@@ -66,19 +66,19 @@ else
                     {
                         <tr>
                             <td>@day.Date.ToString("MMMM dd, yyyy")</td>
-                            <td class="@GetMacroClass(day.TotalCalories, userProfile?.CalorieGoal)">
+                            <td style="@GetMacroStyle(day.TotalCalories, userProfile?.CalorieGoal)">
                                 @day.TotalCalories.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalCalories, userProfile?.CalorieGoal))
                             </td>
-                            <td class="@GetMacroClass(day.TotalProtein, userProfile?.ProteinGoal)">
+                            <td style="@GetMacroStyle(day.TotalProtein, userProfile?.ProteinGoal)">
                                 @day.TotalProtein.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalProtein, userProfile?.ProteinGoal))
                             </td>
-                            <td class="@GetMacroClass(day.TotalCarbs, userProfile?.CarbsGoal)">
+                            <td style="@GetMacroStyle(day.TotalCarbs, userProfile?.CarbsGoal)">
                                 @day.TotalCarbs.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalCarbs, userProfile?.CarbsGoal))
                             </td>
-                            <td class="@GetMacroClass(day.TotalFats, userProfile?.FatGoal)">
+                            <td style="@GetMacroStyle(day.TotalFats, userProfile?.FatGoal)">
                                 @day.TotalFats.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalFats, userProfile?.FatGoal))
                             </td>
-                            <td class="@GetMacroClass(day.TotalFiber, userProfile?.FiberGoal)">
+                            <td style="@GetMacroStyle(day.TotalFiber, userProfile?.FiberGoal)">
                                 @day.TotalFiber.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalFiber, userProfile?.FiberGoal))
                             </td>
                         </tr>
@@ -126,36 +126,51 @@ else
         return !expandedMonths.Contains(tupleKey);
     }
 
-    private string GetMacroClass(float actual, float? goal)
+    private string GetMacroStyle(float actual, float? goal)
     {
         if (goal == null)
         {
-            return string.Empty; // No profile, no highlight
+            return string.Empty; // No styling
         }
 
-        const float toleranceGreen = 0.05f;  // 5% over is still Green
-        const float toleranceYellow = 0.20f; // 20% over is Yellow
+        const float toleranceGreen = 0.05f;
+        const float toleranceYellow = 0.20f;
+        const float toleranceRed = 0.40f;
+        const float extremeRed = 0.60f;
 
         float difference = actual - goal.Value;
 
         if (difference <= 0)
         {
-            return "table-success"; // Under or exactly at goal = Green
+            float percentUnder = Math.Abs(difference) / goal.Value;
+            if (percentUnder >= 0.20f)
+            {
+                return "background-color:#A8E6CF; color:#1b4332;"; // Very Good
+            }
+            return "background-color:#D4F5E9; color:#1b4332;"; // Good
         }
 
         float percentOver = difference / goal.Value;
 
         if (percentOver <= toleranceGreen)
         {
-            return "table-success"; // Up to 5% over = Green
+            return "background-color:#D4F5E9; color:#1b4332;"; // Slightly over = still Green
         }
         else if (percentOver <= toleranceYellow)
         {
-            return "table-warning"; // 5%-20% over = Yellow
+            return "background-color:#FFFACD; color:#7b5e00;"; // Mild Warning
+        }
+        else if (percentOver <= toleranceRed)
+        {
+            return "background-color:#FFB6B6; color:#7b0000;"; // Bad
+        }
+        else if (percentOver <= extremeRed)
+        {
+            return "background-color:#FF7F7F; color:#7b0000;"; // Very Bad
         }
         else
         {
-            return "table-danger"; // >20% over = Red
+            return "background-color:#E57373; color:#4b0000;"; // Extreme Bad
         }
     }
 
