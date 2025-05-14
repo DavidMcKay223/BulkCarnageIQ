@@ -29,7 +29,7 @@ else
 
             <tbody class="table-group-divider">
                 <tr class="table-secondary fw-bold" @onclick="@(() => ToggleMonth(monthGroup.Key))" style="cursor: pointer;">
-                    <td colspan="7">
+                    <td colspan="8">
                         <i class="bi @(IsExpanded(monthGroup.Key) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
                         @monthName
                     </td>
@@ -60,10 +60,20 @@ else
                         <th>Total Carbs</th>
                         <th>Total Fats</th>
                         <th>Total Fiber</th>
+                        <th>Flags</th>
                     </tr>
 
                     @foreach (var group in groupGroups)
                     {
+                        var caloriePerPortion = group.TotalCalories / (group.TotalPortion == 0 ? 1 : group.TotalPortion);
+                        var fatToCarbRatio = group.TotalFats / (group.TotalCarbs == 0 ? 1 : group.TotalCarbs);
+                        var isFatBomb = group.TotalFats > 150 && fatToCarbRatio > 1.5;
+                        var isSugarBomb = group.TotalCarbs > 200 && group.TotalFiber < 10;
+                        var isCalorieBomb = caloriePerPortion > 400;
+                        var isFiberFail = group.TotalFiber < 5;
+
+                        var showLowFiber = isFatBomb || isSugarBomb || isCalorieBomb;
+
                         <tr>
                             <td>@group.GroupName</td>
                             <td>@group.TotalPortion.ToString("N2")</td>
@@ -72,6 +82,24 @@ else
                             <td>@group.TotalCarbs.ToString("N2")</td>
                             <td>@group.TotalFats.ToString("N2")</td>
                             <td>@group.TotalFiber.ToString("N2")</td>
+                            <td>
+                                @if (isFatBomb)
+                                {
+                                    <span class="badge bg-danger me-1"><i class="bi bi-droplet-fill"></i> Fat Bomb</span>
+                                }
+                                @if (isSugarBomb)
+                                {
+                                    <span class="badge bg-warning text-dark me-1"><i class="bi bi-cup-straw"></i> Sugar Bomb</span>
+                                }
+                                @if (isCalorieBomb)
+                                {
+                                    <span class="badge bg-danger me-1"><i class="bi bi-fire"></i> Calorie Bomb</span>
+                                }
+                                @if (showLowFiber && isFiberFail)
+                                {
+                                    <span class="badge bg-secondary me-1"><i class="bi bi-emoji-dizzy"></i> Low Fiber</span>
+                                }
+                            </td>
                         </tr>
                     }
 
@@ -83,6 +111,7 @@ else
                         <td>@monthGroup.Sum(e => e.Carbs).ToString("N2")</td>
                         <td>@monthGroup.Sum(e => e.Fats).ToString("N2")</td>
                         <td>@monthGroup.Sum(e => e.Fiber).ToString("N2")</td>
+                        <td></td>
                     </tr>
                 }
             </tbody>
