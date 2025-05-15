@@ -13,7 +13,7 @@ namespace BulkCarnageIQ.Core.Carnage.Report
         public bool IsLowCarb { get; set; }
         public bool IsKeto { get; set; }
         public bool IsBulkMeal { get; set; }
-        public bool IsHighSugar { get; set; }
+        public bool IsHighCarb { get; set; }
         public bool IsLowFiber { get; set; }
         public bool IsHighFat { get; set; }
         public bool IsBalancedMeal { get; set; }
@@ -31,7 +31,7 @@ namespace BulkCarnageIQ.Core.Carnage.Report
             IsLowCarb = false;
             IsKeto = false;
             IsBulkMeal = false;
-            IsHighSugar = false;
+            IsHighCarb = false;
             IsLowFiber = false;
             IsHighFat = false;
             IsBalancedMeal = false;
@@ -52,7 +52,7 @@ namespace BulkCarnageIQ.Core.Carnage.Report
                 (!IsLowCarb || item.IsLowCarb) &&
                 (!IsKeto || item.IsKeto) &&
                 (!IsBulkMeal || item.IsBulkMeal) &&
-                (!IsHighSugar || item.IsHighSugar) &&
+                (!IsHighCarb || item.IsHighCarb) &&
                 (!IsLowFiber || item.IsLowFiber) &&
                 (!IsHighFat || item.IsHighFat) &&
                 (!IsBalancedMeal || item.IsBalancedMeal) &&

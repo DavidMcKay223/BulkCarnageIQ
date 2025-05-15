@@ -68,11 +68,11 @@ else
                         var caloriePerPortion = group.TotalCalories / (group.TotalPortion == 0 ? 1 : group.TotalPortion);
                         var fatToCarbRatio = group.TotalFats / (group.TotalCarbs == 0 ? 1 : group.TotalCarbs);
                         var isFatBomb = group.TotalFats > 150 && fatToCarbRatio > 1.5;
-                        var isSugarBomb = group.TotalCarbs > 200 && group.TotalFiber < 10;
+                        var isCarbBomb = group.TotalCarbs > 200 && group.TotalFiber < 10;
                         var isCalorieBomb = caloriePerPortion > 400;
                         var isFiberFail = group.TotalFiber < 5;
 
-                        var showLowFiber = isFatBomb || isSugarBomb || isCalorieBomb;
+                        var showLowFiber = isFatBomb || isCarbBomb || isCalorieBomb;
 
                         <tr>
                             <td>@group.GroupName</td>
@@ -87,9 +87,9 @@ else
                                 {
                                     <span class="badge bg-danger me-1"><i class="bi bi-droplet-fill"></i> Fat Bomb</span>
                                 }
-                                @if (isSugarBomb)
+                                @if (isCarbBomb)
                                 {
-                                    <span class="badge bg-warning text-dark me-1"><i class="bi bi-cup-straw"></i> Sugar Bomb</span>
+                                    <span class="badge bg-warning text-dark me-1"><i class="bi bi-cup-straw"></i> Carb Bomb</span>
                                 }
                                 @if (isCalorieBomb)
                                 {

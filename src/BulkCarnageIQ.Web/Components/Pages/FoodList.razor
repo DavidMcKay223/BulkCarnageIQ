@@ -76,8 +76,8 @@
                 <label class="form-check-label" for="bulkMeal">Bulk Meal</label>
             </div>
             <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="highSugar" @bind="filter.IsHighSugar" />
-                <label class="form-check-label" for="highSugar">High Sugar</label>
+                <input type="checkbox" class="form-check-input" id="highCarb" @bind="filter.IsHighCarb" />
+                <label class="form-check-label" for="highCarb">High Carb</label>
             </div>
             <div class="form-check me-3">
                 <input type="checkbox" class="form-check-input" id="lowFiber" @bind="filter.IsLowFiber" />
@@ -191,9 +191,9 @@ else
                                         {
                                             <span class="badge bg-danger me-1"><i class="bi bi-graph-up"></i> Bulk</span>
                                         }
-                                        @if (item.IsHighSugar)
+                                        @if (item.IsHighCarb)
                                         {
-                                            <span class="badge bg-danger text-white me-1"><i class="bi bi-cup-straw"></i> High Sugar</span>
+                                            <span class="badge bg-danger text-white me-1"><i class="bi bi-cup-straw"></i> High Carb</span>
                                         }
                                         @if (item.IsLowFiber)
                                         {
