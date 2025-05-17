@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BulkCarnageIQ.Core.Carnage.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,9 +15,10 @@ namespace BulkCarnageIQ.Core.Carnage
         public required string UserName { get; set; }
 
         public float Age { get; set; }
-        public float HeightInches { get; set; } // in inches
-        public float WeightPounds { get; set; } // in pounds
-        public required string ActivityLevel { get; set; } // Sedentary, Lightly Active, etc.
+        public Sex Sex { get; set; }
+        public float HeightInches { get; set; }
+        public float WeightPounds { get; set; }
+        public required string ActivityLevel { get; set; }
         public required string GoalType { get; set; }
 
         // Calculated Goals
@@ -35,9 +37,17 @@ namespace BulkCarnageIQ.Core.Carnage
             CalorieGoal = adjustedCalories;
 
             float weightKg = PoundsToKg(WeightPounds);
-            ProteinGoal = Math.Min(weightKg * 1.5f, 170f);
+
+            // Protein goal calculation - typically grams per kg.
+            ProteinGoal = Math.Min(weightKg * 1.5f, 175f);
+
+            // Fat goal calculation as a percentage of calories
             FatGoal = CalorieGoal * 0.25f / 9f;
+
+            // Carb goal calculation based on remaining calories
             CarbsGoal = (CalorieGoal - (ProteinGoal * 4f + FatGoal * 9f)) / 4f;
+
+            // Fiber goal calculation based on calories (14g per 1000 kcal)
             FiberGoal = (CalorieGoal / 1000.0f) * 14.0f;
         }
 
@@ -45,7 +55,21 @@ namespace BulkCarnageIQ.Core.Carnage
         {
             float weightKg = PoundsToKg(WeightPounds);
             float heightCm = InchesToCm(HeightInches);
-            return 10f * weightKg + 6.25f * heightCm - 5f * Age + 5f;
+
+            float bmr;
+
+            if (Sex == Sex.Male)
+            {
+                // Mifflin-St Jeor for males
+                bmr = 10f * weightKg + 6.25f * heightCm - 5f * Age + 5f;
+            }
+            else
+            {
+                // Mifflin-St Jeor for females
+                bmr = 10f * weightKg + 6.25f * heightCm - 5f * Age - 161f;
+            }
+
+            return bmr;
         }
 
         private float GetActivityFactor()
@@ -57,7 +81,7 @@ namespace BulkCarnageIQ.Core.Carnage
                 case "moderately active": return 1.55f;
                 case "very active": return 1.725f;
                 case "super active": return 1.9f;
-                default: return 1.2f;
+                default: return 1.2f; // Default to sedentary if level is unknown
             }
         }
 
@@ -67,18 +91,18 @@ namespace BulkCarnageIQ.Core.Carnage
             {
                 case "maintain":
                     return tdee;
-                case "lose0.5":
+                case "lose0.5": // Lose 0.5 lbs/week (approx 250 kcal deficit/day)
                     return tdee - 250f;
-                case "lose1":
+                case "lose1": // Lose 1 lbs/week (approx 500 kcal deficit/day)
                     return tdee - 500f;
-                case "lose2":
+                case "lose2": // Lose 2 lbs/week (approx 1000 kcal deficit/day)
                     return tdee - 1000f;
-                case "gain0.5":
+                case "gain0.5": // Gain 0.5 lbs/week (approx 250 kcal surplus/day)
                     return tdee + 250f;
-                case "gain1":
+                case "gain1": // Gain 1 lbs/week (approx 500 kcal surplus/day)
                     return tdee + 500f;
                 default:
-                    return tdee;
+                    return tdee; // Default to maintain if goal is unknown
             }
         }
 

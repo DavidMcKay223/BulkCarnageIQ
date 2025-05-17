@@ -1,6 +1,7 @@
 ﻿@page "/UserProfile"
 @rendermode InteractiveServer
 @using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Carnage.Enums
 @using BulkCarnageIQ.Core.Contracts
 @inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
@@ -36,6 +37,16 @@ else
                         <div class="form-group mb-3">
                             <label for="age" class="form-label">Age</label>
                             <input type="number" id="age" class="form-control" @bind="userProfile.Age" min="1" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="sex" class="form-label">Sex</label>
+                            <select id="sex" class="form-select" @bind="userProfile.Sex">
+                                @foreach (var sexOption in Enum.GetValues<Sex>())
+                                {
+                                    <option value="@sexOption">@sexOption</option>
+                                }
+                            </select>
                         </div>
 
                         <div class="form-group mb-3">
