@@ -399,7 +399,7 @@ else
                 await MealEntryService.AddAsync(new MealEntry
                     {
                         Date = newEntry.Date,
-                        Day = newEntry.Day,
+                        Day = newEntry.Date.DayOfWeek.ToString(),
                         MealType = newEntry.MealType,
                         MealName = foodItem.RecipeName,
                         PortionEaten = meal.PortionAmount,
