@@ -1,0 +1,68 @@
+﻿@using BulkCarnageIQ.Core.Carnage
+
+<div class="card shadow-sm rounded p-3 mb-4">
+    <h5 class="mb-3">
+        <i class="bi bi-lightning-charge-fill text-warning"></i>
+        Quick Add Grouped Meals
+    </h5>
+
+    @if (GroupItems?.Any() == true)
+    {
+        <div class="row g-3">
+            @foreach (var group in GroupItems)
+            {
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title text-primary">@group.GroupName</h6>
+                            <div class="flex-grow-1 overflow-auto" style="max-height: 300px; min-height: 100px;">
+                                @foreach (var entry in group.Entries)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="entry_@entry.Id"
+                                               @onchange="(e) => ToggleSelection(entry, (bool)e.Value!)"
+                                               checked="@SelectedItems.Contains(entry)" />
+                                        <label class="form-check-label" for="entry_@entry.Id">
+                                            @entry.RecipeName
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <button class="btn btn-success mt-3" @onclick="AddSelectedItems">
+            <i class="bi bi-plus-circle"></i> Add Selected Items (@SelectedItems.Count)
+        </button>
+    }
+    else
+    {
+        <div class="text-muted">No group meals available.</div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<GroupFoodItem> GroupItems { get; set; } = new();
+    [Parameter] public EventCallback<List<GroupFoodItemEntry>> OnMealsAdded { get; set; }
+
+    private HashSet<GroupFoodItemEntry> SelectedItems { get; set; } = new();
+
+    private void ToggleSelection(GroupFoodItemEntry entry, bool isSelected)
+    {
+        if (isSelected)
+            SelectedItems.Add(entry);
+        else
+            SelectedItems.Remove(entry);
+    }
+
+    private async Task AddSelectedItems()
+    {
+        await OnMealsAdded.InvokeAsync(SelectedItems.ToList());
+        SelectedItems.Clear();
+    }
+}

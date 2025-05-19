@@ -19,6 +19,14 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             _db = db;
         }
 
+        public async Task<FoodItem?> GetFoodItemByName(string recipeName)
+        {
+            var foodItem = await _db.FoodItems
+                .FirstOrDefaultAsync(f => f.RecipeName == recipeName);
+
+            return foodItem;
+        }
+
         public async Task<List<FoodItem>> GetAllAsync()
         {
             return await _db.FoodItems

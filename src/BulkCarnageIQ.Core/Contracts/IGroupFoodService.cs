@@ -9,6 +9,7 @@ namespace BulkCarnageIQ.Core.Contracts
 {
     public interface IGroupFoodService
     {
+        Task<List<GroupFoodItem>> GetAllAsync();
         Task<List<FoodItem>> GetFoodItemByGroupName(string groupName);
         Task<List<string>> GetGroupNames();
     }

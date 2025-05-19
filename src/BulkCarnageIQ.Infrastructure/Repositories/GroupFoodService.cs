@@ -19,6 +19,13 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             _db = db;
         }
 
+        public async Task<List<GroupFoodItem>> GetAllAsync()
+        {
+            return await _db.GroupFoodItems
+                .Include(g => g.Entries)
+                .ToListAsync();
+        }
+
         public async Task<List<FoodItem>> GetFoodItemByGroupName(string groupName)
         {
             var group = await _db.GroupFoodItems

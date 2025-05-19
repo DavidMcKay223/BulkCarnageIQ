@@ -3,6 +3,8 @@
 @using BulkCarnageIQ.Core.Carnage
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
+@inject IFoodItemService FoodItemService
+@inject IGroupFoodService GroupFoodService
 @inject AuthenticationStateProvider AuthProvider
 @using System.Linq
 
@@ -51,6 +53,8 @@
         </div>
     </EditForm>
 </div>
+
+<BulkCarnageIQ.Web.Components.Carnage.GroupMealQuickAdd OnMealsAdded="HandleGroupMealsAdded" GroupItems="groupFoodItems" />
 
 @if (entries is null)
 {
@@ -159,6 +163,7 @@ else
 @code {
     private List<string> suggestions = new();
     private List<MealEntry>? entries;
+    private List<GroupFoodItem>? groupFoodItems;
     private string currentUserId = string.Empty;
     private MealEntry newEntry;
     private HashSet<DateOnly> expandedDates = new();
@@ -186,6 +191,8 @@ else
         {
             entries = new List<MealEntry>();
         }
+
+        groupFoodItems = await GroupFoodService.GetAllAsync();
     }
 
     private void InitializeNewEntry(DateOnly? date = null, string? mealType = null)
@@ -376,5 +383,45 @@ else
             "Snack" => 4,
             _ => 5,
         };
+    }
+
+    private async Task HandleGroupMealsAdded(List<GroupFoodItemEntry> newMeals)
+    {
+        if (newMeals == null || !newMeals.Any() || String.IsNullOrEmpty(currentUserId))
+            return;
+
+        foreach (var meal in newMeals)
+        {
+            var foodItem = await FoodItemService.GetFoodItemByName(meal.RecipeName);
+
+            if (foodItem != null)
+            {
+                await MealEntryService.AddAsync(new MealEntry
+                    {
+                        Date = newEntry.Date,
+                        Day = newEntry.Day,
+                        MealType = newEntry.MealType,
+                        MealName = foodItem.RecipeName,
+                        PortionEaten = meal.PortionAmount,
+                        Calories = foodItem.CaloriesPerServing * meal.PortionAmount,
+                        Protein = foodItem.Protein * meal.PortionAmount,
+                        Carbs = foodItem.Carbs * meal.PortionAmount,
+                        Fats = foodItem.Fats * meal.PortionAmount,
+                        Fiber = foodItem.Fiber * meal.PortionAmount,
+                        MeasurementServings = foodItem.MeasurementServings * meal.PortionAmount,
+                        MeasurementType = foodItem.MeasurementType,
+                        GroupName = foodItem.GroupName,
+                        UserId = currentUserId
+                    });
+            }
+        }
+
+        DateOnly savedDate = newEntry.Date;
+        entries = await MealEntryService.GetAllAsync(currentUserId); // Reload entries
+        if (!expandedDates.Contains(savedDate)) // Expand the date if it was collapsed
+        {
+            expandedDates.Add(savedDate);
+        }
+        StateHasChanged();
     }
 }
