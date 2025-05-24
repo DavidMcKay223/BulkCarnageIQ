@@ -1,0 +1,22 @@
+USE [BulkCarnageIQ]
+GO
+
+/****** Object:  View [dbo].[View_UnfilledMealEntries]    Script Date: 5/24/2025 1:38:29 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE VIEW [dbo].[View_UnfilledMealEntries]
+AS
+SELECT *
+FROM [dbo].[MealEntries]
+WHERE 
+	(PortionEaten IS NULL OR PortionEaten = 1) AND
+    (Calories IS NULL OR Calories = 0) AND
+    (Protein IS NULL OR Protein = 0) AND
+    (Carbs IS NULL OR Carbs = 0) AND
+    (Fats IS NULL OR Fats = 0) AND
+    (Fiber IS NULL OR Fiber = 0)
+GO

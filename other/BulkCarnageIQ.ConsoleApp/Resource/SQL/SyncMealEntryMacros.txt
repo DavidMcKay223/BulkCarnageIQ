@@ -1,0 +1,38 @@
+USE [BulkCarnageIQ]
+GO
+
+/****** Object:  StoredProcedure [dbo].[SyncMealEntryMacros]    Script Date: 5/24/2025 1:39:52 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[SyncMealEntryMacros]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE ME
+    SET 
+		ME.PortionEaten = FI.Servings,
+        ME.Calories = FI.CaloriesPerServing * FI.Servings,
+        ME.Protein = FI.Protein * FI.Servings,
+        ME.Carbs = FI.Carbs * FI.Servings,
+        ME.Fats = FI.Fats * FI.Servings,
+        ME.Fiber = FI.Fiber * FI.Servings,
+		me.MeasurementServings = CAST(FI.Servings * fi.MeasurementServings AS DECIMAL(10, 2)),
+		me.MeasurementType = fi.MeasurementType,
+		me.GroupName = fi.GroupName
+    FROM [dbo].[MealEntries] ME
+    INNER JOIN [dbo].[FoodItems] FI
+        ON ME.MealName = FI.RecipeName
+    WHERE 
+		(ME.PortionEaten IS NULL OR ME.PortionEaten = 1) AND
+        (ME.Calories IS NULL OR ME.Calories = 0) AND
+        (ME.Protein IS NULL OR ME.Protein = 0) AND
+        (ME.Carbs IS NULL OR ME.Carbs = 0) AND
+        (ME.Fats IS NULL OR ME.Fats = 0) AND
+        (ME.Fiber IS NULL OR ME.Fiber = 0)
+END
+GO
