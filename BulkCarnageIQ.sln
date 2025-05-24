@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulkCarnageIQ.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulkCarnageIQ.Web", "src\BulkCarnageIQ.Web\BulkCarnageIQ.Web.csproj", "{EC572EB3-FCBB-4839-B20A-9B096E429567}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "other", "other", "{B37DD929-D76B-40C6-B9B4-D06691E9CACE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulkCarnageIQ.ConsoleApp", "other\BulkCarnageIQ.ConsoleApp\BulkCarnageIQ.ConsoleApp.csproj", "{BB912CAD-A18E-422C-A222-6554B90E784A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,10 @@ Global
 		{EC572EB3-FCBB-4839-B20A-9B096E429567}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC572EB3-FCBB-4839-B20A-9B096E429567}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC572EB3-FCBB-4839-B20A-9B096E429567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB912CAD-A18E-422C-A222-6554B90E784A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB912CAD-A18E-422C-A222-6554B90E784A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB912CAD-A18E-422C-A222-6554B90E784A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB912CAD-A18E-422C-A222-6554B90E784A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +52,7 @@ Global
 		{9E161EEF-E117-4424-ADC9-C714419D72C2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{181F1D63-4BDE-4116-BD44-5EC9B5B82DE3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{EC572EB3-FCBB-4839-B20A-9B096E429567} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{BB912CAD-A18E-422C-A222-6554B90E784A} = {B37DD929-D76B-40C6-B9B4-D06691E9CACE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32D85995-FAF4-4C8B-BB66-4CC9345D3844}
