@@ -16,5 +16,17 @@ namespace BulkCarnageIQ.Tests.SharedUtils.Seed
             var foodItems = faker.Generate(count);
             return foodItems;
         }
+
+        public static List<MealEntry> GenerateMealEntries(string userId, int count = 10)
+        {
+            var faker = MealEntryGenerator.GetFaker(userId);
+            return faker.Generate(count);
+        }
+
+        public static List<GroceryListItem> GenerateGroceryListItems(string userId, int count = 10)
+        {
+            var faker = GroceryListItemGenerator.GetFaker(userId);
+            return faker.Generate(count);
+        }
     }
 }

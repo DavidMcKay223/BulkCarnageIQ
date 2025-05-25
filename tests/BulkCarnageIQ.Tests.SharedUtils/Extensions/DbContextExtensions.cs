@@ -15,5 +15,17 @@ namespace BulkCarnageIQ.Tests.SharedUtils.Extensions
             await context.FoodItems.AddRangeAsync(foodItems);
             await context.SaveChangesAsync();
         }
+
+        public static async Task SeedGroceryListItemsAsync(this AppDbContext context, IEnumerable<GroceryListItem> items)
+        {
+            await context.GroceryListItems.AddRangeAsync(items);
+            await context.SaveChangesAsync();
+        }
+
+        public static async Task SeedMealEntriesAsync(this AppDbContext context, IEnumerable<MealEntry> items)
+        {
+            await context.MealEntries.AddRangeAsync(items);
+            await context.SaveChangesAsync();
+        }
     }
 }
