@@ -16,5 +16,6 @@ namespace BulkCarnageIQ.Tests.SharedUtils.Constants
         public float WeightPounds { get; set; } = 250f; // 250 lbs
         public string ActivityLevel { get; set; } = "moderately active"; // e.g., "Sedentary", "Light", "Moderate", "Active", "Very Active"
         public string GoalType { get; set; } = "lose2"; // e.g., "Lose", "Maintain", "Gain"
+        public DietType DietType { get; set; } = DietType.None;
     }
 }

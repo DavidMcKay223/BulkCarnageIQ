@@ -81,6 +81,16 @@ else
                                 <option value="gain1">Gain 1 lb/week (~500 cal surplus)</option>
                             </select>
                         </div>
+
+                        <div class="form-group mb-3">
+                            <label for="dietType" class="form-label">Diet Type</label>
+                            <select id="dietType" class="form-select" @bind="userProfile.DietType">
+                                @foreach (var diet in Enum.GetValues<DietType>())
+                                {
+                                    <option value="@diet">@diet</option>
+                                }
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

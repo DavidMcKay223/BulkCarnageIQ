@@ -26,18 +26,19 @@ namespace BulkCarnageIQ.Core.Tests.Carnage
                 HeightInches = _defaults.HeightInches,
                 WeightPounds = _defaults.WeightPounds,
                 ActivityLevel = _defaults.ActivityLevel,
-                GoalType = _defaults.GoalType
+                GoalType = _defaults.GoalType,
+                DietType = _defaults.DietType
             };
 
             // Act
             profile.CalculateGoals();
 
-            // Assert – spot check against known expected values (based on formulas)
-            profile.CalorieGoal.ShouldBeInRange(2200f, 2400f);  // ~2294 kcal
-            profile.ProteinGoal.ShouldBeInRange(165f, 175f);    // ~170g protein
-            profile.FatGoal.ShouldBeInRange(60f, 70f);          // ~63.7g fat
-            profile.CarbsGoal.ShouldBeInRange(250f, 270f);      // ~260g carbs
-            profile.FiberGoal.ShouldBeInRange(30f, 35f);        // ~32g fiber
+            // Assert – spot check against known expected values (based on formulas and DietType.None macro split)
+            profile.CalorieGoal.ShouldBeInRange(2290f, 2300f);   // More precise range for ~2294 kcal
+            profile.ProteinGoal.ShouldBeInRange(140f, 150f);    // Updated from ~170g to ~143.4g (25% of calories)
+            profile.FatGoal.ShouldBeInRange(60f, 70f);          // ~63.7g fat (25% of calories) - still within range
+            profile.CarbsGoal.ShouldBeInRange(280f, 290f);      // Updated from ~260g to ~286.8g (50% of calories)
+            profile.FiberGoal.ShouldBeInRange(30f, 35f);        // ~32.1g fiber - still within range
 
             // Ensure macro breakdown fits the calorie total
             var totalCaloriesFromMacros =
@@ -45,7 +46,9 @@ namespace BulkCarnageIQ.Core.Tests.Carnage
                 (profile.CarbsGoal * 4f) +
                 (profile.FatGoal * 9f);
 
-            totalCaloriesFromMacros.ShouldBeInRange(profile.CalorieGoal - 100, profile.CalorieGoal + 100);
+            // Give a slightly larger tolerance for float comparisons if needed,
+            // but 100 kcal is probably fine given the rounding in individual macros.
+            totalCaloriesFromMacros.ShouldBeInRange(profile.CalorieGoal - 5f, profile.CalorieGoal + 5f); // Smaller, more precise range for sum
         }
 
         [Theory]

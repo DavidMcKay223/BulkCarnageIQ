@@ -25,7 +25,7 @@ namespace BulkCarnageIQ.Infrastructure.Tests.Repositories
         public async Task GetFoodItemByName_ShouldReturnCorrectFoodItem_WhenExists()
         {
             // Arrange
-            await using var context = TestDbContextFactory.CreateInMemoryDb();
+            await using var context = TestDbContextFactory.CreateSqliteDb();
             await context.SeedFoodItemsAsync(_sampleFoodItems);
             var service = new FoodItemService(context);
 
@@ -44,7 +44,7 @@ namespace BulkCarnageIQ.Infrastructure.Tests.Repositories
         public async Task GetFoodItemByName_ShouldReturnNull_WhenNotFound()
         {
             // Arrange
-            await using var context = TestDbContextFactory.CreateInMemoryDb();
+            await using var context = TestDbContextFactory.CreateSqliteDb();
             await context.SeedFoodItemsAsync(_sampleFoodItems);
             var service = new FoodItemService(context);
 
@@ -59,7 +59,7 @@ namespace BulkCarnageIQ.Infrastructure.Tests.Repositories
         public async Task GetAllAsync_ShouldReturnAllFoodItems()
         {
             // Arrange
-            await using var context = TestDbContextFactory.CreateInMemoryDb();
+            await using var context = TestDbContextFactory.CreateSqliteDb();
             await context.SeedFoodItemsAsync(_sampleFoodItems);
             var service = new FoodItemService(context);
 
@@ -69,14 +69,18 @@ namespace BulkCarnageIQ.Infrastructure.Tests.Repositories
             // Assert
             results.ShouldNotBeNull();
             results.Count.ShouldBe(_sampleFoodItems.Count);
-            results.Select(f => f.RecipeName).ShouldBe(_sampleFoodItems.Select(f => f.RecipeName));
+
+            // Sort both the actual and expected lists before comparison
+            // This ensures the order matches for the ShouldBe assertion.
+            results.Select(f => f.RecipeName).OrderBy(name => name) // Sort actual results by name
+                   .ShouldBe(_sampleFoodItems.Select(f => f.RecipeName).OrderBy(name => name)); // Sort expected by name
         }
 
         [Fact]
         public async Task GetAllDictionaryAsync_ShouldReturnEmptyDictionary_WhenInputIsNullOrEmpty()
         {
             // Arrange
-            await using var context = TestDbContextFactory.CreateInMemoryDb();
+            await using var context = TestDbContextFactory.CreateSqliteDb();
             await context.SeedFoodItemsAsync(_sampleFoodItems);
             var service = new FoodItemService(context);
 
@@ -96,7 +100,7 @@ namespace BulkCarnageIQ.Infrastructure.Tests.Repositories
         public async Task GetAllDictionaryAsync_ShouldReturnCorrectDictionary_WhenRecipeNamesProvided()
         {
             // Arrange
-            await using var context = TestDbContextFactory.CreateInMemoryDb();
+            await using var context = TestDbContextFactory.CreateSqliteDb();
             await context.SeedFoodItemsAsync(_sampleFoodItems);
             var service = new FoodItemService(context);
 

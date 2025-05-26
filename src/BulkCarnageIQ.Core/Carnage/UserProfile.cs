@@ -1,4 +1,5 @@
 ﻿using BulkCarnageIQ.Core.Carnage.Enums;
+using BulkCarnageIQ.Core.Carnage.Report;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -20,6 +21,7 @@ namespace BulkCarnageIQ.Core.Carnage
         public float WeightPounds { get; set; }
         public required string ActivityLevel { get; set; }
         public required string GoalType { get; set; }
+        public DietType DietType { get; set; } = DietType.None;
 
         // Calculated Goals
         public float CalorieGoal { get; set; }
@@ -38,17 +40,12 @@ namespace BulkCarnageIQ.Core.Carnage
 
             float weightKg = PoundsToKg(WeightPounds);
 
-            // Protein goal calculation - typically grams per kg.
-            ProteinGoal = Math.Min(weightKg * 1.5f, 175f);
+            var macroSplit = MacroSplit.FromDiet(DietType);
 
-            // Fat goal calculation as a percentage of calories
-            FatGoal = CalorieGoal * 0.25f / 9f;
-
-            // Carb goal calculation based on remaining calories
-            CarbsGoal = (CalorieGoal - (ProteinGoal * 4f + FatGoal * 9f)) / 4f;
-
-            // Fiber goal calculation based on calories (14g per 1000 kcal)
-            FiberGoal = (CalorieGoal / 1000.0f) * 14.0f;
+            ProteinGoal = (CalorieGoal * macroSplit.ProteinRatio) / 4f;
+            FatGoal = (CalorieGoal * macroSplit.FatRatio) / 9f;
+            CarbsGoal = (CalorieGoal * macroSplit.CarbRatio) / 4f;
+            FiberGoal = (CalorieGoal / 1000f) * macroSplit.FiberPer1000Calories;
         }
 
         private float CalculateBMR()
