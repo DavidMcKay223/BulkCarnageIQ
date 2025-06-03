@@ -35,6 +35,10 @@
         </div>
 
         <article class="content px-4">
+            <MudThemeProvider Theme="@BulkCarnageIQ.Web.Themes.CustomThemes.BulkCarnageDarkTheme" IsDarkMode="true" />
+            <MudPopoverProvider />
+            <MudDialogProvider />
+            <MudSnackbarProvider />
             @Body
         </article>
     </main>
