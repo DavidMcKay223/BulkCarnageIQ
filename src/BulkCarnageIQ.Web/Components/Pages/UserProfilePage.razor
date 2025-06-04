@@ -6,15 +6,30 @@
 @inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3><i class="bi bi-person-circle"></i> My Profile</h3>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.PersonPinCircle" Class="me-2" />
+    My Profile
+</MudText>
 
 @if (isLoading)
 {
-    <p><em>Loading profile...</em></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading profile...</MudText>
+    </MudPaper>
 }
 else if (userProfile is null)
 {
-    <p class="text-danger"><i class="bi bi-exclamation-circle me-2"></i> No profile found.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No profile found.
+        </MudText>
+    </MudPaper>
 }
 else
 {
@@ -22,115 +37,90 @@ else
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <div class="card shadow-sm mb-3">
-                    <div class="card-header bg-primary text-white">
-                        <i class="bi bi-person-lines-fill me-2"></i> Personal Info
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group mb-3">
-                            <label for="userName" class="form-label">User Name</label>
-                            <input type="text" id="userName" class="form-control" @bind="userProfile.UserName" disabled />
-                        </div>
+        <MudGrid>
+            <!-- Personal Info Card -->
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2" Class="mb-4">
+                    <MudCardHeader Style="background-color: #d9230f" Class="text-white">
+                        <MudText Typo="Typo.h6" Class="d-flex align-items-center">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" Class="me-2" />
+                            Personal Info
+                        </MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
 
-                        <div class="form-group mb-3">
-                            <label for="age" class="form-label">Age</label>
-                            <input type="number" id="age" class="form-control" @bind="userProfile.Age" min="1" />
-                        </div>
+                        <MudTextField @bind-Value="userProfile.UserName" Label="User Name" Disabled="true" Variant="Variant.Outlined" Class="mb-3" />
 
-                        <div class="form-group mb-3">
-                            <label for="sex" class="form-label">Sex</label>
-                            <select id="sex" class="form-select" @bind="userProfile.Sex">
-                                @foreach (var sexOption in Enum.GetValues<Sex>())
-                                {
-                                    <option value="@sexOption">@sexOption</option>
-                                }
-                            </select>
-                        </div>
+                        <MudNumericField @bind-Value="userProfile.Age" Label="Age" Min="1" Variant="Variant.Outlined" Class="mb-3" />
 
-                        <div class="form-group mb-3">
-                            <label for="height" class="form-label">Height (in inches)</label>
-                            <input type="number" id="height" class="form-control" @bind="userProfile.HeightInches" min="1" />
-                        </div>
+                        <MudSelect T="Sex" @bind-Value="userProfile.Sex" Label="Sex" Variant="Variant.Outlined" Class="mb-3">
+                            @foreach (var sexOption in Enum.GetValues<Sex>())
+                            {
+                                <MudSelectItem Value="@sexOption">@sexOption</MudSelectItem>
+                            }
+                        </MudSelect>
 
-                        <div class="form-group mb-3">
-                            <label for="weight" class="form-label">Weight (in pounds)</label>
-                            <input type="number" id="weight" class="form-control" @bind="userProfile.WeightPounds" min="1" />
-                        </div>
+                        <MudNumericField @bind-Value="userProfile.HeightInches" Label="Height (in inches)" Min="1" Variant="Variant.Outlined" Class="mb-3" />
 
-                        <div class="form-group mb-3">
-                            <label for="activityLevel" class="form-label">Activity Level</label>
-                            <select id="activityLevel" class="form-select" @bind="userProfile.ActivityLevel">
-                                <option value="sedentary">Sedentary</option>
-                                <option value="lightly active">Lightly Active</option>
-                                <option value="moderately active">Moderately Active</option>
-                                <option value="very active">Very Active</option>
-                                <option value="super active">Super Active</option>
-                            </select>
-                        </div>
+                        <MudNumericField @bind-Value="userProfile.WeightPounds" Label="Weight (in pounds)" Min="1" Variant="Variant.Outlined" Class="mb-3" />
 
-                        <div class="form-group mb-3">
-                            <label for="goalType" class="form-label">Goal Type</label>
-                            <select id="goalType" class="form-select" @bind="userProfile.GoalType">
-                                <option value="maintain">Maintain weight</option>
-                                <option value="lose0.5">Lose 0.5 lb/week (~250 cal deficit)</option>
-                                <option value="lose1">Lose 1 lb/week (~500 cal deficit)</option>
-                                <option value="lose2">Lose 2 lb/week (~1000 cal deficit)</option>
-                                <option value="gain0.5">Gain 0.5 lb/week (~250 cal surplus)</option>
-                                <option value="gain1">Gain 1 lb/week (~500 cal surplus)</option>
-                            </select>
-                        </div>
+                        <MudSelect T="string" @bind-Value="userProfile.ActivityLevel" Label="Activity Level" Variant="Variant.Outlined" Class="mb-3">
+                            <MudSelectItem Value="@("sedentary")">Sedentary</MudSelectItem>
+                            <MudSelectItem Value="@("lightly active")">Lightly Active</MudSelectItem>
+                            <MudSelectItem Value="@("moderately active")">Moderately Active</MudSelectItem>
+                            <MudSelectItem Value="@("very active")">Very Active</MudSelectItem>
+                            <MudSelectItem Value="@("super active")">Super Active</MudSelectItem>
+                        </MudSelect>
 
-                        <div class="form-group mb-3">
-                            <label for="dietType" class="form-label">Diet Type</label>
-                            <select id="dietType" class="form-select" @bind="userProfile.DietType">
-                                @foreach (var diet in Enum.GetValues<DietType>())
-                                {
-                                    <option value="@diet">@diet</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <MudSelect T="string" @bind-Value="userProfile.GoalType" Label="Goal Type" Variant="Variant.Outlined" Class="mb-3">
+                            <MudSelectItem Value="@("maintain")">Maintain weight</MudSelectItem>
+                            <MudSelectItem Value="@("lose0.5")">Lose 0.5 lb/week (~250 cal deficit)</MudSelectItem>
+                            <MudSelectItem Value="@("lose1")">Lose 1 lb/week (~500 cal deficit)</MudSelectItem>
+                            <MudSelectItem Value="@("lose2")">Lose 2 lb/week (~1000 cal deficit)</MudSelectItem>
+                            <MudSelectItem Value="@("gain0.5")">Gain 0.5 lb/week (~250 cal surplus)</MudSelectItem>
+                            <MudSelectItem Value="@("gain1")">Gain 1 lb/week (~500 cal surplus)</MudSelectItem>
+                        </MudSelect>
 
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <i class="bi bi-graph-up-arrow me-2"></i> Nutrition Goals
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group mb-3">
-                            <label for="calories" class="form-label">Calories</label>
-                            <input type="number" id="calories" class="form-control" @bind="userProfile.CalorieGoal" disabled />
-                        </div>
+                        <MudSelect T="DietType" @bind-Value="userProfile.DietType" Label="Diet Type" Variant="Variant.Outlined" Class="mb-3">
+                            @foreach (var diet in Enum.GetValues<DietType>())
+                            {
+                                <MudSelectItem Value="@diet">@diet</MudSelectItem>
+                            }
+                        </MudSelect>
 
-                        <div class="form-group mb-3">
-                            <label for="protein" class="form-label">Protein (g)</label>
-                            <input type="number" id="protein" class="form-control" @bind="userProfile.ProteinGoal" disabled />
-                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
 
-                        <div class="form-group mb-3">
-                            <label for="carbs" class="form-label">Carbs (g)</label>
-                            <input type="number" id="carbs" class="form-control" @bind="userProfile.CarbsGoal" disabled />
-                        </div>
+            <!-- Nutrition Goals Card -->
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2" Class="mb-4">
+                    <MudCardHeader Style="background-color: #d9230f" Class="text-white">
+                        <MudText Typo="Typo.h6" Class="d-flex align-items-center">
+                            <MudIcon Icon="@Icons.Material.Filled.ShowChart" Class="me-2" />
+                            Nutrition Goals
+                        </MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
 
-                        <div class="form-group mb-3">
-                            <label for="fat" class="form-label">Fats (g)</label>
-                            <input type="number" id="fat" class="form-control" @bind="userProfile.FatGoal" disabled />
-                        </div>
+                        <MudNumericField @bind-Value="userProfile.CalorieGoal" Label="Calories" Disabled="true" Variant="Variant.Outlined" Class="mb-3" />
 
-                        <div class="form-group mb-3">
-                            <label for="fiber" class="form-label">Fiber (g)</label>
-                            <input type="number" id="fiber" class="form-control" @bind="userProfile.FiberGoal" disabled />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <MudNumericField @bind-Value="userProfile.ProteinGoal" Label="Protein (g)" Disabled="true" Variant="Variant.Outlined" Class="mb-3" />
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <MudNumericField @bind-Value="userProfile.CarbsGoal" Label="Carbs (g)" Disabled="true" Variant="Variant.Outlined" Class="mb-3" />
+
+                        <MudNumericField @bind-Value="userProfile.FatGoal" Label="Fats (g)" Disabled="true" Variant="Variant.Outlined" Class="mb-3" />
+
+                        <MudNumericField @bind-Value="userProfile.FiberGoal" Label="Fiber (g)" Disabled="true" Variant="Variant.Outlined" Class="mb-3" />
+
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">
+            Save Changes
+        </MudButton>
     </EditForm>
 }
 

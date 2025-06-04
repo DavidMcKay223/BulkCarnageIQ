@@ -1,8 +1,13 @@
 ﻿@page "/MealTrackerReport"
+@rendermode InteractiveServer
 @using BulkCarnageIQ.Core.Carnage
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
 @inject AuthenticationStateProvider AuthProvider
+
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
 
 <MudText Typo="Typo.h3" Class="d-flex align-items-center">
     <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="me-2" />
