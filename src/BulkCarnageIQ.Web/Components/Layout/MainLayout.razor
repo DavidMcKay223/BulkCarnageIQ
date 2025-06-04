@@ -3,12 +3,12 @@
 @inject NavigationManager Navigation
 
 <MudThemeProvider Theme="@BulkCarnageIQ.Web.Themes.CustomThemes.BulkCarnageDarkTheme" IsDarkMode="true" />
+<MudPopoverProvider />
 <MudSnackbarProvider />
 <MudDialogProvider />
-<MudPopoverProvider />
 
 <MudLayout>
-
+    
     <!-- Sidebar -->
     <MudDrawer Elevation="1" ClipMode="DrawerClipMode.Always" Open="true" Variant="DrawerVariant.Mini">
         <NavMenu />
