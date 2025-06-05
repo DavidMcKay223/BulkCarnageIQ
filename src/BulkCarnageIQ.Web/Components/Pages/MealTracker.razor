@@ -12,61 +12,83 @@
 <MudSnackbarProvider />
 <MudDialogProvider />
 
-<h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="me-2" />
+    Meal Tracker
+</MudText>
 
-<div class="mb-4">
+<MudPaper Class="mb-4 p-4" Elevation="2">
     <EditForm Model="@newEntry" OnValidSubmit="SaveMeal">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="row g-2 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label">Date</label>
-                <InputDate class="form-control" @bind-Value="newEntry.Date" />
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Meal Type</label>
-                <InputSelect class="form-control" @bind-Value="newEntry.MealType">
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Snack">Snack</option>
-                </InputSelect>
-            </div>
-            <div class="col-md position-relative">
-                <label class="form-label">Meal Name</label>
-                <InputText class="form-control" @bind-Value="newEntry.MealName" @oninput="OnMealNameChanged" placeholder="Type to search..." />
+        <MudGrid GutterSize="2">
+            <MudItem xs="12" sm="6" md="2">
+                <MudDatePicker Date="DateBridge" Label="Date" DateChanged="OnDateChanged" Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6" md="2">
+                <MudSelect T="string" Label="Meal Type" @bind-Value="newEntry.MealType" Required="true">
+                    <MudSelectItem Value="@("Breakfast")">Breakfast</MudSelectItem>
+                    <MudSelectItem Value="@("Lunch")">Lunch</MudSelectItem>
+                    <MudSelectItem Value="@("Dinner")">Dinner</MudSelectItem>
+                    <MudSelectItem Value="@("Snack")">Snack</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="6" Class="position-relative">
+                <MudTextField T="string"
+                Label="Meal Name"
+                Placeholder="Type to search..."
+                Value="newEntry.MealName"
+                Immediate="true"
+                Adornment="Adornment.Start"
+                AdornmentIcon="@Icons.Material.Filled.Search"
+                ValueChanged="OnMealNameChanged" />
+
                 @if (suggestions.Any())
                 {
-                    <ul class="list-group position-absolute w-100" style="z-index: 1050;">
-                        @foreach (var suggestion in suggestions)
-                        {
-                            <li class="list-group-item list-group-item-action"
-                            @onclick="() => SelectSuggestion(suggestion)" role="button">
-                                @suggestion
-                            </li>
-                        }
-                    </ul>
+                    <MudPaper Class="position-absolute w-100" Style="z-index:1050;">
+                        <MudList T="string">
+                            @foreach (var suggestion in suggestions)
+                            {
+                                <MudListItem Class="cursor-pointer"
+                                @onclick="() => SelectSuggestion(suggestion)">
+                                    @suggestion
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudPaper>
                 }
-            </div>
-            <div class="col-md-auto">
-                <button type="submit" class="btn btn-success w-100">
-                    <i class="bi bi-plus-circle"></i> Add
-                </button>
-            </div>
-        </div>
+            </MudItem>
+
+            <MudItem xs="12" md="2">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Class="w-100">
+                    <MudIcon Icon="@Icons.Material.Filled.AddCircle" Class="me-1" />
+                    Add
+                </MudButton>
+            </MudItem>
+        </MudGrid>
     </EditForm>
-</div>
+</MudPaper>
 
 <BulkCarnageIQ.Web.Components.Carnage.GroupMealQuickAdd OnMealsAdded="HandleGroupMealsAdded" GroupItems="groupFoodItems" />
 
 @if (entries is null)
 {
-    <p><em>Loading meals...</em></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading meals...</MudText>
+    </MudPaper>
 }
 else if (!entries.Any())
 {
-    <p>No meals tracked yet.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No meals tracked yet.
+        </MudText>
+    </MudPaper>
 }
 else
 {
@@ -172,6 +194,21 @@ else
     private MealEntry newEntry;
     private HashSet<DateOnly> expandedDates = new();
 
+    private DateTime DateBridge
+    {
+        get => newEntry.Date.ToDateTime(TimeOnly.MinValue);
+        set => newEntry.Date = DateOnly.FromDateTime(value);
+    }
+
+    private void OnDateChanged(DateTime? newDate)
+    {
+        if (newDate.HasValue)
+        {
+            newEntry.Date = DateOnly.FromDateTime(newDate.Value);
+            StateHasChanged();
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
@@ -271,9 +308,9 @@ else
         }
     }
 
-    private async Task OnMealNameChanged(ChangeEventArgs e)
+    private async Task OnMealNameChanged(string e)
     {
-        newEntry.MealName = e.Value?.ToString() ?? string.Empty; // Update bound value explicitly
+        newEntry.MealName = e;
         var input = newEntry.MealName;
 
         if (input.Length >= 2)
