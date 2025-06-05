@@ -6,61 +6,71 @@
 @inject NavigationManager Nav
 @inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Weight Tracker</PageTitle>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
 
-<h3>Weight Tracker</h3>
+<MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
+    <MudText Typo="Typo.h3" Class="mb-3 d-flex align-items-center">
+        <MudIcon Icon="@Icons.Material.Filled.MonitorWeight" Color="Color.Primary" Class="me-2" />
+        Weight Tracker
+    </MudText>
 
-<EditForm Model="@weightEntry" OnValidSubmit="SaveWeight">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Date</label>
-            <InputDate @bind-Value="weightEntry.Date" class="form-control" />
-        </div>
+    <EditForm Model="@weightEntry" OnValidSubmit="SaveWeight">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudDatePicker Date="@PickerDate" DateChanged="OnDateChanged" Label="Date" Required="true" />
+            </MudItem>
 
-        <div class="col-md-6">
-            <label class="form-label">Weight (lbs)</label>
-            <InputNumber @bind-Value="weightEntry.WeightLbs" class="form-control" />
-        </div>
-    </div>
+            <MudItem xs="12" sm="6">
+                <MudNumericField @bind-Value="weightEntry.WeightLbs"
+                                 Label="Weight (lbs)"
+                                 Required="true"
+                                 Immediate="true"
+                                 Max="1500"
+                                 Min="0"
+                                 Adornment="Adornment.End"
+                                 AdornmentText="lbs" />
+            </MudItem>
+        </MudGrid>
 
-    <button type="submit" class="btn btn-primary mb-3">Save</button>
-</EditForm>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4">
+            Save
+        </MudButton>
+    </EditForm>
+</MudPaper>
 
 @if (weightLogs.Any())
 {
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white d-flex align-items-center">
-            <i class="bi bi-graph-up me-2"></i> Weight Over Time
-        </div>
-        <div class="card-body">
-            <BulkCarnageIQ.Web.Components.Charts.LineChart Title="Weight Over Time"
-                Labels="@weightLogs.Select(w => w.Date.ToShortDateString()).ToList()"
-                Data="@weightLogs.Select(w => w.WeightLbs).ToList()"
-                DataLabel="Weight (lbs)"
-                LineColor="rgba(54, 162, 235, 1)"
-                xLabel="Date"
-                yLabel="Weight (lbs)" />
-        </div>
-    </div>
+    <MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
+        <MudText Typo="Typo.h6" Class="mb-3 d-flex align-items-center">
+            <MudIcon Icon="@Icons.Material.Filled.ShowChart" Color="Color.Primary" Class="me-2" />
+            Weight Over Time
+        </MudText>
 
-    <h5 class="mt-4">Past Weights</h5>
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Weight (lbs)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var log in weightLogs.OrderByDescending(w => w.Date))
-            {
-                <tr>
-                    <td>@log.Date.ToShortDateString()</td>
-                    <td>@log.WeightLbs.ToString("N2")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        <BulkCarnageIQ.Web.Components.Charts.LineChart Title="Weight Over Time"
+                                                       Labels="@weightLogs.Select(w => w.Date.ToShortDateString()).ToList()"
+                                                       Data="@weightLogs.Select(w => w.WeightLbs).ToList()"
+                                                       DataLabel="Weight (lbs)"
+                                                       LineColor="rgba(217, 35, 15, 1)"
+                                                       xLabel="Date"
+                                                       yLabel="Weight (lbs)" />
+    </MudPaper>
+
+    <MudPaper Class="pa-4" Elevation="1" Rounded="true">
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Past Weights</MudText>
+
+        <MudTable Items="weightLogs.OrderByDescending(w => w.Date)" Striped="true">
+            <HeaderContent>
+                <MudTh>Date</MudTh>
+                <MudTh>Weight (lbs)</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Date.ToShortDateString()</MudTd>
+                <MudTd>@context.WeightLbs.ToString("N2")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
 }
 
 @code {
@@ -93,5 +103,25 @@
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = authState.User?.Identity?.Name;
         return userId!;
+    }
+
+    private DateTime? PickerDate
+    {
+        get => weightEntry.Date.ToDateTime(TimeOnly.MinValue);
+        set
+        {
+            if (value.HasValue)
+            {
+                weightEntry.Date = DateOnly.FromDateTime(value.Value);
+            }
+        }
+    }
+
+    private void OnDateChanged(DateTime? newDate)
+    {
+        if (newDate.HasValue)
+        {
+            weightEntry.Date = DateOnly.FromDateTime(newDate.Value);
+        }
     }
 }
