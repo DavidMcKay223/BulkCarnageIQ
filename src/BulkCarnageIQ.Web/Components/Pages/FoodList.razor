@@ -5,235 +5,225 @@
 @using BulkCarnageIQ.Core.Contracts
 @inject IFoodItemService FoodItemService
 
-<PageTitle>Food List</PageTitle>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
 
-<h2 class="my-4 text-center">
-    <i class="bi bi-egg-fried"></i> Food Items
-</h2>
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.Egg" Class="me-2" />
+    Food Items
+</MudText>
 
-<!-- Filters Section in a Card -->
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">
-            <i class="bi bi-funnel"></i> Filters
-        </h4>
-    </div>
-    <div class="card-body">
-        <div class="d-flex flex-wrap mb-3">
-            <!-- Recipe Name Dropdown -->
-            <div class="me-3">
-                <label for="recipeName">Recipe Name</label>
-                <select class="form-select" id="recipeName" @bind="filter.SelectedRecipeName">
-                    <option value="">Select Recipe</option>
-                    @foreach (var recipe in recipeNames)
-                    {
-                        <option value="@recipe">@recipe</option>
-                    }
-                </select>
-            </div>
+<MudPaper Class="mb-4" Elevation="1" Rounded="true" Style="padding:16px;">
+    <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-3 d-flex align-items-center">
+        <MudIcon Icon="@Icons.Material.Filled.Sort" Class="me-2" /> Filters
+    </MudText>
 
-            <!-- Group Name Dropdown -->
-            <div class="me-3">
-                <label for="groupName">Group Name</label>
-                <select class="form-select" id="groupName" @bind="filter.SelectedGroupName">
-                    <option value="">Select Group</option>
-                    @foreach (var group in groupNames)
-                    {
-                        <option value="@group">@group</option>
-                    }
-                </select>
-            </div>
+    <MudGrid Class="mb-3" GutterSize="3">
+        <MudItem xs="12" sm="4">
+            <MudSelect T="string" Label="Recipe Name" @bind-Value="filter.SelectedRecipeName" Variant="Variant.Outlined" Dense="true" Clearable="true">
+                @foreach (var recipe in recipeNames)
+                {
+                    <MudSelectItem Value="@recipe">@recipe</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
 
-            <!-- Brand Type Dropdown -->
-            <div class="me-3">
-                <label for="brandType">Brand Type</label>
-                <select class="form-select" id="brandType" @bind="filter.SelectedBrandType">
-                    <option value="">Select Brand</option>
-                    @foreach (var brand in brandTypes)
-                    {
-                        <option value="@brand">@brand</option>
-                    }
-                </select>
-            </div>
-        </div>
+        <MudItem xs="12" sm="4">
+            <MudSelect T="string" Label="Group Name" @bind-Value="filter.SelectedGroupName" Variant="Variant.Outlined" Dense="true" Clearable="true">
+                @foreach (var group in groupNames)
+                {
+                    <MudSelectItem Value="@group">@group</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
 
-        <div class="d-flex flex-wrap">
-            <!-- Flags Section -->
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="highProtein" @bind="filter.IsHighProtein" />
-                <label class="form-check-label" for="highProtein">High Protein</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="lowCarb" @bind="filter.IsLowCarb" />
-                <label class="form-check-label" for="lowCarb">Low Carb</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="keto" @bind="filter.IsKeto" />
-                <label class="form-check-label" for="keto">Keto</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="bulkMeal" @bind="filter.IsBulkMeal" />
-                <label class="form-check-label" for="bulkMeal">Bulk Meal</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="highCarb" @bind="filter.IsHighCarb" />
-                <label class="form-check-label" for="highCarb">High Carb</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="lowFiber" @bind="filter.IsLowFiber" />
-                <label class="form-check-label" for="lowFiber">Low Fiber</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="highFat" @bind="filter.IsHighFat" />
-                <label class="form-check-label" for="highFat">High Fat</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="balancedMeal" @bind="filter.IsBalancedMeal" />
-                <label class="form-check-label" for="balancedMeal">Balanced Meal</label>
-            </div>
-            <div class="form-check me-3">
-                <input type="checkbox" class="form-check-input" id="lowProtein" @bind="filter.IsLowProtein" />
-                <label class="form-check-label" for="lowProtein">Low Protein</label>
-            </div>
-        </div>
+        <MudItem xs="12" sm="4">
+            <MudSelect T="string" Label="Brand Type" @bind-Value="filter.SelectedBrandType" Variant="Variant.Outlined" Dense="true" Clearable="true">
+                @foreach (var brand in brandTypes)
+                {
+                    <MudSelectItem Value="@brand">@brand</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
 
-        <div class="d-flex flex-wrap mb-3 mt-3">
-            <div class="me-3">
-                <button class="btn btn-sm btn-outline-secondary" @onclick="ClearFilters">
-                    <i class="bi bi-x-circle"></i> Reset Filters
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+    <MudGrid GutterSize="2" Class="mb-3">
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="High Protein" @bind-value="filter.IsHighProtein" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="Low Carb" @bind-value="filter.IsLowCarb" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="Keto" @bind-value="filter.IsKeto" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="Bulk Meal" @bind-value="filter.IsBulkMeal" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="High Carb" @bind-value="filter.IsHighCarb" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="Low Fiber" @bind-value="filter.IsLowFiber" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="High Fat" @bind-value="filter.IsHighFat" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="Balanced Meal" @bind-value="filter.IsBalancedMeal" />
+        </MudItem>
+        <MudItem xs="6" sm="3" md="2">
+            <MudCheckBox Label="Low Protein" @bind-value="filter.IsLowProtein" />
+        </MudItem>
+    </MudGrid>
+
+    <MudButton Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" StartIcon="@Icons.Material.Filled.Circle" OnClick="ClearFilters">
+        Reset Filters
+    </MudButton>
+</MudPaper>
 
 @if (foodItems == null)
 {
-    <div class="text-center my-5">
-        <div class="spinner-border text-primary" role="status"></div>
-    </div>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading food...</MudText>
+    </MudPaper>
 }
-else if (foodItems.Count == 0)
+else if (!foodItems.Any())
 {
-    <p>No food items found.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No food items found.
+        </MudText>
+    </MudPaper>
 }
 else
 {
     var filteredItems = filter.ApplyFilters(foodItems);
     var groupedItems = filteredItems.GroupBy(item => item.GroupName ?? "Ungrouped");
 
-    foreach (var group in groupedItems)
+    @foreach (var group in groupedItems)
     {
-        <div class="card shadow-lg mb-4 rounded-4 border-0">
-            <div class="card-header bg-primary text-white rounded-top">
-                <h4 class="mb-0">
-                    <i class="bi bi-collection"></i> @group.Key
-                </h4>
-            </div>
-            <div class="card-body">
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    @foreach (var item in group)
-                    {
-                        <div class="col">
-                            <div class="card h-100 shadow rounded-4 border-0">
-                                @if (!string.IsNullOrEmpty(item.PictureLink))
-                                {
-                                    <img src="@item.PictureLink" alt="@item.RecipeName" class="card-img-top img-fluid rounded-top" style="max-height: 300px; width: 100%; height: auto; object-fit: contain;" />
-                                }
-                                else
-                                {
-                                    <img src="photos/FoodItemPlaceHolder.jpg" alt="@item.RecipeName" class="card-img-top img-fluid rounded-top" style="max-height: 300px; width: 100%; height: auto; object-fit: contain;" />
-                                }
+        <MudPaper Class="mb-4" Elevation="3" Rounded="true" Style="border:none;">
+            <MudPaper Class="mud-theme-primary mud-text-white mud-rounded-top px-3 py-2" Elevation="0" Square="true">
+                <MudText Typo="Typo.h6" Class="mb-0 d-flex align-items-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Collections" Class="me-2" /> @group.Key
+                </MudText>
+            </MudPaper>
+            <MudGrid GutterSize="3" Class="p-3">
+                @foreach (var item in group)
+                {
+                    <MudItem xs="12" sm="6" md="4" lg="3">
+                        <MudCard Class="h-100">
+                            @if (!string.IsNullOrEmpty(item.PictureLink))
+                            {
+                                <MudCardMedia Image="@item.PictureLink" Alt="@item.RecipeName" Height="200" Style="object-fit: contain;" />
+                            }
+                            else
+                            {
+                                <MudCardMedia Image="photos/FoodItemPlaceHolder.jpg" Alt="@item.RecipeName" Height="200" Style="object-fit: contain;" />
+                            }
 
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title d-flex justify-content-between align-items-center">
-                                        @item.RecipeName
-                                        <span class="badge bg-secondary">@item.BrandType</span>
-                                    </h5>
+                            <MudCardContent Class="d-flex flex-column">
+                                <MudText Typo="Typo.h6" Class="d-flex justify-content-between align-items-center">
+                                    @item.RecipeName
+                                    <MudBadge Color="Color.Secondary" Variant="Variant.Filled">@item.BrandType</MudBadge>
+                                </MudText>
 
-                                    <p class="text-muted small mb-2">
-                                        @item.Servings x @item.MeasurementServings @item.MeasurementType
-                                    </p>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2">
+                                    @item.Servings x @item.MeasurementServings @item.MeasurementType
+                                </MudText>
 
-                                    <div class="mb-2">
-                                        @if (item.IsBreakfast)
-                                        {
-                                            <span class="badge bg-warning text-dark me-1"><i class="bi bi-sunrise"></i> Breakfast</span>
-                                        }
-                                        @if (item.IsLunch)
-                                        {
-                                            <span class="badge bg-success text-white me-1"><i class="bi bi-box"></i> Lunch</span>
-                                        }
-                                        @if (item.IsDinner)
-                                        {
-                                            <span class="badge bg-dark text-white me-1"><i class="bi bi-moon"></i> Dinner</span>
-                                        }
-                                        @if (item.IsSnack)
-                                        {
-                                            <span class="badge bg-info text-dark me-1"><i class="bi bi-cookie"></i> Snack</span>
-                                        }
-                                    </div>
-
-                                    <div class="mb-2">
-                                        @if (item.IsHighProtein)
-                                        {
-                                            <span class="badge bg-success me-1"><i class="bi bi-fire"></i> High Protein</span>
-                                        }
-                                        @if (item.IsLowCarb)
-                                        {
-                                            <span class="badge bg-info text-dark me-1"><i class="bi bi-arrow-down-circle"></i> Low Carb</span>
-                                        }
-                                        @if (item.IsKeto)
-                                        {
-                                            <span class="badge bg-warning text-dark me-1"><i class="bi bi-droplet-half"></i> Keto</span>
-                                        }
-                                        @if (item.IsBulkMeal)
-                                        {
-                                            <span class="badge bg-danger me-1"><i class="bi bi-graph-up"></i> Bulk</span>
-                                        }
-                                        @if (item.IsHighCarb)
-                                        {
-                                            <span class="badge bg-danger text-white me-1"><i class="bi bi-cup-straw"></i> High Carb</span>
-                                        }
-                                        @if (item.IsLowFiber)
-                                        {
-                                            <span class="badge bg-secondary me-1"><i class="bi bi-flower3"></i> Low Fiber</span>
-                                        }
-                                        @if (item.IsHighFat)
-                                        {
-                                            <span class="badge bg-dark text-white me-1"><i class="bi bi-droplet"></i> High Fat</span>
-                                        }
-                                        @if (item.IsBalancedMeal)
-                                        {
-                                            <span class="badge bg-primary me-1"><i class="bi bi-lightning-charge"></i> Balanced Meal</span>
-                                        }
-                                        @if (item.IsLowProtein)
-                                        {
-                                            <span class="badge bg-info me-1"><i class="bi bi-egg"></i> Low Protein</span>
-                                        }
-                                    </div>
-
-                                    <ul class="list-group list-group-flush small mb-3">
-                                        <li class="list-group-item"><i class="bi bi-lightning-charge"></i> <strong>Calories:</strong> @item.CaloriesPerServing</li>
-                                        <li class="list-group-item"><i class="bi bi-bar-chart-line"></i> <strong>Protein:</strong> @item.Protein g</li>
-                                        <li class="list-group-item"><i class="bi bi-cup-straw"></i> <strong>Carbs:</strong> @item.Carbs g</li>
-                                        <li class="list-group-item"><i class="bi bi-droplet"></i> <strong>Fats:</strong> @item.Fats g</li>
-                                        <li class="list-group-item"><i class="bi bi-flower3"></i> <strong>Fiber:</strong> @item.Fiber g</li>
-                                    </ul>
-
-                                    @if (!string.IsNullOrEmpty(item.Link))
+                                <div class="mb-2">
+                                    @if (item.IsBreakfast)
                                     {
-                                        <a href="@item.Link" class="btn btn-outline-primary btn-sm mt-auto" target="_blank">
-                                            <i class="bi bi-box-arrow-up-right"></i> Nutrition Info
-                                        </a>
+                                        <MudChip T="string" Text="Breakfast" Color="Color.Warning" TextColor="Color.Dark" Icon="@Icons.Material.Filled.WbSunny" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsLunch)
+                                    {
+                                        <MudChip T="string" Text="Lunch" Color="Color.Success" Icon="@Icons.Material.Filled.LunchDining" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsDinner)
+                                    {
+                                        <MudChip T="string" Text="Dinner" Color="Color.Dark" Icon="@Icons.Material.Filled.NightsStay" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsSnack)
+                                    {
+                                        <MudChip T="string" Text="Snack" Color="Color.Info" TextColor="Color.Dark" Icon="@Icons.Material.Filled.Coffee" Class="me-1" Size="Size.Small" />
                                     }
                                 </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
+
+                                <div class="mb-2">
+                                    @if (item.IsHighProtein)
+                                    {
+                                        <MudChip T="string" Text="High Protein" Color="Color.Success" Icon="@Icons.Material.Filled.Whatshot" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsLowCarb)
+                                    {
+                                        <MudChip T="string" Text="Low Carb" Color="Color.Info" TextColor="Color.Dark" Icon="@Icons.Material.Filled.ArrowDownward" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsKeto)
+                                    {
+                                        <MudChip T="string" Text="Keto" Color="Color.Warning" TextColor="Color.Dark" Icon="@Icons.Material.Filled.InvertColors" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsBulkMeal)
+                                    {
+                                        <MudChip T="string" Text="Bulk Meal" Color="Color.Error" Icon="@Icons.Material.Filled.ShowChart" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsHighCarb)
+                                    {
+                                        <MudChip T="string" Text="High Carb" Color="Color.Error" Icon="@Icons.Material.Filled.LocalCafe" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsLowFiber)
+                                    {
+                                        <MudChip T="string" Text="Low Fiber" Color="Color.Secondary" Icon="@Icons.Material.Filled.LocalFlorist" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsHighFat)
+                                    {
+                                        <MudChip T="string" Text="High Fat" Color="Color.Dark" Icon="@Icons.Material.Filled.InvertColors" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsBalancedMeal)
+                                    {
+                                        <MudChip T="string" Text="Balanced Meal" Color="Color.Primary" Icon="@Icons.Material.Filled.Bolt" Class="me-1" Size="Size.Small" />
+                                    }
+                                    @if (item.IsLowProtein)
+                                    {
+                                        <MudChip T="string" Text="Low Protein" Color="Color.Info" Icon="@Icons.Material.Filled.Egg" Class="me-1" Size="Size.Small" />
+                                    }
+                                </div>
+
+                                <MudList T="string" Dense="true" Class="mb-3" Style="flex-grow: 1;">
+                                    <MudListItem>
+                                        <MudIcon T="string" Icon="@Icons.Material.Filled.Bolt" Class="me-1" /> Calories: @item.CaloriesPerServing
+                                    </MudListItem>
+                                    <MudListItem>
+                                        <MudIcon T="string" Icon="@Icons.Material.Filled.BarChart" Class="me-1" /> Protein: @item.Protein g
+                                    </MudListItem>
+                                    <MudListItem>
+                                        <MudIcon T="string" Icon="@Icons.Material.Filled.Coffee" Class="me-1" /> Carbs: @item.Carbs g
+                                    </MudListItem>
+                                    <MudListItem>
+                                        <MudIcon T="string" Icon="@Icons.Material.Filled.InvertColors" Class="me-1" /> Fats: @item.Fats g
+                                    </MudListItem>
+                                    <MudListItem>
+                                        <MudIcon T="string" Icon="@Icons.Material.Filled.LocalFlorist" Class="me-1" /> Fiber: @item.Fiber g
+                                    </MudListItem>
+                                </MudList>
+
+                                @if (!string.IsNullOrEmpty(item.Link))
+                                {
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="@item.Link" Target="_blank" StartIcon="@Icons.Material.Filled.AddBox" Class="mt-auto" Size="Size.Small">
+                                        Nutrition Info
+                                    </MudButton>
+                                }
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudPaper>
     }
 }
 
