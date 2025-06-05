@@ -1,36 +1,27 @@
 ﻿@using BulkCarnageIQ.Core.Carnage.Report
 
-<div class="table-responsive">
-    <table class="table table-bordered text-center align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Day</th>
-                @foreach (var macro in MacroNames)
-                {
-                    <th>@macro</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @if (WeeklyData != null)
+<MudPaper Class="p-4">
+    <MudTable T="KeyValuePair<string, MacroSummary>" Items="@WeeklyData" Dense="true" Hover="true" Bordered="true">
+        <HeaderContent>
+            <MudTh>Day</MudTh>
+            @foreach (var macro in MacroNames)
             {
-                foreach (var day in WeeklyData)
-                {
-                    <tr>
-                        <td class="fw-bold">@day.Key</td>
-                        @foreach (var macro in MacroNames)
-                        {
-                            var value = GetMacroValue(day.Value, macro);
-                            var goal = GetGoal(macro);
-                            var css = GetCellClass(value, goal);
-                            <td class="@css">@value.ToString("N2") g / @goal.ToString("N2") g</td>
-                        }
-                    </tr>
-                }
+                <MudTh>@macro</MudTh>
             }
-        </tbody>
-    </table>
-</div>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd Class="fw-bold">@context.Key</MudTd>
+            @foreach (var macro in MacroNames)
+            {
+                var value = GetMacroValue(@context.Value, macro);
+                var goal = GetGoal(macro);
+                var css = GetCellClass(value, goal);
+
+                <MudTd Class="@css">@value.ToString("N2") g / @goal.ToString("N2") g</MudTd>
+            }
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
 
 @code {
     [Parameter] public Dictionary<string, MacroSummary> WeeklyData { get; set; } = new();

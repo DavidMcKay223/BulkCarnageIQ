@@ -7,42 +7,54 @@
 @inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
 
-<div class="container mt-4">
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     @if (DailyMacros != null)
     {
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3"><i class="bi bi-nut me-2"></i> Macros Today</h4>
-                <BulkCarnageIQ.Web.Components.Carnage.MacroAlertPanel DailyMacros="DailyMacros" UserProfile="UserProfile" />
-            </div>
-        </div>
+        <MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
+            <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
+                <MudIcon Icon="@Icons.Material.Filled.FitnessCenter" Color="Color.Info" Class="me-2" />
+                Macros Today
+            </MudText>
+
+            <BulkCarnageIQ.Web.Components.Carnage.MacroAlertPanel DailyMacros="DailyMacros" UserProfile="UserProfile" />
+        </MudPaper>
     }
 
     @if (WeeklyMacros != null)
     {
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3"><i class="bi bi-graph-up-arrow me-2"></i> Macro Heatmap This Week</h4>
-                <BulkCarnageIQ.Web.Components.Carnage.WeeklyMacroHeatmap 
-                    WeeklyData="WeeklyMacros"
-                    ProteinGoal="UserProfile!.ProteinGoal"
-                    CarbsGoal="UserProfile!.CarbsGoal"
-                    FatsGoal="UserProfile!.FatGoal"
-                    FiberGoal="UserProfile!.FiberGoal" />
-            </div>
-        </div>
+        <MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
+            <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
+                <MudIcon Icon="@Icons.Material.Filled.Insights" Color="Color.Primary" Class="me-2" />
+                Macro Heatmap This Week
+            </MudText>
+
+            <BulkCarnageIQ.Web.Components.Carnage.WeeklyMacroHeatmap WeeklyData="WeeklyMacros"
+                ProteinGoal="UserProfile!.ProteinGoal"
+                CarbsGoal="UserProfile!.CarbsGoal"
+                FatsGoal="UserProfile!.FatGoal"
+                FiberGoal="UserProfile!.FiberGoal" />
+        </MudPaper>
     }
 
     @if (labels != null && calories != null)
     {
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3"><i class="bi bi-graph-up-arrow me-2"></i> Calories This Week</h4>
-                <BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart @ref="CalorieBarChart" Labels="labels" Data="calories" ChartLabel="Calories Eaten" />
-            </div>
-        </div>
+        <MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
+            <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
+                <MudIcon Icon="@Icons.Material.Filled.LocalFireDepartment" Color="Color.Warning" Class="me-2" />
+                Calories This Week
+            </MudText>
+
+            <BulkCarnageIQ.Web.Components.Carnage.CalorieBarChart @ref="CalorieBarChart"
+                Labels="labels"
+                Data="calories"
+                ChartLabel="Calories Eaten" />
+        </MudPaper>
     }
-</div>
+</MudContainer>
 
 @code {
     private List<string>? labels;
