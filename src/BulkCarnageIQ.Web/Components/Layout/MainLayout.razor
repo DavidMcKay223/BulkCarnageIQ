@@ -1,45 +1,51 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
 
-<div class="page">
-    <div class="sidebar">
+<MudThemeProvider Theme="@BulkCarnageIQ.Web.Themes.CustomThemes.BulkCarnageDarkTheme" IsDarkMode="true" />
+
+<MudLayout>
+    
+    <!-- Sidebar -->
+    <MudDrawer Elevation="1" ClipMode="DrawerClipMode.Always" Open="true" Variant="DrawerVariant.Mini">
         <NavMenu />
-    </div>
+    </MudDrawer>
 
-    <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <div class="nav-item px-3">
-                        <form action="Account/Logout" method="post">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="ReturnUrl" value="" />
-                            <button type="submit" class="nav-link">
-                                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                            </button>
-                        </form>
-                    </div>
-                </Authorized>
-                <NotAuthorized>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="Account/Register">
-                            <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                        </NavLink>
-                    </div>
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="Account/Login">
-                            <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                        </NavLink>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
-        </div>
+    <!-- AppBar -->
+    <MudAppBar Color="Color.Primary" Elevation="4" Fixed="true">
+        <MudText Typo="Typo.h6" Class="ml-2">BulkCarnageIQ</MudText>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <MudSpacer />
 
+        <AuthorizeView>
+            <Authorized>
+                <form action="Account/Logout" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="" />
+                    <MudButton StartIcon="@Icons.Material.Filled.Logout" Variant="Variant.Text" ButtonType="ButtonType.Submit">
+                        Logout
+                    </MudButton>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Text" Href="Account/Register">
+                    Register
+                </MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Login" Variant="Variant.Text" Href="Account/Login">
+                    Login
+                </MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+
+    <!-- Main Content -->
+    <MudMainContent Class="pt-20 p-4">
+        @Body
+    </MudMainContent>
+
+</MudLayout>
+
+<!-- Blazor Error UI -->
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>

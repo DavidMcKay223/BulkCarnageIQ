@@ -3,127 +3,153 @@
 @using BulkCarnageIQ.Core.Carnage
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
-@inject IFoodItemService FoodItemService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="me-2" />
+    Meal Report
+</MudText>
 
 @if (entries is null)
 {
-    <p><em>Loading meals...</em></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading meals...</MudText>
+    </MudPaper>
 }
 else if (!entries.Any())
 {
-    <p>No meals tracked yet.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No meals tracked yet.
+        </MudText>
+    </MudPaper>
 }
 else
 {
-    <table class="table table-hover table-bordered small align-middle">
-        @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
-        {
-            var date = dateGroup.Key;
+    @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
+    {
+        <MudPaper Class="p-4 mb-4" Style="background-color: #d9230f" Outlined="true" Elevation="3">
+            <MudText Typo="Typo.h6" Class="mt-4 mb-2">@dateGroup.Key.ToString("dddd, MMMM dd")</MudText>
 
-            <tbody class="table-group-divider">
-                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleDate(date))" style="cursor: pointer;">
-                    <td colspan="8">
-                        <i class="bi @(IsExpanded(date) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
-                        @date.ToString("MMMM dd, yyyy") (@dateGroup.First().Day)
-                    </td>
-                </tr>
+            @foreach (var mealTypeGroup in dateGroup.GroupBy(e => e.MealType))
+            {
+                <MudPaper Class="mb-3 p-2" Elevation="1">
+                    <MudText Typo="Typo.subtitle1">@mealTypeGroup.Key</MudText>
 
-                @if (IsExpanded(date))
-                {
-                    @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType))
-                    {
-                        <tr class="fw-bold table-info">
-                            <td>@mealGroup.Key</td>
-                            <th>Portion</th>
-                            <th>Calories</th>
-                            <th>Protein</th>
-                            <th>Carbs</th>
-                            <th>Fats</th>
-                            <th>Fiber</th>
-                            <th>Tags</th>
-                        </tr>
+                    <MudTable Items="mealTypeGroup" Striped="true" Dense>
+                        <HeaderContent>
+                            <MudTh>Meal Name</MudTh>
+                            <MudTh>Portion</MudTh>
+                            <MudTh>Calories</MudTh>
+                            <MudTh>Protein</MudTh>
+                            <MudTh>Carbs</MudTh>
+                            <MudTh>Fats</MudTh>
+                            <MudTh>Fiber</MudTh>
+                            <MudTh>Tags</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@context.MealName (@context.MeasurementServings?.ToString("N2") x @context.MeasurementType)</MudTd>
+                            <MudTd>@context.PortionEaten</MudTd>
+                            <MudTd>@context.Calories</MudTd>
+                            <MudTd>@context.Protein</MudTd>
+                            <MudTd>@context.Carbs</MudTd>
+                            <MudTd>@context.Fats</MudTd>
+                            <MudTd>@context.Fiber</MudTd>
+                            <MudTd>
+                                @if (context.IsHighProtein)
+                                {
+                                    <MudChip T="string" Color="Color.Success" Text="High Protein" />
+                                }
+                                @if (context.IsLowCarb)
+                                {
+                                    <MudChip T="string" Color="Color.Warning" Text="Low Carb" />
+                                }
+                                @if (context.IsKeto)
+                                {
+                                    <MudChip T="string" Color="Color.Dark" Text="Keto" />
+                                }
+                                @if (context.IsBulkMeal)
+                                {
+                                    <MudChip T="string" Color="Color.Primary" Text="Bulk Meal" />
+                                }
+                                @if (context.IsHighCarb)
+                                {
+                                    <MudChip T="string" Color="Color.Error" Text="High Carb" />
+                                }
+                                @if (context.IsLowFiber)
+                                {
+                                    <MudChip T="string" Color="Color.Secondary" Text="Low Fiber" />
+                                }
+                                @if (context.IsHighFat)
+                                {
+                                    <MudChip T="string" Color="Color.Info" Text="High Fat" />
+                                }
+                                @if (context.IsLowProtein)
+                                {
+                                    <MudChip T="string" Color="Color.Default" Text="Low Protein" />
+                                }
+                                @if (context.IsBalancedMeal)
+                                {
+                                    <MudChip T="string" Color="Color.Success" Text="Balanced Meal" />
+                                }
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudPaper>
+            }
 
-                        @foreach (var meal in mealGroup)
-                        {
-                            <tr>
-                                <td>@meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)</td>
-                                <td>@meal.PortionEaten</td>
-                                <td>@meal.Calories.ToString("N2")</td>
-                                <td>@meal.Protein.ToString("N2")</td>
-                                <td>@meal.Carbs.ToString("N2")</td>
-                                <td>@meal.Fats.ToString("N2")</td>
-                                <td>@meal.Fiber.ToString("N2")</td>
-                                <td>
-                                    @if (meal.IsHighProtein)
-                                    {
-                                        <span class="badge bg-success" title="High Protein">High Protein</span>
-                                    }
-                                    @if (meal.IsLowCarb)
-                                    {
-                                        <span class="badge bg-warning" title="Low Carb">Low Carb</span>
-                                    }
-                                    @if (meal.IsKeto)
-                                    {
-                                        <span class="badge bg-dark" title="Keto">Keto</span>
-                                    }
-                                    @if (meal.IsBulkMeal)
-                                    {
-                                        <span class="badge bg-primary" title="Bulk Meal">Bulk Meal</span>
-                                    }
-                                    @if (meal.IsHighCarb)
-                                    {
-                                        <span class="badge bg-danger" title="High Carb">High Carb</span>
-                                    }
-                                    @if (meal.IsLowFiber)
-                                    {
-                                        <span class="badge bg-secondary" title="Low Fiber">Low Fiber</span>
-                                    }
-                                    @if (meal.IsHighFat)
-                                    {
-                                        <span class="badge bg-info" title="High Fat">High Fat</span>
-                                    }
-                                    @if (meal.IsLowProtein)
-                                    {
-                                        <span class="badge bg-light text-dark" title="Low Protein">Low Protein</span>
-                                    }
-                                    @if (meal.IsBalancedMeal)
-                                    {
-                                        <span class="badge bg-success" title="Balanced Meal">Balanced Meal</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    }
+            <MudPaper Class="p-4 mb-4" Elevation="4">
+                <MudText Typo="Typo.h6" Class="mb-3">Summary for @dateGroup.Key.ToString("MMMM dd, yyyy")</MudText>
 
-                    <tr class="table-warning fw-bold">
-                        <td colspan="2" class="text-end">Total</td>
-                        <td>@dateGroup.Sum(e => e.Calories).ToString("N2")</td>
-                        <td>@dateGroup.Sum(e => e.Protein).ToString("N2")</td>
-                        <td>@dateGroup.Sum(e => e.Carbs).ToString("N2")</td>
-                        <td>@dateGroup.Sum(e => e.Fats).ToString("N2")</td>
-                        <td>@dateGroup.Sum(e => e.Fiber).ToString("N2")</td>
-                        <td></td>
-                    </tr>
-                }
-            </tbody>
-        }
-    </table>
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
+                            <MudText Typo="Typo.subtitle2">Calories</MudText>
+                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Calories)</MudText>
+                        </MudCard>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
+                            <MudText Typo="Typo.subtitle2">Protein</MudText>
+                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Protein)</MudText>
+                        </MudCard>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
+                            <MudText Typo="Typo.subtitle2">Carbs</MudText>
+                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Carbs)</MudText>
+                        </MudCard>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
+                            <MudText Typo="Typo.subtitle2">Fats</MudText>
+                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Fats)</MudText>
+                        </MudCard>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
+                            <MudText Typo="Typo.subtitle2">Fiber</MudText>
+                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Fiber)</MudText>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudPaper>
+    }
 }
 
 @code {
-    private List<string> suggestions = new();
     private List<MealEntry>? entries;
-    private MealEntry newEntry = new()
-        {
-            Date = DateOnly.FromDateTime(DateTime.Today),
-            Day = DateTime.Today.DayOfWeek.ToString(),
-            MealType = "Breakfast",
-            MealName = string.Empty,
-            UserId = string.Empty
-        };
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,80 +158,4 @@ else
 
         entries = await MealEntryService.GetAllAsync(userId!);
     }
-
-    private async Task SaveMeal()
-    {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var userId = authState.User?.Identity?.Name;
-
-        if (!string.IsNullOrWhiteSpace(newEntry.MealName) && !string.IsNullOrWhiteSpace(userId))
-        {
-            // Ensure its populated:
-            var item = await MealEntryService.GetFoodItemByNameAsync(newEntry.MealName);
-            if (item is not null)
-            {
-                newEntry.Calories = item.CaloriesPerServing * newEntry.PortionEaten;
-                newEntry.Protein = item.Protein * newEntry.PortionEaten;
-                newEntry.Carbs = item.Carbs * newEntry.PortionEaten;
-                newEntry.Fats = item.Fats * newEntry.PortionEaten;
-                newEntry.Fiber = item.Fiber * newEntry.PortionEaten;
-            }
-
-            newEntry.Day = newEntry.Date.DayOfWeek.ToString();
-            newEntry.UserId = userId;
-            await MealEntryService.AddAsync(newEntry);
-
-            string mealType = newEntry.MealType;
-            DateOnly dateOnly = newEntry.Date;
-
-            newEntry = new MealEntry
-                {
-                    Date = dateOnly,
-                    Day = dateOnly.DayOfWeek.ToString(),
-                    MealName = string.Empty,
-                    MealType = mealType,
-                    UserId = string.Empty
-                };
-
-            entries = await MealEntryService.GetAllAsync(userId);
-        }
-    }
-
-    private async Task OnMealNameChanged(ChangeEventArgs e)
-    {
-        var input = e.Value?.ToString() ?? string.Empty;
-
-        if (input.Length >= 2) // Optional: only start searching after 2 characters
-        {
-            suggestions = await MealEntryService.SearchFoodNamesAsync(input);
-        }
-        else
-        {
-            suggestions.Clear();
-        }
-    }
-
-    private async void SelectSuggestion(string selected)
-    {
-        newEntry.MealName = selected;
-        suggestions.Clear();
-
-        var item = await MealEntryService.GetFoodItemByNameAsync(selected);
-        if (item is not null)
-        {
-            newEntry.PortionEaten = item.Servings;
-        }
-    }
-}
-
-@code {
-    private HashSet<DateOnly> expandedDates = new();
-
-    private void ToggleDate(DateOnly date)
-    {
-        if (!expandedDates.Add(date))
-            expandedDates.Remove(date);
-    }
-
-    private bool IsExpanded(DateOnly date) => !expandedDates.Contains(date);
 }

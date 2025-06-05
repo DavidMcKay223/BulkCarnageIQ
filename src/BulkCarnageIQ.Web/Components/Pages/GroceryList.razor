@@ -8,114 +8,147 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILogger<GroceryList> Logger
 
-<h3><i class="bi bi-cart"></i> Grocery List</h3>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudText Typo="Typo.h3" Class="mb-4 d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Class="me-2" /> Grocery List
+</MudText>
 
 @if (initialLoadComplete)
 {
-    <div class="mb-3">
-        <div class="col-md position-relative">
-            <label class="form-label">Search and Add Item</label>
-            <InputText class="form-control" @bind-Value="newItemName" @oninput="OnMealNameChanged" placeholder="Type to search..." />
-            @if (suggestions.Any())
-            {
-                <ul class="list-group position-absolute w-100 mt-1" style="z-index: 1050;">
-                    @foreach (var suggestion in suggestions)
-                    {
-                        <li class="list-group-item list-group-item-action" @onclick="() => SelectSuggestion(suggestion)" role="button">
-                            @suggestion
-                        </li>
-                    }
-                </ul>
-            }
-        </div>
-    </div>
+    <MudPaper Class="mb-4 p-3">
+        <MudTextField T="string" Value="newItemName"
+                      Label="Search and Add Item"
+                      Placeholder="Type to search..."
+                      Immediate="true"
+                      ValueChanged="OnMealNameChanged"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Class="w-100" />
+
+        @if (suggestions.Any())
+        {
+            <MudList T="string" Dense="true" Class="mt-2 elevation-1" Style="max-height: 200px; overflow-y: auto;">
+                @foreach (var suggestion in suggestions)
+                {
+                    <MudListItem T="string" @onclick="() => SelectSuggestion(suggestion)">
+                        @suggestion
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </MudPaper>
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger" role="alert">
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Elevation="1" Class="mb-3">
             @errorMessage
-        </div>
+        </MudAlert>
     }
 
     @if (!items.Any())
     {
-        <p>No items yet.</p>
+        <MudText>No items yet.</MudText>
     }
     else
     {
         @foreach (var group in items.GroupBy(x => x.GroupName))
         {
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white rounded-top">
-                    <h5 class="mb-0">@(!string.IsNullOrEmpty(group.Key) ? group.Key : "Ungrouped")</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        @foreach (var item in group)
-                        {
-                            <div class="col-md-6 col-lg-4 mb-3" @key="item.Id">
-                                <div class="card @(item.IsCompleted ? "opacity-50" : "") @(item.IsSaving ? "opacity-75" : "")">
-                                    <div class="card-body d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <input type="checkbox" class="form-check-input me-2"
-                                                   checked="@item.IsCompleted"
-                                                   disabled="@item.IsSaving"
-                                                   @onchange="@(() => ToggleCompleted(item))" />
-                                            <strong>@item.RecipeName</strong><br />
-                                            <small>@item.MeasurementServings @item.MeasurementType</small>
-                                        </div>
-                                        <div>
-                                            <button class="btn btn-sm btn-outline-secondary me-2 @(item.IsSaving ? "disabled" : "")" @onclick="() => ToggleFavorite(item)">
-                                                @if (item.IsSaving && item.LastAction == ItemAction.ToggleFavorite)
-                                                {
-                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                }
-                                                else
-                                                {
-                                                    <i class="bi @(item.IsFavorite ? "bi-star-fill text-warning" : "bi-star")"></i>
-                                                }
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger @(item.IsSaving ? "disabled" : "")" @onclick="() => Remove(item)">
-                                                @if (item.IsSaving && item.LastAction == ItemAction.Remove)
-                                                {
-                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                }
-                                                else
-                                                {
-                                                    <i class="bi bi-trash"></i>
-                                                }
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
+            <MudPaper Class="mb-4 p-0">
+                <MudCard Class="rounded">
+                    <MudCardHeader Class="text-white" Style="background-color:#d9230f;">
+                        <MudText Typo="Typo.h6" Class="m-0">@(!string.IsNullOrEmpty(group.Key) ? group.Key : "Ungrouped")</MudText>
+                    </MudCardHeader>
+
+                    <MudCardContent>
+                        <MudGrid>
+                            @foreach (var item in group)
+                            {
+                                <MudItem xs="12" sm="6" md="4" @key="item.Id">
+                                    <MudCard Class="@GetCardClass(item)">
+                                        <MudCardContent Class="d-flex justify-between align-items-center">
+                                            <div>
+                                                <MudCheckBox T="bool"
+                                                             Class="me-2"
+                                                             Value="@item.IsCompleted"
+                                                             Disabled="@item.IsSaving"
+                                                             ValueChanged="() => ToggleCompleted(item)" />
+                                                <MudText Typo="Typo.subtitle2">@item.RecipeName</MudText>
+                                                <MudText Typo="Typo.caption">@item.MeasurementServings @item.MeasurementType</MudText>
+                                            </div>
+
+                                            <div class="d-flex align-items-center">
+                                                <MudIconButton Disabled="@item.IsSaving"
+                                                               Color="Color.Default"
+                                                               Variant="Variant.Outlined"
+                                                               Icon="@(item.IsFavorite ? Icons.Material.Filled.Star : Icons.Material.Outlined.Star)"
+                                                               ButtonType="ButtonType.Submit"
+                                                               OnClick="() => ToggleFavorite(item)">
+                                                    @if (item.IsSaving && item.LastAction == ItemAction.ToggleFavorite)
+                                                    {
+                                                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+                                                    }
+                                                </MudIconButton>
+
+                                                <MudIconButton Disabled="@item.IsSaving"
+                                                               Color="Color.Error"
+                                                               Variant="Variant.Outlined"
+                                                               Icon="@Icons.Material.Filled.Delete"
+                                                               ButtonType="ButtonType.Submit"
+                                                               OnClick="() => Remove(item)">
+                                                    @if (item.IsSaving && item.LastAction == ItemAction.Remove)
+                                                    {
+                                                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+                                                    }
+                                                </MudIconButton>
+                                            </div>
+                                        </MudCardContent>
+                                    </MudCard>
+                                </MudItem>
+                            }
+                        </MudGrid>
+                    </MudCardContent>
+                </MudCard>
+            </MudPaper>
         }
     }
 
-    <div class="mt-3">
-        <button class="btn btn-outline-success me-2" @onclick="GenerateFromMeals" disabled="@isGenerating">
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Success"
+                   Disabled="@isGenerating"
+                   ButtonType="ButtonType.Submit"
+                   OnClick="GenerateFromMeals"
+                   StartIcon="@Icons.Material.Filled.Autorenew">
             @if (isGenerating)
             {
-                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
             }
-            <i class="bi bi-arrow-repeat"></i> Auto-generate from Meals
-        </button>
-        <button class="btn btn-outline-danger" @onclick="ClearCompleted" disabled="@isClearing">
+            Auto-generate from Meals
+        </MudButton>
+
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Error"
+                   Disabled="@isClearing"
+                   ButtonType="ButtonType.Submit"
+                   OnClick="ClearCompleted"
+                   StartIcon="@Icons.Material.Filled.DeleteSweep">
             @if (isClearing)
             {
-                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
             }
-            <i class="bi bi-trash"></i> Clear Completed
-        </button>
+            Clear Completed
+        </MudButton>
     </div>
 }
 else
 {
-    <p><em>Loading grocery list...</em> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading grocery list...</MudText>
+    </MudPaper>
 }
 
 @code {
@@ -387,9 +420,9 @@ else
         }
     }
 
-    private async Task OnMealNameChanged(ChangeEventArgs e)
+    private async Task OnMealNameChanged(string e)
     {
-        newItemName = e.Value?.ToString() ?? string.Empty;
+        newItemName = e;
         var input = newItemName;
 
         if (input.Length >= 2)
@@ -408,5 +441,13 @@ else
         newItemName = suggestion;
         suggestions.Clear();
         await Add();
+    }
+
+    private string GetCardClass(GroceryListItemUI item)
+    {
+        var classes = "h-100";
+        if (item.IsCompleted) classes += " opacity-50";
+        if (item.IsSaving) classes += " opacity-75";
+        return classes;
     }
 }

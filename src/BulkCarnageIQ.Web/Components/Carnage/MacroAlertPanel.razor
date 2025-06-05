@@ -3,23 +3,28 @@
 
 @if (DailyMacros != null)
 {
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+    <MudGrid GutterSize="3">
         @foreach (var macro in GetMacros())
         {
-            <div class="col">
-                <div class="p-4 border rounded-xl shadow-md bg-white">
-                    <div class="d-flex justify-content-between font-weight-bold">
-                        <span>@macro.Name</span>
-                        <span>@macro.Current.ToString("N2") g / @macro.Goal.ToString("N2") g</span>
-                    </div>
-                    <div class="w-100 h-3 bg-secondary rounded-3 overflow-hidden mt-2">
-                        <div class="@GetBarColor(macro.Current, macro.Goal) h-100" style="width:@GetBarWidth(macro.Current, macro.Goal)"></div>
-                    </div>
-                    <p class="text-muted mt-1">@GetStatus(macro.Current, macro.Goal)</p>
-                </div>
-            </div>
+            <MudItem xs="12" sm="6" lg="3">
+                <MudPaper Class="p-4 rounded-xl shadow-md">
+                    <MudStack Direction="Row" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Baseline" Class="mb-1">
+                        <MudText Typo="Typo.subtitle1">@macro.Name</MudText>
+                        <MudText Typo="Typo.subtitle1">@macro.Current.ToString("N2") g / @macro.Goal.ToString("N2") g</MudText>
+                    </MudStack>
+
+                    <MudProgressLinear Value="@GetBarWidth(macro.Current, macro.Goal)"
+                                       Color="@GetBarColor(macro.Current, macro.Goal)"
+                                       Height="6"
+                                       Class="mt-2 rounded" />
+
+                    <MudText Typo="Typo.caption" Color="Color.Primary" Class="mt-1 text-muted">
+                        @GetStatus(macro.Current, macro.Goal)
+                    </MudText>
+                </MudPaper>
+            </MudItem>
         }
-    </div>
+    </MudGrid>
 }
 
 @code {
@@ -51,17 +56,16 @@
         return "🟢 On Track";
     }
 
-    private string GetBarColor(float current, float goal)
+    private Color GetBarColor(float current, float goal)
     {
         var ratio = current / goal;
-        if (ratio > 1.0) return "bg-red-500";
-        if (ratio >= 0.85) return "bg-yellow-400";
-        return "bg-green-500";
+        if (ratio > 1.0) return Color.Error;
+        if (ratio >= 0.85) return Color.Warning;
+        return Color.Success;
     }
 
-    private string GetBarWidth(float current, float goal)
+    private double GetBarWidth(float current, float goal)
     {
-        var width = Math.Min(current / goal * 100, 100);
-        return $"{width}%";
+        return Math.Min(current / goal * 100, 100);
     }
 }

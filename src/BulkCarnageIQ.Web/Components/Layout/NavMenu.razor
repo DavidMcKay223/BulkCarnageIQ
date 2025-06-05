@@ -2,86 +2,49 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">BulkCarnageIQ.Web</a>
-    </div>
-</div>
+<MudNavMenu Class="mud-width-300">
+    
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
+        Home
+    </MudNavLink>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    <MudNavLink Href="/MealTracker" Icon="@Icons.Material.Filled.Assignment">
+        Meal Tracker
+    </MudNavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="" Match="NavLinkMatch.All">
-                <i class="bi bi-house-door-fill fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Home</span>
-            </NavLink>
-        </div>
+    <MudNavLink Href="/MealTrackerReport" Icon="@Icons.Material.Filled.ShowChart">
+        Meal Report
+    </MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTracker">
-                <i class="bi bi-clipboard-data fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Meal Tracker</span>
-            </NavLink>
-            <div class="collapse show" id="foodTrackerMenu">
-                <div class="nav-item px-3 ms-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerReport">
-                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                        Meal Report
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3 ms-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerTopFoods">
-                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                        Top Foods
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3 ms-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerTopGroupNames">
-                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                        Top Groups
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3 ms-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/MealTrackerReportMacro">
-                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                        Report Macro
-                    </NavLink>
-                </div>
-            </div>
-        </div>
+    <MudNavLink Href="/MealTrackerTopFoods" Icon="@Icons.Material.Filled.BarChart">
+        Top Foods
+    </MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/GroceryList">
-                <i class="bi bi-basket-fill fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Grocery List</span>
-            </NavLink>
-        </div>
+    <MudNavLink Href="/MealTrackerTopGroupNames" Icon="@Icons.Material.Filled.GroupWork">
+        Top Groups
+    </MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/FoodList">
-                <i class="bi bi-list-ul fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>Food List</span>
-            </NavLink>
-        </div>
+    <MudNavLink Href="/MealTrackerReportMacro" Icon="@Icons.Material.Filled.PieChart">
+        Report Macro
+    </MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/UserProfile">
-                <i class="bi bi-person-circle fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                <span>User Profile</span>
-            </NavLink>
-            <div class="collapse show" id="userProfileMenu">
-                <div class="nav-item px-3 ms-3">
-                    <NavLink class="nav-link d-flex align-items-center gap-2 py-2" href="/WeightTracker">
-                        <i class="bi bi-graph-up fs-5 me-2 d-inline-flex align-items-center justify-content-center"></i>
-                        Weight
-                    </NavLink>
-                </div>
-            </div>
-        </div>
-    </nav>
-</div>
+    <MudNavLink Href="/GroceryList" Icon="@Icons.Material.Filled.ShoppingBasket">
+        Grocery List
+    </MudNavLink>
+
+    <MudNavLink Href="/FoodList" Icon="@Icons.Material.Filled.List">
+        Food List
+    </MudNavLink>
+
+    <MudNavLink Href="/UserProfile" Icon="@Icons.Material.Filled.Person">
+        Profile
+    </MudNavLink>
+
+    <MudNavLink Href="/WeightTracker" Icon="@Icons.Material.Filled.FitnessCenter">
+        Weight
+    </MudNavLink>
+
+</MudNavMenu>
 
 @code {
     private string? currentUrl;

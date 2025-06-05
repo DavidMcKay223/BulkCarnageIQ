@@ -8,155 +8,191 @@
 @inject AuthenticationStateProvider AuthProvider
 @using System.Linq
 
-<h3><i class="bi bi-calendar-week"></i> Meal Tracker</h3>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
 
-<div class="mb-4">
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="me-2" />
+    Meal Tracker
+</MudText>
+
+<MudPaper Class="mb-4 p-4" Elevation="2">
     <EditForm Model="@newEntry" OnValidSubmit="SaveMeal">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="row g-2 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label">Date</label>
-                <InputDate class="form-control" @bind-Value="newEntry.Date" />
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Meal Type</label>
-                <InputSelect class="form-control" @bind-Value="newEntry.MealType">
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Snack">Snack</option>
-                </InputSelect>
-            </div>
-            <div class="col-md position-relative">
-                <label class="form-label">Meal Name</label>
-                <InputText class="form-control" @bind-Value="newEntry.MealName" @oninput="OnMealNameChanged" placeholder="Type to search..." />
+        <MudGrid GutterSize="2">
+            <MudItem xs="12" sm="6" md="2">
+                <MudDatePicker Date="DateBridge" Label="Date" DateChanged="OnDateChanged" Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6" md="2">
+                <MudSelect T="string" Label="Meal Type" @bind-Value="newEntry.MealType" Required="true">
+                    <MudSelectItem Value="@("Breakfast")">Breakfast</MudSelectItem>
+                    <MudSelectItem Value="@("Lunch")">Lunch</MudSelectItem>
+                    <MudSelectItem Value="@("Dinner")">Dinner</MudSelectItem>
+                    <MudSelectItem Value="@("Snack")">Snack</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="6" Class="position-relative">
+                <MudTextField T="string"
+                Label="Meal Name"
+                Placeholder="Type to search..."
+                Value="newEntry.MealName"
+                Immediate="true"
+                Adornment="Adornment.Start"
+                AdornmentIcon="@Icons.Material.Filled.Search"
+                ValueChanged="OnMealNameChanged" />
+
                 @if (suggestions.Any())
                 {
-                    <ul class="list-group position-absolute w-100" style="z-index: 1050;">
-                        @foreach (var suggestion in suggestions)
-                        {
-                            <li class="list-group-item list-group-item-action"
-                            @onclick="() => SelectSuggestion(suggestion)" role="button">
-                                @suggestion
-                            </li>
-                        }
-                    </ul>
+                    <MudPaper Class="position-absolute w-100" Style="z-index:1050;">
+                        <MudList T="string">
+                            @foreach (var suggestion in suggestions)
+                            {
+                                <MudListItem Class="cursor-pointer"
+                                @onclick="() => SelectSuggestion(suggestion)">
+                                    @suggestion
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudPaper>
                 }
-            </div>
-            <div class="col-md-auto">
-                <button type="submit" class="btn btn-success w-100">
-                    <i class="bi bi-plus-circle"></i> Add
-                </button>
-            </div>
-        </div>
+            </MudItem>
+
+            <MudItem xs="12" md="2">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Class="w-100">
+                    <MudIcon Icon="@Icons.Material.Filled.AddCircle" Class="me-1" />
+                    Add
+                </MudButton>
+            </MudItem>
+        </MudGrid>
     </EditForm>
-</div>
+</MudPaper>
 
 <BulkCarnageIQ.Web.Components.Carnage.GroupMealQuickAdd OnMealsAdded="HandleGroupMealsAdded" GroupItems="groupFoodItems" />
 
 @if (entries is null)
 {
-    <p><em>Loading meals...</em></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading meals...</MudText>
+    </MudPaper>
 }
 else if (!entries.Any())
 {
-    <p>No meals tracked yet.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No meals tracked yet.
+        </MudText>
+    </MudPaper>
 }
 else
 {
-    @foreach (var monthGroup in entries.GroupBy(e => new { Year = e.Date.Year, Month = e.Date.Month }).OrderByDescending(g => g.Key.Year).ThenByDescending(g => g.Key.Month))
+    @foreach (var monthGroup in entries
+       .GroupBy(e => new { Year = e.Date.Year, Month = e.Date.Month })
+       .OrderByDescending(g => g.Key.Year)
+       .ThenByDescending(g => g.Key.Month))
     {
-        <div class="mb-4">
-            <h4 class="text-primary mb-3">
-                <span role="button" @onclick="@(() => ToggleMonth(monthGroup.Key))">
-                    <i class="bi @(IsMonthExpanded(monthGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>
-                    @(new DateTime(monthGroup.Key.Year, monthGroup.Key.Month, 1).ToString("MMMM yyyy"))
-                </span>
-            </h4>
+        <MudPaper Class="mb-4 p-3" Elevation="1" Style="background-color:#1e1e1e; color:#eee;">
+            <MudText Typo="Typo.h5" Class="mb-2" Style="cursor:pointer; user-select:none;" @onclick="@(() => ToggleMonth(monthGroup.Key))">
+                <MudIcon Icon="@(IsMonthExpanded(monthGroup.Key) ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ChevronRight)" Class="me-2" />
+                @(new DateTime(monthGroup.Key.Year, monthGroup.Key.Month, 1).ToString("MMMM yyyy"))
+            </MudText>
 
             @if (IsMonthExpanded(monthGroup.Key))
             {
                 foreach (var dateGroup in monthGroup.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
                 {
-                    <div class="ms-3 mb-4">
-                        <h5 class="text-secondary mb-2">
-                            <span role="button" @onclick="@(() => ToggleDate(dateGroup.Key))">
-                                <i class="bi @(IsExpanded(dateGroup.Key) ? "bi-chevron-down" : "bi-chevron-right") me-2"></i>
-                                @dateGroup.Key.ToString("MMMM dd, yyyy")
-                            </span>
-                        </h5>
+                    <MudPaper Class="ms-4 mb-4 p-2" Elevation="0" Square="true" Style="background-color:#2a2a2a;">
+                        <MudText Typo="Typo.h6" Class="mb-1" Style="cursor:pointer; user-select:none;" @onclick="@(() => ToggleDate(dateGroup.Key))">
+                            <MudIcon Icon="@(IsExpanded(dateGroup.Key) ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ChevronRight)" Class="me-2" />
+                            @dateGroup.Key.ToString("MMMM dd, yyyy")
+                        </MudText>
 
                         @if (IsExpanded(dateGroup.Key))
                         {
-                            @* Your inner mealGroup logic stays the same *@
-                            @foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType).OrderBy(mg => GetMealTypeOrder(mg.Key)))
+                            foreach (var mealGroup in dateGroup.GroupBy(m => m.MealType).OrderBy(mg => GetMealTypeOrder(mg.Key)))
                             {
-                                <div class="card shadow-sm mb-3">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap">
-                                        <h6 class="mb-0 me-3">
-                                            <i class="bi bi-egg-fried me-2"></i>@mealGroup.Key
-                                        </h6>
-                                        <small class="text-muted text-nowrap">
+                                <MudPaper Class="mb-3 p-3" Elevation="2" Style="color:#f5f5f5;">
+                                    <MudStack Direction="Row" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Baseline" Class="mb-2" Spacing="1">
+                                        <MudText Typo="Typo.subtitle1" StartIcon="@GetMealIcon(mealGroup.Key)">
+                                            @mealGroup.Key
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Primary" Class="text-muted" Style="white-space:nowrap;">
                                             Total: @mealGroup.Sum(m => m.Calories).ToString("N0") Cal
-                                            | P:@mealGroup.Sum(m => m.Protein).ToString("N1")g
-                                            | C:@mealGroup.Sum(m => m.Carbs).ToString("N1")g
-                                            | F:@mealGroup.Sum(m => m.Fats).ToString("N1")g
-                                        </small>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <ul class="list-group list-group-flush">
-                                            @foreach (var meal in mealGroup)
-                                            {
-                                                <li class="list-group-item">
-                                                    <div class="row align-items-center g-2">
-                                                        <div class="col-lg-3 col-md-12 fw-bold">
-                                                            @meal.MealName (@meal.MeasurementServings x @meal.MeasurementType)
-                                                        </div>
-                                                        <div class="col-lg-2 col-md-3">
-                                                            <div class="input-group input-group-sm">
-                                                                <InputNumber class="form-control" @bind-Value="meal.PortionEaten" />
-                                                                <button class="btn btn-outline-secondary" @onclick="() => UpdateMealMacros(meal)" title="Update Macros">
-                                                                    <i class="bi bi-calculator"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-6 col-md-7 small text-muted">
-                                                            <span class="me-2" title="Calories"><i class="bi bi-fire me-1"></i>@meal.Calories.ToString("N0")</span>
-                                                            <span class="me-2" title="Protein"><i class="bi bi-egg me-1"></i>@meal.Protein.ToString("N1")g</span>
-                                                            <span class="me-2" title="Carbs"><i class="bi bi-basket me-1"></i>@meal.Carbs.ToString("N1")g</span>
-                                                            <span class="me-2" title="Fats"><i class="bi bi-droplet me-1"></i>@meal.Fats.ToString("N1")g</span>
-                                                            <span title="Fiber"><i class="bi bi-flower2 me-1"></i>@meal.Fiber.ToString("N1")g</span>
-                                                        </div>
-                                                        <div class="col-lg-1 col-md-2 text-end">
-                                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteMeal(meal)" title="Delete Item">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
+                                            | P: @mealGroup.Sum(m => m.Protein).ToString("N1")g
+                                            | C: @mealGroup.Sum(m => m.Carbs).ToString("N1")g
+                                            | F: @mealGroup.Sum(m => m.Fats).ToString("N1")g
+                                        </MudText>
+                                    </MudStack>
+
+                                    <MudTable T="MealEntry" Items="mealGroup" Elevation="0" Dense="true" Bordered="true" Striped="true" Hover="true" Style="color:#ddd;">
+                                        <HeaderContent>
+                                            <MudTh>Meal Name</MudTh>
+                                            <MudTh>Portion Eaten</MudTh>
+                                            <MudTh></MudTh> @* For Calculate button *@
+                                            <MudTh>Calories</MudTh>
+                                            <MudTh>Protein (g)</MudTh>
+                                            <MudTh>Carbs (g)</MudTh>
+                                            <MudTh>Fats (g)</MudTh>
+                                            <MudTh>Fiber (g)</MudTh>
+                                            <MudTh></MudTh> @* For Delete button *@
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd Title="@context.MealName" Style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                                @context.MealName (@context.MeasurementServings x @context.MeasurementType)
+                                            </MudTd>
+                                            <MudTd Style="width:130px;">
+                                                <MudNumericField @bind-Value="context.PortionEaten" Min="1" Variant="Variant.Outlined" Size="Size.Small" Immediate="true" Class="m-0" />
+                                            </MudTd>
+                                            <MudTd Style="width:40px;">
+                                                <MudIconButton Icon="@Icons.Material.Filled.Calculate" Color="Color.Primary" Size="Size.Small"
+                                                               OnClick="() => UpdateMealMacros(context)" />
+                                            </MudTd>
+                                            <MudTd Style="width:70px; text-align:right;">
+                                                @context.Calories.ToString("N0")
+                                            </MudTd>
+                                            <MudTd Style="width:70px; text-align:right;">
+                                                @context.Protein.ToString("N1")
+                                            </MudTd>
+                                            <MudTd Style="width:70px; text-align:right;">
+                                                @context.Carbs.ToString("N1")
+                                            </MudTd>
+                                            <MudTd Style="width:70px; text-align:right;">
+                                                @context.Fats.ToString("N1")
+                                            </MudTd>
+                                            <MudTd Style="width:70px; text-align:right;">
+                                                @context.Fiber.ToString("N1")
+                                            </MudTd>
+                                            <MudTd Style="width:40px;">
+                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small"
+                                                               OnClick="() => DeleteMeal(context)" />
+                                            </MudTd>
+                                        </RowTemplate>
+                                    </MudTable>
+                                </MudPaper>
                             }
 
-                            <div class="mt-3 pt-3 border-top">
-                                <h6 class="text-secondary">Daily Totals (@dateGroup.Key.ToString("MMMM dd"))</h6>
-                                <div class="d-flex justify-content-around flex-wrap small">
-                                    <span class="mx-2"><strong>Calories:</strong> @dateGroup.Sum(m => m.Calories).ToString("N0")</span>
-                                    <span class="mx-2"><strong>Protein:</strong> @dateGroup.Sum(m => m.Protein).ToString("N1")g</span>
-                                    <span class="mx-2"><strong>Carbs:</strong> @dateGroup.Sum(m => m.Carbs).ToString("N1")g</span>
-                                    <span class="mx-2"><strong>Fats:</strong> @dateGroup.Sum(m => m.Fats).ToString("N1")g</span>
-                                    <span class="mx-2"><strong>Fiber:</strong> @dateGroup.Sum(m => m.Fiber).ToString("N1")g</span>
-                                </div>
-                            </div>
+                            <MudDivider Class="mt-3 mb-1" />
+                            <MudText Typo="Typo.subtitle2" Color="Color.Info" Class="mb-1">
+                                Daily Totals (@dateGroup.Key.ToString("MMMM dd"))
+                            </MudText>
+                            <MudText Color="Color.Primary" Style="font-weight:bold; font-size:0.95rem;">
+                                Calories: @dateGroup.Sum(m => m.Calories).ToString("N0") &nbsp;
+                                Protein: @dateGroup.Sum(m => m.Protein).ToString("N1")g &nbsp;
+                                Carbs: @dateGroup.Sum(m => m.Carbs).ToString("N1")g &nbsp;
+                                Fats: @dateGroup.Sum(m => m.Fats).ToString("N1")g &nbsp;
+                                Fiber: @dateGroup.Sum(m => m.Fiber).ToString("N1")g
+                            </MudText>
                         }
-                    </div>
+                    </MudPaper>
                 }
             }
-        </div>
+        </MudPaper>
     }
 }
 
@@ -167,6 +203,21 @@ else
     private string currentUserId = string.Empty;
     private MealEntry newEntry;
     private HashSet<DateOnly> expandedDates = new();
+
+    private DateTime DateBridge
+    {
+        get => newEntry.Date.ToDateTime(TimeOnly.MinValue);
+        set => newEntry.Date = DateOnly.FromDateTime(value);
+    }
+
+    private void OnDateChanged(DateTime? newDate)
+    {
+        if (newDate.HasValue)
+        {
+            newEntry.Date = DateOnly.FromDateTime(newDate.Value);
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -267,9 +318,9 @@ else
         }
     }
 
-    private async Task OnMealNameChanged(ChangeEventArgs e)
+    private async Task OnMealNameChanged(string e)
     {
-        newEntry.MealName = e.Value?.ToString() ?? string.Empty; // Update bound value explicitly
+        newEntry.MealName = e;
         var input = newEntry.MealName;
 
         if (input.Length >= 2)
@@ -424,4 +475,13 @@ else
         }
         StateHasChanged();
     }
+
+    private string GetMealIcon(string mealType) => mealType switch
+    {
+        "Breakfast" => Icons.Material.Filled.Egg,
+        "Lunch" => Icons.Material.Filled.LunchDining,
+        "Dinner" => Icons.Material.Filled.DinnerDining,
+        "Snack" => Icons.Material.Filled.Fastfood,
+        _ => Icons.Material.Filled.Restaurant
+    };
 }

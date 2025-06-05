@@ -1,50 +1,43 @@
 ﻿@using BulkCarnageIQ.Core.Carnage
 
-<div class="card shadow-sm rounded p-3 mb-4">
-    <h5 class="mb-3">
-        <i class="bi bi-lightning-charge-fill text-warning"></i>
+<MudPaper Class="pa-4 mb-4" Style="background-color:#d9230f;" Elevation="2" Rounded="true">
+    <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
+        <MudIcon Icon="@Icons.Material.Filled.FlashOn" Color="Color.Warning" Class="me-2" />
         Quick Add Grouped Meals
-    </h5>
+    </MudText>
 
     @if (GroupItems?.Any() == true)
     {
-        <div class="row g-3">
+        <MudGrid GutterSize="3">
             @foreach (var group in GroupItems)
             {
-                <div class="col-md-3">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h6 class="card-title text-primary">@group.GroupName</h6>
-                            <div class="flex-grow-1 overflow-auto" style="max-height: 300px; min-height: 100px;">
-                                @foreach (var entry in group.Entries)
-                                {
-                                    <div class="form-check">
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               id="entry_@entry.Id"
-                                               @onchange="(e) => ToggleSelection(entry, (bool)e.Value!)"
-                                               checked="@SelectedItems.Contains(entry)" />
-                                        <label class="form-check-label" for="entry_@entry.Id">
-                                            @entry.RecipeName
-                                        </label>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="1" Rounded="true" Class="d-flex flex-column h-100">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="px-3 pt-3 mb-2">@group.GroupName</MudText>
+                        <MudStack Spacing="1">
+                            @foreach (var entry in group.Entries)
+                            {
+                                <MudCheckBox T="bool"
+                                    Value="@IsSelected(entry)"
+                                    ValueChanged="@((bool isChecked) => ToggleSelection(entry, isChecked))"
+                                    Label="@entry.RecipeName"
+                                    Class="me-2" />
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
             }
-        </div>
+        </MudGrid>
 
-        <button class="btn btn-success mt-3" @onclick="AddSelectedItems">
-            <i class="bi bi-plus-circle"></i> Add Selected Items (@SelectedItems.Count)
-        </button>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" Class="mt-3" OnClick="AddSelectedItems" StartIcon="@Icons.Material.Filled.AddCircle">
+            Add Selected Items (@SelectedItems.Count)
+        </MudButton>
     }
     else
     {
-        <div class="text-muted">No group meals available.</div>
+        <MudText Color="Color.Secondary">No group meals available.</MudText>
     }
-</div>
+</MudPaper>
 
 @code {
     [Parameter] public List<GroupFoodItem> GroupItems { get; set; } = new();
@@ -52,9 +45,11 @@
 
     private HashSet<GroupFoodItemEntry> SelectedItems { get; set; } = new();
 
-    private void ToggleSelection(GroupFoodItemEntry entry, bool isSelected)
+    private bool IsSelected(GroupFoodItemEntry entry) => SelectedItems.Contains(entry);
+
+    private void ToggleSelection(GroupFoodItemEntry entry, bool isChecked)
     {
-        if (isSelected)
+        if (isChecked)
             SelectedItems.Add(entry);
         else
             SelectedItems.Remove(entry);

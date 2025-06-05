@@ -6,96 +6,94 @@
 @inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3><i class="bi bi-bar-chart-line"></i> Meal Tracker Report by Macro</h3>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.BarChart" Class="me-2" />
+    Meal Tracker Report by Macro
+</MudText>
 
 @if (entries is null)
 {
-    <p><em>Loading meals...</em></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading meals...</MudText>
+    </MudPaper>
 }
 else if (!entries.Any())
 {
-    <p>No meals tracked yet.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No meals tracked yet.
+        </MudText>
+    </MudPaper>
 }
 else
 {
-    <table class="table table-hover table-bordered small align-middle">
-        @foreach (var monthGroup in entries
+    @foreach (var monthGroup in entries
        .GroupBy(e => new { e.Date.Year, e.Date.Month })
        .OrderByDescending(g => g.Key.Year)
        .ThenByDescending(g => g.Key.Month))
-        {
-            var year = monthGroup.Key.Year;
-            var month = monthGroup.Key.Month;
-            var monthName = new DateTime(year, month, 1).ToString("MMMM yyyy");
+    {
+        var year = monthGroup.Key.Year;
+        var month = monthGroup.Key.Month;
+        var monthName = new DateTime(year, month, 1).ToString("MMMM yyyy");
+        var dayGroups = monthGroup
+            .GroupBy(m => m.Date)
+            .Select(g => new
+            {
+                Date = g.Key,
+                TotalCalories = g.Sum(m => m.Calories),
+                TotalProtein = g.Sum(m => m.Protein),
+                TotalCarbs = g.Sum(m => m.Carbs),
+                TotalFats = g.Sum(m => m.Fats),
+                TotalFiber = g.Sum(m => m.Fiber)
+            })
+            .OrderByDescending(d => d.Date)
+            .ToList();
 
-            <tbody class="table-group-divider">
-                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleMonth(monthGroup.Key))" style="cursor: pointer;">
-                    <td colspan="6">
-                        <i class="bi @(IsExpanded(monthGroup.Key) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
-                        @monthName
-                    </td>
-                </tr>
+        <MudText Typo="Typo.h6" Class="mt-4">@monthName</MudText>
 
-                @if (IsExpanded(monthGroup.Key))
-                {
-                    <!-- Headers for the Month Group -->
-                    <tr class="table-info fw-bold">
-                        <th>Date</th>
-                        <th>Total Calories</th>
-                        <th>Total Protein</th>
-                        <th>Total Carbs</th>
-                        <th>Total Fats</th>
-                        <th>Total Fiber</th>
-                    </tr>
-
-                    var dayGroups = monthGroup
-                    .GroupBy(m => m.Date)
-                    .Select(g => new
-                    {
-                        Date = g.Key,
-                        TotalCalories = g.Sum(m => m.Calories),
-                        TotalProtein = g.Sum(m => m.Protein),
-                        TotalCarbs = g.Sum(m => m.Carbs),
-                        TotalFats = g.Sum(m => m.Fats),
-                        TotalFiber = g.Sum(m => m.Fiber)
-                    })
-                    .OrderByDescending(d => d.Date)
-                    .ToList();
-
-                    @foreach (var day in dayGroups)
-                    {
-                        <tr>
-                            <td>@day.Date.ToString("MMMM dd, yyyy")</td>
-                            <td style="@GetMacroStyle(day.TotalCalories, userProfile?.CalorieGoal)">
-                                @day.TotalCalories.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalCalories, userProfile?.CalorieGoal))
-                            </td>
-                            <td style="@GetMacroStyle(day.TotalProtein, userProfile?.ProteinGoal)">
-                                @day.TotalProtein.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalProtein, userProfile?.ProteinGoal))
-                            </td>
-                            <td style="@GetMacroStyle(day.TotalCarbs, userProfile?.CarbsGoal)">
-                                @day.TotalCarbs.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalCarbs, userProfile?.CarbsGoal))
-                            </td>
-                            <td style="@GetMacroStyle(day.TotalFats, userProfile?.FatGoal)">
-                                @day.TotalFats.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalFats, userProfile?.FatGoal))
-                            </td>
-                            <td style="@GetMacroStyle(day.TotalFiber, userProfile?.FiberGoal)">
-                                @day.TotalFiber.ToString("N2") @((MarkupString)GetArrowIcon(day.TotalFiber, userProfile?.FiberGoal))
-                            </td>
-                        </tr>
-                    }
-
-                    <tr class="table-warning fw-bold">
-                        <td class="text-end">Monthly Total</td>
-                        <td>@monthGroup.Sum(e => e.Calories).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Protein).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Carbs).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Fats).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Fiber).ToString("N2")</td>
-                    </tr>
-                }
-            </tbody>
-        }
-    </table>
+            <MudTable Items="dayGroups" Dense="true" Bordered="true" Hover="true" Class="small">
+            <HeaderContent>
+                <MudTh>Date</MudTh>
+                <MudTh>Total Calories</MudTh>
+                <MudTh>Total Protein</MudTh>
+                <MudTh>Total Carbs</MudTh>
+                <MudTh>Total Fats</MudTh>
+                <MudTh>Total Fiber</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Date.ToString("MMMM dd, yyyy")</MudTd>
+                <MudTd Style="@GetMacroStyle(context.TotalCalories, userProfile?.CalorieGoal)">
+                    @context.TotalCalories.ToString("N2") @((MarkupString)GetArrowIcon(context.TotalCalories, userProfile?.CalorieGoal))
+                </MudTd>
+                <MudTd Style="@GetMacroStyle(context.TotalProtein, userProfile?.ProteinGoal)">
+                    @context.TotalProtein.ToString("N2") @((MarkupString)GetArrowIcon(context.TotalProtein, userProfile?.ProteinGoal))
+                </MudTd>
+                <MudTd Style="@GetMacroStyle(context.TotalCarbs, userProfile?.CarbsGoal)">
+                    @context.TotalCarbs.ToString("N2") @((MarkupString)GetArrowIcon(context.TotalCarbs, userProfile?.CarbsGoal))
+                </MudTd>
+                <MudTd Style="@GetMacroStyle(context.TotalFats, userProfile?.FatGoal)">
+                    @context.TotalFats.ToString("N2") @((MarkupString)GetArrowIcon(context.TotalFats, userProfile?.FatGoal))
+                </MudTd>
+                <MudTd Style="@GetMacroStyle(context.TotalFiber, userProfile?.FiberGoal)">
+                    @context.TotalFiber.ToString("N2") @((MarkupString)GetArrowIcon(context.TotalFiber, userProfile?.FiberGoal))
+                </MudTd>
+            </RowTemplate>
+            <FooterContent>
+                <MudTd ColSpan="1" Class="text-end mud-font-weight-bold">Monthly Total</MudTd>
+                <MudTd>@monthGroup.Sum(e => e.Calories).ToString("N2")</MudTd>
+                <MudTd>@monthGroup.Sum(e => e.Protein).ToString("N2")</MudTd>
+                <MudTd>@monthGroup.Sum(e => e.Carbs).ToString("N2")</MudTd>
+                <MudTd>@monthGroup.Sum(e => e.Fats).ToString("N2")</MudTd>
+                <MudTd>@monthGroup.Sum(e => e.Fiber).ToString("N2")</MudTd>
+            </FooterContent>
+        </MudTable>
+    }
 }
 
 @code {
@@ -133,10 +131,10 @@ else
             return string.Empty; // No styling
         }
 
-        const float toleranceGreen = 0.05f;
-        const float toleranceYellow = 0.20f;
-        const float toleranceRed = 0.40f;
-        const float extremeRed = 0.60f;
+        const float toleranceGreen = 0.05f;  // within 5% is good
+        const float toleranceYellow = 0.20f; // mild warning
+        const float toleranceRed = 0.40f;    // bad
+        const float extremeRed = 0.60f;      // very bad
 
         float difference = actual - goal.Value;
 
@@ -145,32 +143,39 @@ else
             float percentUnder = Math.Abs(difference) / goal.Value;
             if (percentUnder >= 0.20f)
             {
-                return "background-color:#A8E6CF; color:#1b4332;"; // Very Good
+                // Significantly under — light green background, black text
+                return "background-color:#a3d9a5; color:#000000;";
             }
-            return "background-color:#D4F5E9; color:#1b4332;"; // Good
+            // Slightly under — dark green background, white text
+            return "background-color:#27ae60; color:#ffffff;";
         }
 
         float percentOver = difference / goal.Value;
 
         if (percentOver <= toleranceGreen)
         {
-            return "background-color:#D4F5E9; color:#1b4332;"; // Slightly over = still Green
+            // Slightly over — white background, black text (neutral)
+            return "background-color:#ffffff; color:#000000;";
         }
         else if (percentOver <= toleranceYellow)
         {
-            return "background-color:#FFFACD; color:#7b5e00;"; // Mild Warning
+            // Mild warning — bright yellow background, black text
+            return "background-color:#f1c40f; color:#000000;";
         }
         else if (percentOver <= toleranceRed)
         {
-            return "background-color:#FFB6B6; color:#7b0000;"; // Bad
+            // Bad — BulkCarnageIQ red background, white text
+            return "background-color:#d9230f; color:#ffffff;";
         }
         else if (percentOver <= extremeRed)
         {
-            return "background-color:#FF7F7F; color:#7b0000;"; // Very Bad
+            // Very bad — darker red background, white text
+            return "background-color:#a7200b; color:#ffffff;";
         }
         else
         {
-            return "background-color:#E57373; color:#4b0000;"; // Extreme Bad
+            // Extreme bad — darkest red background, white text
+            return "background-color:#7f1607; color:#ffffff;";
         }
     }
 
@@ -178,24 +183,36 @@ else
     {
         if (goal == null)
         {
-            return new MarkupString(string.Empty); // No goal, no icon
+            return new MarkupString(string.Empty);
         }
 
-        // Logic to decide whether to show an up or down arrow
-        if (Math.Abs(actual - goal.Value) / goal.Value <= 0.1f) // Within 10% tolerance
+        if (Math.Abs(actual - goal.Value) / goal.Value <= 0.1f)
         {
-            return new MarkupString(string.Empty); // No arrow if within goal range
+            return new MarkupString(string.Empty);
         }
 
-        if (actual < goal) // Below the goal
+        if (actual < goal)
         {
-            return new MarkupString("<i class='bi bi-arrow-down text-danger'></i>"); // Down arrow, red
+            // Down arrow SVG in BulkCarnageIQ RED (#d9230f), pointing down
+            var downArrowSvg = @"
+                <svg width='16' height='16' viewBox='0 0 16 16' fill='#d9230f' xmlns='http://www.w3.org/2000/svg' aria-label='Down arrow'>
+                    <path fill-rule='evenodd' d='M8 4a.75.75 0 0 0-.75.75v6.69l-3.47-3.47a.75.75 0 1 0-1.06 1.06l4.75 4.75a.75.75 0 0 0 1.06 0l4.75-4.75a.75.75 0 0 0-1.06-1.06l-3.47 3.47V4.75A.75.75 0 0 0 8 4z'/>
+                </svg>";
+
+            return new MarkupString(downArrowSvg);
         }
-        else if (actual > goal) // Above the goal
+        else if (actual > goal)
         {
-            return new MarkupString("<i class='bi bi-arrow-up text-success'></i>"); // Up arrow, green
+            // Up arrow SVG in BLACK (#000000), pointing up
+            var upArrowSvg = @"
+                <svg width='16' height='16' viewBox='0 0 16 16' fill='#000000' xmlns='http://www.w3.org/2000/svg' aria-label='Up arrow'>
+                    <path fill-rule='evenodd' d='M8 12a.75.75 0 0 1 .75-.75V4.56l3.47 3.47a.75.75 0 1 1 1.06-1.06l-4.75-4.75a.75.75 0 0 1-1.06 0L2.72 6.97a.75.75 0 1 1 1.06 1.06l3.47-3.47v6.69A.75.75 0 0 1 8 12z'/>
+                </svg>";
+
+            return new MarkupString(upArrowSvg);
         }
 
-        return new MarkupString(string.Empty); // No icon
+        return new MarkupString(string.Empty);
     }
+
 }
