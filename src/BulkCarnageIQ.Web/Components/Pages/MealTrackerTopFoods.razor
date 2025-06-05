@@ -5,121 +5,132 @@
 @inject IMealEntryService MealEntryService
 @inject AuthenticationStateProvider AuthProvider
 
-<h3><i class="bi bi-bar-chart-line"></i> Top Foods by Month</h3>
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudText Typo="Typo.h3" Class="d-flex align-items-center">
+    <MudIcon Icon="@Icons.Material.Filled.BarChart" Class="me-2" />
+    Top Foods by Month
+</MudText>
 
 @if (entries is null)
 {
-    <p><em>Loading meals...</em></p>
+    <MudPaper Class="p-4 d-flex align-items-center">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="me-2" />
+        <MudText Typo="Typo.subtitle1" Class="text-muted">Loading meals...</MudText>
+    </MudPaper>
 }
 else if (!entries.Any())
 {
-    <p>No meals tracked yet.</p>
+    <MudPaper Class="p-4">
+        <MudText Typo="Typo.subtitle1" Class="text-warning">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="me-1" />
+            No meals tracked yet.
+        </MudText>
+    </MudPaper>
 }
 else
 {
-    <table class="table table-hover table-bordered small align-middle">
+    <MudExpansionPanels MultiExpansion="true" Elevation="1">
         @foreach (var monthGroup in entries
        .GroupBy(e => new { e.Date.Year, e.Date.Month })
        .OrderByDescending(g => g.Key.Year)
        .ThenByDescending(g => g.Key.Month))
         {
-            var year = monthGroup.Key.Year;
-            var month = monthGroup.Key.Month;
+            var key = monthGroup.Key;
+            var year = key.Year;
+            var month = key.Month;
             var monthName = new DateTime(year, month, 1).ToString("MMMM yyyy");
 
-            <tbody class="table-group-divider">
-                <tr class="table-secondary fw-bold" @onclick="@(() => ToggleMonth(monthGroup.Key))" style="cursor: pointer;">
-                    <td colspan="9">
-                        <i class="bi @(IsExpanded(monthGroup.Key) ? "bi-chevron-up" : "bi-chevron-down") me-2"></i>
-                        @monthName
-                    </td>
-                </tr>
+            var foodGroups = monthGroup
+            .GroupBy(m => m.MealName)
+            .Select(g => new
+            {
+                MealName = $"{g.Key} ({g.Sum(m => m.MeasurementServings)?.ToString("N2")} x {g.First().MeasurementType})",
+                GroupName = g.First().GroupName ?? "Unknown",
+                TotalPortion = g.Sum(m => m.PortionEaten),
+                TotalCalories = g.Sum(m => m.Calories),
+                TotalProtein = g.Sum(m => m.Protein),
+                TotalCarbs = g.Sum(m => m.Carbs),
+                TotalFats = g.Sum(m => m.Fats),
+                TotalFiber = g.Sum(m => m.Fiber)
+            })
+            .OrderByDescending(f => f.TotalCalories)
+            .ToList();
 
-                @if (IsExpanded(monthGroup.Key))
-                {
-                    var foodGroups = monthGroup
-                    .GroupBy(m => m.MealName)
-                    .Select(g => new
-                    {
-                        MealName = String.Format("{0} ({1} x {2})", g.Key, g.Sum(m => m.MeasurementServings)?.ToString("N2"), g.First().MeasurementType),
-                        GroupName = g.First().GroupName ?? "Unknown",
-                        TotalPortion = g.Sum(m => m.PortionEaten),
-                        TotalCalories = g.Sum(m => m.Calories),
-                        TotalProtein = g.Sum(m => m.Protein),
-                        TotalCarbs = g.Sum(m => m.Carbs),
-                        TotalFats = g.Sum(m => m.Fats),
-                        TotalFiber = g.Sum(m => m.Fiber)
-                    })
-                    .OrderByDescending(f => f.TotalCalories)
-                    .ToList();
+            <MudExpansionPanel Expanded="true" Text="@monthName" Class="mb-2" ExpandIcon="@Icons.Material.Filled.ExpandMore" CollapseIcon="@Icons.Material.Filled.ExpandLess">
+                <MudTable Dense="true" Bordered="true" Hover="true" Striped="true" Elevation="0" Items="@foodGroups">
+                    <HeaderContent>
+                        <MudTh>Group Name</MudTh>
+                        <MudTh>Meal Name</MudTh>
+                        <MudTh>Total Portion</MudTh>
+                        <MudTh>Total Calories</MudTh>
+                        <MudTh>Total Protein</MudTh>
+                        <MudTh>Total Carbs</MudTh>
+                        <MudTh>Total Fats</MudTh>
+                        <MudTh>Total Fiber</MudTh>
+                        <MudTh>Flags</MudTh>
+                    </HeaderContent>
 
-                    <tr class="fw-bold table-info">
-                        <td>Group Name</td>
-                        <td>Meal Name</td>
-                        <th>Total Portion</th>
-                        <th>Total Calories</th>
-                        <th>Total Protein</th>
-                        <th>Total Carbs</th>
-                        <th>Total Fats</th>
-                        <th>Total Fiber</th>
-                        <th>Flags</th>
-                    </tr>
+                    <RowTemplate>
+                        @{
+                            var caloriePerPortion = context.TotalCalories / (context.TotalPortion == 0 ? 1 : context.TotalPortion);
+                            var fatToCarbRatio = context.TotalFats / (context.TotalCarbs == 0 ? 1 : context.TotalCarbs);
+                            var isFatBomb = context.TotalFats > 150 && fatToCarbRatio > 1.5;
+                            var isCarbBomb = context.TotalCarbs > 200 && context.TotalFiber < 10;
+                            var isCalorieBomb = caloriePerPortion > 400;
+                            var isFiberFail = context.TotalFiber < 5;
+                            var showLowFiber = isFatBomb || isCarbBomb || isCalorieBomb;
+                        }
 
-                    @foreach (var food in foodGroups)
-                    {
-                        var caloriePerPortion = food.TotalCalories / (food.TotalPortion == 0 ? 1 : food.TotalPortion);
-                        var fatToCarbRatio = food.TotalFats / (food.TotalCarbs == 0 ? 1 : food.TotalCarbs);
-                        var isFatBomb = food.TotalFats > 150 && fatToCarbRatio > 1.5;
-                        var isCarbBomb = food.TotalCarbs > 200 && food.TotalFiber < 10;
-                        var isCalorieBomb = caloriePerPortion > 400;
-                        var isFiberFail = food.TotalFiber < 5;
+                        <MudTd>@context.GroupName</MudTd>
+                        <MudTd>@context.MealName</MudTd>
+                        <MudTd>@context.TotalPortion.ToString("N2")</MudTd>
+                        <MudTd>@context.TotalCalories.ToString("N2")</MudTd>
+                        <MudTd>@context.TotalProtein.ToString("N2")</MudTd>
+                        <MudTd>@context.TotalCarbs.ToString("N2")</MudTd>
+                        <MudTd>@context.TotalFats.ToString("N2")</MudTd>
+                        <MudTd>@context.TotalFiber.ToString("N2")</MudTd>
+                        <MudTd>
+                            @if (isFatBomb)
+                            {
+                                <MudChip T="string" Color="Color.Error" Size="Size.Small" Class="me-1" Icon="@Icons.Material.Filled.WaterDrop">Fat Bomb</MudChip>
+                            }
+                            @if (isCarbBomb)
+                            {
+                                <MudChip T="string" Color="Color.Warning" Size="Size.Small" Class="me-1" Icon="@Icons.Material.Filled.ElectricBolt">Carb Bomb</MudChip>
+                            }
+                            @if (isCalorieBomb)
+                            {
+                                <MudChip T="string" Color="Color.Error" Size="Size.Small" Class="me-1" Icon="@Icons.Material.Filled.LocalFireDepartment">Calorie Bomb</MudChip>
+                            }
+                            @if (showLowFiber && isFiberFail)
+                            {
+                                <MudChip T="string" Color="Color.Secondary" Size="Size.Small" Class="me-1" Icon="@Icons.Material.Filled.MoodBad">Low Fiber</MudChip>
+                            }
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
 
-                        var showLowFiber = isFatBomb || isCarbBomb || isCalorieBomb;
+                <MudCard Class="mt-4" Style="background-color: #d9230f;">
+                    <MudCardContent>
+                        <MudPaper Class="d-flex flex-wrap justify-content-between align-items-center p-3" Elevation="0" Square="true">
+                            <MudText Typo="Typo.h6" Class="fw-bold">Monthly Total</MudText>
 
-                        <tr>
-                            <td>@food.GroupName</td>
-                            <td>@food.MealName</td>
-                            <td>@food.TotalPortion.ToString("N2")</td>
-                            <td>@food.TotalCalories.ToString("N2")</td>
-                            <td>@food.TotalProtein.ToString("N2")</td>
-                            <td>@food.TotalCarbs.ToString("N2")</td>
-                            <td>@food.TotalFats.ToString("N2")</td>
-                            <td>@food.TotalFiber.ToString("N2")</td>
-                            <td>
-                                @if (isFatBomb)
-                                {
-                                    <span class="badge bg-danger me-1"><i class="bi bi-droplet-fill"></i> Fat Bomb</span>
-                                }
-                                @if (isCarbBomb)
-                                {
-                                    <span class="badge bg-warning text-dark me-1"><i class="bi bi-cup-straw"></i> Carb Bomb</span>
-                                }
-                                @if (isCalorieBomb)
-                                {
-                                    <span class="badge bg-danger me-1"><i class="bi bi-fire"></i> Calorie Bomb</span>
-                                }
-                                @if (showLowFiber && isFiberFail)
-                                {
-                                    <span class="badge bg-secondary me-1"><i class="bi bi-emoji-dizzy"></i> Low Fiber</span>
-                                }
-                            </td>
-                        </tr>
-                    }
+                            <MudText>Portions: @monthGroup.Sum(e => e.PortionEaten).ToString("N2")</MudText>
+                            <MudText>Calories: @monthGroup.Sum(e => e.Calories).ToString("N2")</MudText>
+                            <MudText>Protein: @monthGroup.Sum(e => e.Protein).ToString("N2")</MudText>
+                            <MudText>Carbs: @monthGroup.Sum(e => e.Carbs).ToString("N2")</MudText>
+                            <MudText>Fats: @monthGroup.Sum(e => e.Fats).ToString("N2")</MudText>
+                            <MudText>Fiber: @monthGroup.Sum(e => e.Fiber).ToString("N2")</MudText>
+                        </MudPaper>
+                    </MudCardContent>
+                </MudCard>
 
-                    <tr class="table-warning fw-bold">
-                        <td colspan="2" class="text-end">Monthly Total</td>
-                        <td>@monthGroup.Sum(e => e.PortionEaten).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Calories).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Protein).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Carbs).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Fats).ToString("N2")</td>
-                        <td>@monthGroup.Sum(e => e.Fiber).ToString("N2")</td>
-                        <td></td>
-                    </tr>
-                }
-            </tbody>
+            </MudExpansionPanel>
         }
-    </table>
+    </MudExpansionPanels>
 }
 
 @code {
@@ -132,19 +143,5 @@ else
         var userId = authState.User?.Identity?.Name;
 
         entries = await MealEntryService.GetAllAsync(userId!);
-    }
-
-    private void ToggleMonth(dynamic key)
-    {
-        var tupleKey = (Year: (int)key.Year, Month: (int)key.Month);
-
-        if (!expandedMonths.Add(tupleKey))
-            expandedMonths.Remove(tupleKey);
-    }
-
-    private bool IsExpanded(dynamic key)
-    {
-        var tupleKey = (Year: (int)key.Year, Month: (int)key.Month);
-        return !expandedMonths.Contains(tupleKey);
     }
 }

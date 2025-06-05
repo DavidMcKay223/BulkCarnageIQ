@@ -42,7 +42,7 @@ else
                 <MudPaper Class="mb-3 p-2" Elevation="1">
                     <MudText Typo="Typo.subtitle1">@mealTypeGroup.Key</MudText>
 
-                    <MudTable Items="mealTypeGroup" Dense>
+                    <MudTable Items="mealTypeGroup" Striped="true" Dense>
                         <HeaderContent>
                             <MudTh>Meal Name</MudTh>
                             <MudTh>Portion</MudTh>
@@ -54,7 +54,7 @@ else
                             <MudTh>Tags</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd>@context.MealName</MudTd>
+                            <MudTd>@context.MealName (@context.MeasurementServings?.ToString("N2") x @context.MeasurementType)</MudTd>
                             <MudTd>@context.PortionEaten</MudTd>
                             <MudTd>@context.Calories</MudTd>
                             <MudTd>@context.Protein</MudTd>
