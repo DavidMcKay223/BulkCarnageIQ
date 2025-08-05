@@ -1,6 +1,6 @@
 ﻿@using BulkCarnageIQ.Core.Carnage
 
-<MudPaper Class="pa-4 mb-4" Style="background-color:#d9230f;" Elevation="2" Rounded="true">
+<MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
     <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
         <MudIcon Icon="@Icons.Material.Filled.FlashOn" Color="Color.Warning" Class="me-2" />
         Quick Add Grouped Meals
@@ -13,7 +13,18 @@
             {
                 <MudItem xs="12" sm="6" md="3">
                     <MudPaper Elevation="1" Rounded="true" Class="d-flex flex-column h-100">
+                       
+                        @if (!string.IsNullOrEmpty(group.PictureLink))
+                        {
+                            <MudCardMedia Image="@group.PictureLink" Alt="@group.GroupName" Height="200" Style="object-fit: contain;" />
+                        }
+                        else
+                        {
+                            <MudCardMedia Image="photos/FoodItemPlaceHolder.jpg" Alt="@group.GroupName" Height="200" Style="object-fit: contain;" />
+                        }
+
                         <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="px-3 pt-3 mb-2">@group.GroupName</MudText>
+                        
                         <MudStack Spacing="1">
                             @foreach (var entry in group.Entries)
                             {

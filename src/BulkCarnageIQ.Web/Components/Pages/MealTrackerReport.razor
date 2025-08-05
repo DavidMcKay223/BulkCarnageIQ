@@ -34,7 +34,7 @@ else
 {
     @foreach (var dateGroup in entries.GroupBy(e => e.Date).OrderByDescending(g => g.Key))
     {
-        <MudPaper Class="p-4 mb-4" Style="background-color: #d9230f" Outlined="true" Elevation="3">
+        <MudPaper Class="p-4 mb-4" Outlined="true" Elevation="3">
             <MudText Typo="Typo.h6" Class="mt-4 mb-2">@dateGroup.Key.ToString("dddd, MMMM dd")</MudText>
 
             @foreach (var mealTypeGroup in dateGroup.GroupBy(e => e.MealType))
