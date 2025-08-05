@@ -1,0 +1,115 @@
+﻿@using BulkCarnageIQ.Core.Carnage
+@using BulkCarnageIQ.Core.Contracts
+
+<MudPaper Class="p-3 mb-4" Elevation="3" Rounded="true">
+
+    @if (TodayMeals?.Any() == true)
+    {
+        @foreach (var group in TodayMeals.GroupBy(m => m.MealType))
+        {
+            <MudText Typo="Typo.subtitle1" Class="mt-4 mb-2">@group.Key</MudText>
+
+            <MudGrid GutterSize="3">
+                @foreach (var meal in group)
+                {
+                    <MudItem xs="12" sm="6" md="4" lg="3">
+                        <MudCard Class="mb-2" Style="background-color:#222222; color:#e0e0e0;">
+                            <MudCardContent>
+                                <MudText Typo="Typo.subtitle2" Class="mb-1" Color="Color.Primary">@meal.MealName</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Tertiary">
+                                    @meal.Calories.ToString("N0") kcal |
+                                    P: @meal.Protein.ToString("N1")g |
+                                    C: @meal.Carbs.ToString("N1")g |
+                                    F: @meal.Fats.ToString("N1")g
+                                </MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    }
+    else
+    {
+        <MudText Color="Color.Warning" Typo="Typo.caption">No meals added today.</MudText>
+    }
+
+    <MudDivider Class="my-3" />
+
+    <MudText Typo="Typo.body1" Class="mb-2" Color="Color.Info">
+        <strong>Total Calories:</strong> @TotalCalories.ToString("N0") kcal
+        <span> / </span>
+        <strong>Goal:</strong> @(UserProfile?.CalorieGoal.ToString("N0")) kcal
+    </MudText>
+
+    <MudGrid GutterSize="3">
+        @foreach (var macro in GetMacros())
+        {
+            <MudItem xs="12" sm="6" lg="3">
+                <MudPaper Class="p-3 rounded-xl shadow-sm" Style="background-color:#1e1e1e; color:#ddd;">
+                    <MudStack Direction="Row" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Baseline" Class="mb-1">
+                        <MudText Typo="Typo.subtitle2">@macro.Name</MudText>
+                        <MudText Typo="Typo.subtitle2">@macro.Current.ToString("N1") g / @macro.Goal.ToString("N1") g</MudText>
+                    </MudStack>
+
+                    <MudProgressLinear Value="@GetBarWidth(macro.Current, macro.Goal)"
+                                       Color="@GetBarColor(macro.Current, macro.Goal)"
+                                       Height="6"
+                                       Class="mt-1 rounded" />
+
+                    <MudText Typo="Typo.caption" Color="@(GetBarColor(macro.Current, macro.Goal))" Class="mt-1">
+                        @GetStatus(macro.Current, macro.Goal)
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>
+
+@code {
+    [Parameter] public List<MealEntry> TodayMeals { get; set; } = new();
+    [Parameter] public UserProfile? UserProfile { get; set; }
+
+    private float TotalCalories => TodayMeals.Sum(m => m.Calories);
+    private float TotalProtein => TodayMeals.Sum(m => m.Protein);
+    private float TotalCarbs => TodayMeals.Sum(m => m.Carbs);
+    private float TotalFats => TodayMeals.Sum(m => m.Fats);
+    private float TotalFiber => TodayMeals.Sum(m => m.Fiber);
+
+    private IEnumerable<(string Name, float Current, float Goal)> GetMacros()
+    {
+        if (UserProfile == null) return Enumerable.Empty<(string, float, float)>();
+
+        float SafeGoal(float? value, float fallback) =>
+            (value.HasValue && value.Value > 0) ? value.Value : fallback;
+
+        return new[]
+        {
+            ("Protein", TotalProtein, SafeGoal(UserProfile.ProteinGoal, 120f)),
+            ("Carbs", TotalCarbs, SafeGoal(UserProfile.CarbsGoal, 220f)),
+            ("Fats", TotalFats, SafeGoal(UserProfile.FatGoal, 80f)),
+            ("Fiber", TotalFiber, SafeGoal(UserProfile.FiberGoal, 25f))
+        };
+    }
+
+    private string GetStatus(float current, float goal)
+    {
+        var ratio = current / goal;
+        if (ratio > 1.0) return $"🔴 Over Limit by {current - goal:F1}g";
+        if (ratio >= 0.85) return "🟡 Getting Close";
+        return "🟢 On Track";
+    }
+
+    private Color GetBarColor(float current, float goal)
+    {
+        var ratio = current / goal;
+        if (ratio > 1.0) return Color.Error;
+        if (ratio >= 0.85) return Color.Warning;
+        return Color.Success;
+    }
+
+    private double GetBarWidth(float current, float goal)
+    {
+        return Math.Min(current / goal * 100, 100);
+    }
+}

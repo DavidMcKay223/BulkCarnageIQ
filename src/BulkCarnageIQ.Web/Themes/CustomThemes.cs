@@ -13,7 +13,7 @@ namespace BulkCarnageIQ.Web.Themes
                 Primary = "#d9230f",
                 PrimaryContrastText = "#ffffff",
                 Secondary = "#1e1e1e",
-                SecondaryContrastText = "#ffffff",
+                SecondaryContrastText = "#f0f0f0",
                 Tertiary = "#570e06",
                 TertiaryContrastText = "#f8f9fa",
                 Info = "#fd5533", // blood orange
@@ -21,27 +21,35 @@ namespace BulkCarnageIQ.Web.Themes
                 Success = "#4caf50",
                 SuccessContrastText = "#1b3e20",
                 Warning = "#ff9800",
-                WarningContrastText = "#3a2200",
+                WarningContrastText = "#fff8e1",
                 Error = "#f44336",
                 ErrorContrastText = "#2a0c0a",
                 Dark = "#121212",
                 DarkContrastText = "#ffffff",
-                TextPrimary = "#f2f2f2",
-                TextSecondary = "#bbbbbb",
+
+                // Main text colors
+                TextPrimary = "#f2f2f2",        // light near-white, good contrast on dark bg
+                TextSecondary = "#d0d0d0",      // bumped from #bbbbbb for better readability
+
+                // Background and UI elements
                 DrawerBackground = "#1a1a1a",
                 DrawerText = "#ffffff",
                 DrawerIcon = "#fd5533",
                 AppbarBackground = "#000000",
                 AppbarText = "#ffffff",
-                Surface = "#121212",
+                Surface = "#121212",             // main surface bg
                 LinesDefault = "#2c2c2c",
                 TableLines = "#2c2c2c",
                 TableStriped = "#1c1c1c",
                 TableHover = "#222222",
                 Divider = "#2c2c2c",
-                GrayLight = "#6c6c6c",
-                GrayLighter = "#9e9e9e",
+
+                // Grays (muted text, borders)
+                GrayLight = "#7a7a7a",           // slightly lighter for clarity
+                GrayLighter = "#b0b0b0",         // lightened a bit for better contrast
                 GrayDark = "#333333",
+
+                // Effects opacity
                 HoverOpacity = 0.08,
                 RippleOpacity = 0.1,
                 RippleOpacitySecondary = 0.2,
