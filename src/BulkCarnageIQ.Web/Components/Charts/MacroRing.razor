@@ -1,0 +1,94 @@
+﻿@using BulkCarnageIQ.Core.Carnage
+
+@if (UserProfile != null)
+{
+    <div class="d-flex align-items-center" style="max-width: 200px;">
+        <div style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
+            <svg width="64" height="64" viewBox="0 0 36 36">
+                @foreach (var arc in GetMacroArcs())
+                {
+                    <circle r="16"
+                            cx="18"
+                            cy="18"
+                            fill="transparent"
+                            stroke="@arc.Color"
+                            stroke-width="4"
+                            stroke-dasharray="@arc.Length @arc.Gap"
+                            stroke-dashoffset="@arc.Offset"
+                            transform="rotate(-90 18 18)" />
+                }
+            </svg>
+            <div style="position:absolute; top:22px; left:0; width:100%; text-align:center; font-size:12px; font-weight:600; color:#ccc;">
+                @Calories.ToString("N0")
+            </div>
+        </div>
+
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(2, max-content);
+            grid-auto-rows: min-content;
+            gap: 4px 12px;
+            font-size: 0.75rem;
+            color: #ddd;
+            max-width: 130px;
+            margin-left: 8px;
+                ">
+            @for (int i = 0; i < GetMacroArcs().Count; i++)
+            {
+                var arc = GetMacroArcs()[i];
+                <div class="d-flex align-items-center gap-1">
+                    <div style="width: 12px; height: 12px; background-color: @arc.Color; border-radius: 2px;"></div>
+                    <div>@arc.Label</div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public float Protein { get; set; }
+    [Parameter] public float Carbs { get; set; }
+    [Parameter] public float Fats { get; set; }
+    [Parameter] public float Fiber { get; set; }
+    [Parameter] public float Calories { get; set; }
+    [Parameter] public UserProfile? UserProfile { get; set; }
+
+    private record ArcSegment(string Label, float Value, float Goal, string Color, double Length, double Gap, double Offset);
+
+    private List<ArcSegment> GetMacroArcs()
+    {
+        float proteinGoal = UserProfile?.ProteinGoal ?? 120f;
+        float carbGoal = UserProfile?.CarbsGoal ?? 220f;
+        float fatGoal = UserProfile?.FatGoal ?? 80f;
+        float fiberGoal = UserProfile?.FiberGoal ?? 25f;
+
+        var segments = new List<(string Label, float Value, float Goal, string Color)>
+        {
+            ("Protein", Protein, proteinGoal, "#90caf9"),    // Blue
+            ("Carbs", Carbs, carbGoal, "#ffcc80"),           // Orange
+            ("Fats", Fats, fatGoal, "#a5d6a7"),              // Green
+            ("Fiber", Fiber, fiberGoal, "#b39ddb")           // Purple
+        };
+
+        double totalCircle = 100.0;
+        double offset = 0;
+        var arcs = new List<ArcSegment>();
+
+        foreach (var (label, value, goal, color) in segments)
+        {
+            var percent = Math.Min(value / goal, 1.0) * totalCircle;
+            arcs.Add(new ArcSegment(
+                Label: label,
+                Value: value,
+                Goal: goal,
+                Color: color,
+                Length: percent,
+                Gap: totalCircle - percent,
+                Offset: offset
+            ));
+            offset -= percent;
+        }
+
+        return arcs;
+    }
+}

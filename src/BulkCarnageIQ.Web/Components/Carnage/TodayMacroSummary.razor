@@ -5,29 +5,29 @@
 
     @if (TodayMeals?.Any() == true)
     {
-        @foreach (var group in TodayMeals.GroupBy(m => m.MealType))
-        {
-            <MudText Typo="Typo.subtitle1" Class="mt-4 mb-2">@group.Key</MudText>
+        <MudGrid GutterSize="3">
+            @foreach (var group in TodayMeals.GroupBy(m => m.MealType))
+            {
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Class="p-2" Style="background-color:#1c1c1c; color:#e0e0e0;">
+                        <MudText Typo="Typo.subtitle1" Class="mb-2">@group.Key</MudText>
 
-            <MudGrid GutterSize="3">
-                @foreach (var meal in group)
-                {
-                    <MudItem xs="12" sm="6" md="4" lg="3">
-                        <MudCard Class="mb-2" Style="background-color:#222222; color:#e0e0e0;">
-                            <MudCardContent>
-                                <MudText Typo="Typo.subtitle2" Class="mb-1" Color="Color.Primary">@meal.MealName</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Tertiary">
-                                    @meal.Calories.ToString("N0") kcal |
-                                    P: @meal.Protein.ToString("N1")g |
-                                    C: @meal.Carbs.ToString("N1")g |
-                                    F: @meal.Fats.ToString("N1")g
-                                </MudText>
-                            </MudCardContent>
-                        </MudCard>
-                    </MudItem>
-                }
-            </MudGrid>
-        }
+                        @foreach (var meal in group)
+                        {
+                            <MudCard Class="mb-2 d-flex flex-column justify-space-between" Style="background-color:#222222; color:#e0e0e0; height: 120px;">
+                                <MudCardContent>
+                                    <MudText Typo="Typo.subtitle2" Class="mb-1 text-truncate" Color="Color.Primary" Style="font-weight:bold;">
+                                        @meal.MealName
+                                    </MudText>
+
+                                    <BulkCarnageIQ.Web.Components.Charts.MacroRing Protein="@meal.Protein" Carbs="@meal.Carbs" Fats="@meal.Fats" Fiber="@meal.Fiber" Calories="@meal.Calories" UserProfile="@UserProfile" />
+                                </MudCardContent>
+                            </MudCard>
+                        }
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
     }
     else
     {

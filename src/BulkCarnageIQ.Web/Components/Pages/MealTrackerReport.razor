@@ -3,6 +3,7 @@
 @using BulkCarnageIQ.Core.Carnage
 @using BulkCarnageIQ.Core.Contracts
 @inject IMealEntryService MealEntryService
+@inject IUserProfileService UserProfileService
 @inject AuthenticationStateProvider AuthProvider
 
 <MudPopoverProvider />
@@ -37,119 +38,14 @@ else
         <MudPaper Class="p-4 mb-4" Outlined="true" Elevation="3">
             <MudText Typo="Typo.h6" Class="mt-4 mb-2">@dateGroup.Key.ToString("dddd, MMMM dd")</MudText>
 
-            @foreach (var mealTypeGroup in dateGroup.GroupBy(e => e.MealType))
-            {
-                <MudPaper Class="mb-3 p-2" Elevation="1">
-                    <MudText Typo="Typo.subtitle1">@mealTypeGroup.Key</MudText>
-
-                    <MudTable Items="mealTypeGroup" Striped="true" Dense>
-                        <HeaderContent>
-                            <MudTh>Meal Name</MudTh>
-                            <MudTh>Portion</MudTh>
-                            <MudTh>Calories</MudTh>
-                            <MudTh>Protein</MudTh>
-                            <MudTh>Carbs</MudTh>
-                            <MudTh>Fats</MudTh>
-                            <MudTh>Fiber</MudTh>
-                            <MudTh>Tags</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.MealName (@context.MeasurementServings?.ToString("N2") x @context.MeasurementType)</MudTd>
-                            <MudTd>@context.PortionEaten</MudTd>
-                            <MudTd>@context.Calories</MudTd>
-                            <MudTd>@context.Protein</MudTd>
-                            <MudTd>@context.Carbs</MudTd>
-                            <MudTd>@context.Fats</MudTd>
-                            <MudTd>@context.Fiber</MudTd>
-                            <MudTd>
-                                @if (context.IsHighProtein)
-                                {
-                                    <MudChip T="string" Color="Color.Success" Text="High Protein" />
-                                }
-                                @if (context.IsLowCarb)
-                                {
-                                    <MudChip T="string" Color="Color.Warning" Text="Low Carb" />
-                                }
-                                @if (context.IsKeto)
-                                {
-                                    <MudChip T="string" Color="Color.Dark" Text="Keto" />
-                                }
-                                @if (context.IsBulkMeal)
-                                {
-                                    <MudChip T="string" Color="Color.Primary" Text="Bulk Meal" />
-                                }
-                                @if (context.IsHighCarb)
-                                {
-                                    <MudChip T="string" Color="Color.Error" Text="High Carb" />
-                                }
-                                @if (context.IsLowFiber)
-                                {
-                                    <MudChip T="string" Color="Color.Secondary" Text="Low Fiber" />
-                                }
-                                @if (context.IsHighFat)
-                                {
-                                    <MudChip T="string" Color="Color.Info" Text="High Fat" />
-                                }
-                                @if (context.IsLowProtein)
-                                {
-                                    <MudChip T="string" Color="Color.Default" Text="Low Protein" />
-                                }
-                                @if (context.IsBalancedMeal)
-                                {
-                                    <MudChip T="string" Color="Color.Success" Text="Balanced Meal" />
-                                }
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </MudPaper>
-            }
-
-            <MudPaper Class="p-4 mb-4" Elevation="4">
-                <MudText Typo="Typo.h6" Class="mb-3">Summary for @dateGroup.Key.ToString("MMMM dd, yyyy")</MudText>
-
-                <MudGrid>
-                    <MudItem xs="12" sm="6" md="2">
-                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
-                            <MudText Typo="Typo.subtitle2">Calories</MudText>
-                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Calories)</MudText>
-                        </MudCard>
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6" md="2">
-                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
-                            <MudText Typo="Typo.subtitle2">Protein</MudText>
-                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Protein)</MudText>
-                        </MudCard>
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6" md="2">
-                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
-                            <MudText Typo="Typo.subtitle2">Carbs</MudText>
-                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Carbs)</MudText>
-                        </MudCard>
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6" md="2">
-                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
-                            <MudText Typo="Typo.subtitle2">Fats</MudText>
-                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Fats)</MudText>
-                        </MudCard>
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6" md="2">
-                        <MudCard Class="pa-3" Style="background:#d9230f; color:white;">
-                            <MudText Typo="Typo.subtitle2">Fiber</MudText>
-                            <MudText Typo="Typo.h5">@dateGroup.Sum(x => x.Fiber)</MudText>
-                        </MudCard>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
+            <BulkCarnageIQ.Web.Components.Carnage.TodayMacroSummary TodayMeals="dateGroup.ToList()" UserProfile="UserProfile" />
         </MudPaper>
     }
 }
 
 @code {
     private List<MealEntry>? entries;
+    private UserProfile? UserProfile;
 
     protected override async Task OnInitializedAsync()
     {
@@ -157,5 +53,7 @@ else
         var userId = authState.User?.Identity?.Name;
 
         entries = await MealEntryService.GetAllAsync(userId!);
+
+        UserProfile = await UserProfileService.GetUserProfile(userId);
     }
 }
