@@ -54,6 +54,6 @@ else
 
         entries = await MealEntryService.GetAllAsync(userId!);
 
-        UserProfile = await UserProfileService.GetUserProfile(userId);
+        UserProfile = await UserProfileService.GetUserProfile(userId!);
     }
 }
