@@ -20,6 +20,35 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             _db = db;
         }
 
+        public static readonly Dictionary<string, int> FoodGroupOrder = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Meat & Seafood"] = 1,
+            ["Nutrition"] = 2,
+            ["Dairy & Eggs"] = 3,
+            ["Fruits & Vegetables"] = 4,
+            ["Breads & Grains"] = 5,
+            ["Yogurt"] = 6,
+            ["Soup"] = 7,
+            ["Prepared Meals"] = 8,
+            ["Frozen Meals"] = 8,
+            ["Homemade"] = 8,
+            ["Canned"] = 9,
+            ["Bakery"] = 10,
+            ["Appetizers"] = 10,
+            ["Restaurant"] = 11,
+            ["Fast Food"] = 11,
+            ["Movie Theater"] = 11,
+            ["Pizza"] = 12,
+            ["Sandwich"] = 12,
+            ["Salad"] = 12,
+            ["Burrito"] = 12,
+            ["Snacks"] = 13,
+            ["Condiments & Sauces"] = 14,
+            ["Dessert"] = 15,
+            ["Candy"] = 15,
+            ["Beverages"] = 15
+        };
+
         public async Task<List<FoodItemSuggestionGroup>> GetFoodItemGroupSuggestionsAsync(List<MealEntry> mealEntries, UserProfile userProfile)
         {
             throw new NotImplementedException();
@@ -66,7 +95,8 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                 (f.Protein <= remainingProtein || remainingProtein <= 0f) &&
                 (f.Carbs <= remainingCarbs || remainingCarbs <= 0f) &&
                 (f.Fats <= remainingFats || remainingFats <= 0f))
-            .OrderByDescending(f => f.Protein)
+            .OrderBy(f => FoodGroupOrder.ContainsKey(f.GroupName!) ? FoodGroupOrder[f.GroupName!] : int.MaxValue)
+            .ThenByDescending(f => f.Protein)
             .ThenByDescending(f => f.Fiber)
             .ThenByDescending(f => f.TotalCalories)
             .ThenByDescending(f => f.Fats)

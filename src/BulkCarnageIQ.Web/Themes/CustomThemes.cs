@@ -10,49 +10,56 @@ namespace BulkCarnageIQ.Web.Themes
             {
                 Black = "#000000",
                 White = "#FFFFFF",
-                Primary = "#d9230f",
+
+                Primary = "#ff3d00",               // vivid red-orange
                 PrimaryContrastText = "#ffffff",
-                Secondary = "#1e1e1e",
-                SecondaryContrastText = "#f0f0f0",
-                Tertiary = "#570e06",
-                TertiaryContrastText = "#f8f9fa",
-                Info = "#fd5533", // blood orange
+
+                Secondary = "#383838",             // lighter secondary for better contrast
+                SecondaryContrastText = "#ffffff",
+
+                Tertiary = "#6a120a",              // rich dark red-brown
+                TertiaryContrastText = "#ffffff",
+
+                Info = "#ff7043",                  // blood orange, readable on dark
                 InfoContrastText = "#ffffff",
-                Success = "#4caf50",
-                SuccessContrastText = "#1b3e20",
-                Warning = "#ff9800",
-                WarningContrastText = "#fff8e1",
-                Error = "#f44336",
-                ErrorContrastText = "#2a0c0a",
-                Dark = "#121212",
+
+                Success = "#66bb6a",               // soft green, readable
+                SuccessContrastText = "#ffffff",
+
+                Warning = "#ffa726",               // bright orange-yellow
+                WarningContrastText = "#000000",
+
+                Error = "#ef5350",                 // light crimson red
+                ErrorContrastText = "#ffffff",
+
+                Dark = "#1a1a1a",                  // clean dark base
                 DarkContrastText = "#ffffff",
 
-                // Main text colors
-                TextPrimary = "#f2f2f2",        // light near-white, good contrast on dark bg
-                TextSecondary = "#d0d0d0",      // bumped from #bbbbbb for better readability
+                TextPrimary = "#f2f2f2",           // near-white for text
+                TextSecondary = "#cccccc",         // light gray for secondary
 
-                // Background and UI elements
-                DrawerBackground = "#1a1a1a",
+                DrawerBackground = "#121212",
                 DrawerText = "#ffffff",
-                DrawerIcon = "#fd5533",
+                DrawerIcon = "#ff7043",
+
                 AppbarBackground = "#000000",
                 AppbarText = "#ffffff",
-                Surface = "#121212",             // main surface bg
-                LinesDefault = "#2c2c2c",
-                TableLines = "#2c2c2c",
-                TableStriped = "#1c1c1c",
-                TableHover = "#222222",
-                Divider = "#2c2c2c",
 
-                // Grays (muted text, borders)
-                GrayLight = "#7a7a7a",           // slightly lighter for clarity
-                GrayLighter = "#b0b0b0",         // lightened a bit for better contrast
-                GrayDark = "#333333",
+                Surface = "#1f1f1f",               // slightly brighter surface for chip contrast
 
-                // Effects opacity
-                HoverOpacity = 0.08,
-                RippleOpacity = 0.1,
-                RippleOpacitySecondary = 0.2,
+                LinesDefault = "#2f2f2f",
+                TableLines = "#2f2f2f",
+                TableStriped = "#252525",
+                TableHover = "#2a2a2a",
+                Divider = "#333333",
+
+                GrayLight = "#888888",
+                GrayLighter = "#cccccc",
+                GrayDark = "#444444",
+
+                HoverOpacity = 0.1,
+                RippleOpacity = 0.15,
+                RippleOpacitySecondary = 0.25
             },
             LayoutProperties = new LayoutProperties()
             {

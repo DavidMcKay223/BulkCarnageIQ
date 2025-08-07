@@ -37,65 +37,70 @@ else
 {
     <BulkCarnageIQ.Web.Components.Carnage.TodayMacroSummary TodayMeals="entries" UserProfile="UserProfile" />
 
-    <MudGrid GutterSize="3">
-        @foreach (var foodItem in foodSuggestionList)
-        {
-            <MudItem xs="12" sm="6" md="4" lg="3">
-                <MudCard Class="h-100">
-                    @if (!string.IsNullOrEmpty(foodItem.PictureLink))
-                    {
-                        <MudCardMedia Image="@foodItem.PictureLink" Alt="@foodItem.GroupName" Height="200" Style="object-fit: contain;" />
-                    }
-                    else
-                    {
-                        <MudCardMedia Image="photos/FoodItemPlaceHolder.jpg" Alt="@foodItem.GroupName" Height="200" Style="object-fit: contain;" />
-                    }
+    @foreach (var group in foodSuggestionList.GroupBy(f => f.GroupName))
+    {
+        <MudText Typo="Typo.h6" Class="mt-5 mb-2 text-primary font-weight-bold">
+            @group.Key
+        </MudText>
 
-                    <MudCardContent>
+        <MudGrid GutterSize="3">
+            @foreach (var foodItem in group)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard Class="h-100">
+                        @if (!string.IsNullOrEmpty(foodItem.PictureLink))
+                        {
+                            <MudCardMedia Image="@foodItem.PictureLink" Alt="@foodItem.GroupName" Height="200" Style="object-fit: contain;" />
+                        }
+                        else
+                        {
+                            <MudCardMedia Image="photos/FoodItemPlaceHolder.jpg" Alt="@foodItem.GroupName" Height="200" Style="object-fit: contain;" />
+                        }
 
-                        <MudText Typo="Typo.subtitle1" Color="Color.Primary">@foodItem.RecipeName</MudText>
-                        <MudText Typo="Typo.subtitle2">
-                            @foodItem.MeasurementServings @foodItem.MeasurementType • @foodItem.TotalCalories.ToString("N0") kcal
-                        </MudText>
+                        <MudCardContent>
+                            <MudText Typo="Typo.subtitle1" Color="Color.Primary">@foodItem.RecipeName</MudText>
+                            <MudText Typo="Typo.subtitle2">
+                                @foodItem.MeasurementServings @foodItem.MeasurementType • @foodItem.TotalCalories.ToString("N0") kcal
+                            </MudText>
 
-                        <BulkCarnageIQ.Web.Components.Charts.MacroRing
-                            Protein="@foodItem.Protein"
-                            Carbs="@foodItem.Carbs"
-                            Fats="@foodItem.Fats"
-                            Fiber="@foodItem.Fiber"
-                            Calories="@foodItem.TotalCalories"
-                            UserProfile="UserProfile" />
+                            <BulkCarnageIQ.Web.Components.Charts.MacroRing Protein="@foodItem.Protein"
+                                                                           Carbs="@foodItem.Carbs"
+                                                                           Fats="@foodItem.Fats"
+                                                                           Fiber="@foodItem.Fiber"
+                                                                           Calories="@foodItem.TotalCalories"
+                                                                           UserProfile="UserProfile" />
 
-                        <MudStack Spacing="1" Direction="Row" Wrap="Wrap.Wrap" Class="mt-2">
-                            @if (foodItem.IsHighProtein)
-                            {
-                                <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined" Size="Size.Small">High Protein</MudChip>
-                            }
-                            @if (foodItem.IsLowCarb)
-                            {
-                                <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Size="Size.Small">Low Carb</MudChip>
-                            }
-                            @if (foodItem.IsKeto)
-                            {
-                                <MudChip T="string" Color="Color.Dark" Variant="Variant.Outlined" Size="Size.Small">Keto</MudChip>
-                            }
-                            @if (foodItem.IsBalancedMeal)
-                            {
-                                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Small">Balanced</MudChip>
-                            }
-                        </MudStack>
-
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-        }
-    </MudGrid>
+                            <MudStack Spacing="1" Direction="Row" Wrap="Wrap.Wrap" Class="mt-2">
+                                @if (foodItem.IsHighProtein)
+                                {
+                                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined" Size="Size.Small">High Protein</MudChip>
+                                }
+                                @if (foodItem.IsLowCarb)
+                                {
+                                    <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined" Size="Size.Small">Low Carb</MudChip>
+                                }
+                                @if (foodItem.IsKeto)
+                                {
+                                    <MudChip T="string" Color="Color.Dark" Variant="Variant.Filled" Size="Size.Small">Keto</MudChip>
+                                }
+                                @if (foodItem.IsBalancedMeal)
+                                {
+                                    <MudChip T="string" Color="Color.Secondary" Variant="Variant.Filled" Size="Size.Small">Balanced</MudChip>
+                                }
+                            </MudStack>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
 }
 
 @code {
     private List<MealEntry>? entries;
     private UserProfile? UserProfile;
     private List<FoodItemSuggestion>? foodSuggestionList;
+    private string currentGroup = null;
 
     protected override async Task OnInitializedAsync()
     {
