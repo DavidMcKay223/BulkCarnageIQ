@@ -19,10 +19,11 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
             _db = db;
         }
 
-        public async Task<List<GroupFoodItem>> GetAllAsync()
+        public async Task<List<GroupFoodItem>> GetAllAsync(bool isRecipe = false)
         {
             return await _db.GroupFoodItems
                 .Include(g => g.Entries)
+                .Where(g => g.IsRecipe == isRecipe)
                 .ToListAsync();
         }
 

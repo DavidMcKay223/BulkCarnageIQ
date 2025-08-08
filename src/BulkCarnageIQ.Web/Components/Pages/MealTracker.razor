@@ -147,7 +147,7 @@ else
                                                 @context.MealName (@context.MeasurementServings x @context.MeasurementType)
                                             </MudTd>
                                             <MudTd Style="width:130px;">
-                                                <MudNumericField @bind-Value="context.PortionEaten" Min="1" Variant="Variant.Outlined" Size="Size.Small" Immediate="true" Class="m-0" />
+                                                <MudNumericField T="float" @bind-Value="context.PortionEaten" Min="0" Variant="Variant.Outlined" Size="Size.Small" Immediate="true" Class="m-0" />
                                             </MudTd>
                                             <MudTd Style="width:40px;">
                                                 <MudIconButton Icon="@Icons.Material.Filled.Calculate" Color="Color.Primary" Size="Size.Small"

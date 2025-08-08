@@ -12,7 +12,19 @@
 <MudDialogProvider />
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    @if (DailyMacros != null)
+    @if (TodayMeals != null)
+    {
+        <MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
+            <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
+                <MudIcon Icon="@Icons.Material.Filled.FitnessCenter" Color="Color.Info" Class="me-2" />
+                Macros Today
+            </MudText>
+
+            <BulkCarnageIQ.Web.Components.Carnage.TodayMacroSummary TodayMeals="TodayMeals" UserProfile="UserProfile" />
+        </MudPaper>
+    }
+
+    @* @if (DailyMacros != null)
     {
         <MudPaper Class="pa-4 mb-4" Elevation="2" Rounded="true">
             <MudText Typo="Typo.h5" Class="mb-3 d-flex align-items-center">
@@ -22,7 +34,7 @@
 
             <BulkCarnageIQ.Web.Components.Carnage.MacroAlertPanel DailyMacros="DailyMacros" UserProfile="UserProfile" />
         </MudPaper>
-    }
+    } *@
 
     @if (WeeklyMacros != null)
     {
@@ -59,7 +71,8 @@
 @code {
     private List<string>? labels;
     private List<int>? calories;
-    private MacroSummary? DailyMacros;
+    private List<MealEntry>? TodayMeals;
+    //private MacroSummary? DailyMacros;
     private Dictionary<string, MacroSummary>? WeeklyMacros;
     private UserProfile? UserProfile;
 
@@ -79,8 +92,11 @@
             labels = weekdayOrder.Where(day => data.ContainsKey(day)).ToList();
             calories = labels.Select(day => (int)data[day]).ToList();
 
+            // Today Macros:
+            TodayMeals = await MealService.GetByDateAsync(DateOnly.FromDateTime(DateTime.Today), userId);
+
             // Daily Macros:
-            DailyMacros = await MealService.GetMacroSummaryAsync(DateOnly.FromDateTime(DateTime.Today), userId);
+            //DailyMacros = await MealService.GetMacroSummaryAsync(DateOnly.FromDateTime(DateTime.Today), userId);
 
             // Weekly Macros:
             WeeklyMacros = await MealService.GetMacroSummariesByDateRangeAsync(

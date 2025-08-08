@@ -59,6 +59,27 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                 .ToList();
         }
 
+        public async Task<List<MealEntry>> GetByDateAsync(DateOnly date, string userId)
+        {
+            // Define the desired order of meal types
+            List<string> mealTypeOrder = new List<string> { "Breakfast", "Lunch", "Dinner", "Snack" };
+
+            // Create a dictionary for quick lookup of the order index
+            Dictionary<string, int> mealTypeOrderDict = mealTypeOrder
+                .Select((mealType, index) => new { mealType, index })
+                .ToDictionary(x => x.mealType, x => x.index);
+
+            var entries = await _db.MealEntries
+                .Where(e => e.UserId == userId && e.Date == date)
+                .ToListAsync(); // fetch all relevant entries first
+
+            // Do the custom ordering in memory
+            return entries
+                .OrderByDescending(e => e.Date)
+                .ThenBy(e => mealTypeOrderDict.TryGetValue(e.MealType, out var index) ? index : 4)
+                .ToList();
+        }
+
         public async Task AddAsync(MealEntry entry)
         {
             _db.MealEntries.Add(entry);

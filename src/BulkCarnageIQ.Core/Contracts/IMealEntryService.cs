@@ -11,6 +11,7 @@ namespace BulkCarnageIQ.Core.Contracts
     public interface IMealEntryService
     {
         Task<List<MealEntry>> GetAllAsync(string userID);
+        Task<List<MealEntry>> GetByDateAsync(DateOnly date, string userId);
         Task AddAsync(MealEntry entry);
         Task UpdateAsync(MealEntry entry);
         Task DeleteAsync(int Id);
