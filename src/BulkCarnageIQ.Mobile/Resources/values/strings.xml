@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">BulkCarnageIQ.Mobile</string>
+    <string name="app_name">BulkCarnageIQ</string>
     <string name="app_text">Hello, Android!</string>
+    <string name="app_text2">Hello, Home Android!</string>
+    <string name="app_btn_Home_text">Home</string>
+    <string name="app_btn_Tracker_text">Tracker</string>
+    <string name="app_btn_Hamburger_text">≡</string>
 </resources>
