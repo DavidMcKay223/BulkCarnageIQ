@@ -6,6 +6,7 @@
     <string name="app_btn_tracker_text">Tracker</string>
     <string name="app_btn_hamburger_text">≡</string>
 
-	<string name="app_fragment_tracker_header"></string>
-	<string name="app_fragment_tracker_add"></string>
+	<string name="app_fragment_tracker_header">Food Tracker</string>
+	<string name="app_fragment_tracker_add">Add</string>
+	<string name="app_fragment_tracker_hint_food_name">Enter food name</string>
 </resources>

@@ -15,16 +15,24 @@
 
 	<!-- Add meal controls -->
 	<LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp">
+
+		<AutoCompleteTextView
+            android:id="@+id/txtFoodName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/app_fragment_tracker_hint_food_name"
+            android:completionThreshold="2" />
 
 		<Button
-            android:id="@+id/btnAddMeal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_fragment_tracker_add" />
+			android:id="@+id/btnAddMeal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/app_fragment_tracker_add" />
 	</LinearLayout>
 
 	<!-- Table container -->

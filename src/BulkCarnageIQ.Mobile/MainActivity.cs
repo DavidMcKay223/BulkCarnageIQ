@@ -1,7 +1,12 @@
 using Android.Animation;
 using Android.App;
+using Android.Content;
 using Android.OS;
+using BulkCarnageIQ.Core.Carnage;
+using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Mobile.Components.Pages;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BulkCarnageIQ.Mobile
 {
@@ -43,6 +48,8 @@ namespace BulkCarnageIQ.Mobile
                 ToggleDrawer();
             };
 
+            InitializeApp();
+
             if (savedInstanceState == null)
             {
                 LoadFragment(new HomeFragment());
@@ -79,5 +86,50 @@ namespace BulkCarnageIQ.Mobile
                 base.OnBackPressed();
             }
         }
+
+        private void InitializeApp()
+        {
+            var dbPath = Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
+                "bulk_carnage.db"
+            );
+
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlite($"Data Source={dbPath}")
+                .Options;
+
+            using var dbContext = new AppDbContext(options);
+
+            // Create DB + tables if not exists
+            dbContext.Database.EnsureCreated();
+
+            // Optional: Run migrations instead of EnsureCreated for schema changes
+            //dbContext.Database.Migrate();
+
+            // Optional: Seed initial data
+            if (!dbContext.FoodItems.Any())
+            {
+                string jsonText;
+
+                using (var stream = Resources.OpenRawResource(Resource.Raw.seed_data))
+                using (var reader = new StreamReader(stream))
+                {
+                    jsonText = reader.ReadToEnd();
+                }
+
+                var seedItems = JsonSerializer.Deserialize<SeedData>(jsonText);
+
+                dbContext.FoodItems.AddRange(seedItems.FoodItems);
+                dbContext.SaveChanges();
+            }
+
+            // Optional: call API to sync fresh data
+            // SyncDataFromServer(dbContext);
+        }
+    }
+
+    public class SeedData
+    {
+        public List<FoodItem> FoodItems { get; set; }
     }
 }
