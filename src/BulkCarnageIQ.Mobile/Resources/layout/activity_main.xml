@@ -18,7 +18,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
-            android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_alignParentStart="true"
@@ -28,9 +27,8 @@
             android:id="@+id/btn_hamburger"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:text="@string/app_btn_Hamburger_text"
+            android:text="@string/app_btn_hamburger_text"
             android:textSize="28sp"
-            android:textColor="#FFFFFF"
             android:background="?android:selectableItemBackgroundBorderless"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true" />
@@ -49,7 +47,7 @@
         android:id="@+id/drawer_panel"
         android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:background="#FFF"
+        android:background="#ff7043"
         android:orientation="vertical"
         android:translationX="-240dp"
         android:elevation="8dp">
@@ -58,13 +56,13 @@
             android:id="@+id/btn_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_btn_Home_text" />
+            android:text="@string/app_btn_home_text" />
 
 		<Button
             android:id="@+id/btn_tracker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_btn_Tracker_text" />
+            android:text="@string/app_btn_tracker_text" />
 
 	</LinearLayout>
 
