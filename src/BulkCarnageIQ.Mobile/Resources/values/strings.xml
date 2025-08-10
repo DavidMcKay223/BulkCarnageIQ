@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">BulkCarnageIQ</string>
-    <string name="app_text">Hello, Android!</string>
-    <string name="app_text2">Hello, Home Android!</string>
+
     <string name="app_btn_home_text">Home</string>
     <string name="app_btn_tracker_text">Tracker</string>
     <string name="app_btn_hamburger_text">≡</string>
-
+	
+    <string name="app_fragment_widget1_text">Todays Macros</string>
+    <string name="app_fragment_widget2_text">Weekly Summary</string>
+    <string name="app_fragment_widget4_text">Todays Meals</string>
+	
 	<string name="app_fragment_tracker_header">Food Tracker</string>
 	<string name="app_fragment_tracker_add">Add</string>
 	<string name="app_fragment_tracker_hint_food_name">Enter food name</string>

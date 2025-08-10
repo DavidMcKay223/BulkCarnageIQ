@@ -143,6 +143,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
 
             return new MacroSummary
             {
+                Calories = entries.Sum(e => e.Calories),
                 Protein = entries.Sum(e => e.Protein),
                 Carbs = entries.Sum(e => e.Carbs),
                 Fats = entries.Sum(e => e.Fats),
@@ -162,6 +163,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                     g => g.Key,
                     g => new MacroSummary
                     {
+                        Calories = g.Sum(m => m.Calories),
                         Protein = g.Sum(m => m.Protein),
                         Carbs = g.Sum(m => m.Carbs),
                         Fats = g.Sum(m => m.Fats),
