@@ -89,6 +89,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 TextSize = 16,
                 LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
+            mealTypeView.SetPadding(10, 10, 10, 10);
             container.AddView(mealTypeView);
 
             var topRow = new LinearLayout(Context)
