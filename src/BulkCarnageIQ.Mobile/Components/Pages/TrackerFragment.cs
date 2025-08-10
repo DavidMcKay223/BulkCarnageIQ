@@ -1,7 +1,11 @@
-﻿using Android.Views;
+﻿using Android.Graphics;
+using Android.Graphics.Text;
+using Android.Views;
+using Android.Views.InputMethods;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
+using BulkCarnageIQ.Mobile.Components.Carnage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -49,42 +53,106 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 }
 
                 AddMealByName(foodName);
+                txtFoodName.Text = string.Empty;
+
+                HideKeyboard();
             };
 
             // Load meals from DB/service
             var meals = LoadMealsFromDb("").Result;
 
-            if (meals == null || !meals.Any())
-            {
-                // Optionally, show a message if no meals are found
-                var emptyRow = new TableRow(Context);
-                emptyRow.AddView(new TextView(Context) { Text = "No meals found." });
-                tableMeals.AddView(emptyRow);
-                return;
-            }
-
             foreach (var meal in meals)
-                AddMeal(meal.MealName, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber);
+                AddMeal(meal.Id, meal.MealName, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
         }
 
-        private void AddMeal(string name, float portions, float calories, float protein, float carbs, float fats, float fiber)
+        private void AddMeal(int Id, string name, float portions, float calories, float protein, float carbs, float fats, float fiber, string mealType)
         {
-            var row = new TableRow(Context);
+            var container = new LinearLayout(Context)
+            {
+                Orientation = Orientation.Vertical
+            };
 
-            row.AddView(new TextView(Context) { Text = name });
-            row.AddView(new TextView(Context) { Text = portions.ToString() });
-            row.AddView(new TextView(Context) { Text = calories.ToString() });
-            row.AddView(new TextView(Context) { Text = protein.ToString() });
-            row.AddView(new TextView(Context) { Text = carbs.ToString() });
-            row.AddView(new TextView(Context) { Text = fats.ToString() });
-            row.AddView(new TextView(Context) { Text = fiber.ToString() });
+            var nameView = new TextView(Context)
+            {
+                Text = name,
+                TextSize = 20,
+                Typeface = Typeface.DefaultBold,
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            nameView.SetPadding(10, 10, 10, 10);
+            nameView.SetTextColor(Resources.GetColor(Resource.Color.colorPrimaryDark, null));
+            container.AddView(nameView);
 
-            var deleteBtn = new Button(Context) { Text = "Delete" };
-            deleteBtn.Click += (s, e) => tableMeals.RemoveView(row);
+            var mealTypeView = new TextView(Context)
+            {
+                Text = $"{mealType}",
+                TextSize = 16,
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            container.AddView(mealTypeView);
 
-            row.AddView(deleteBtn);
+            var topRow = new LinearLayout(Context)
+            {
+                Orientation = Orientation.Horizontal,
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
 
-            tableMeals.AddView(row);
+            var leftContainer = new LinearLayout(Context)
+            {
+                Orientation = Orientation.Horizontal,
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
+            };
+            leftContainer.SetPadding(10, 10, 10, 10);
+
+            var leftColumn = new LinearLayout(Context)
+            {
+                Orientation = Orientation.Vertical,
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
+            };
+
+            leftColumn.AddView(new TextView(Context) { Text = $"Servings: {portions:N1}" });
+            leftColumn.AddView(new TextView(Context) { Text = $"Protein: {protein:N1}" });
+            leftColumn.AddView(new TextView(Context) { Text = $"Fiber: {fiber:N1}" });
+
+            var rightColumn = new LinearLayout(Context)
+            {
+                Orientation = Orientation.Vertical,
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
+            };
+
+            rightColumn.AddView(new TextView(Context) { Text = $"Calories: {calories:N1}" });
+            rightColumn.AddView(new TextView(Context) { Text = $"Carbs: {carbs:N1}" });
+            rightColumn.AddView(new TextView(Context) { Text = $"Fats: {fats:N1}" });
+
+            leftContainer.AddView(leftColumn);
+            leftContainer.AddView(rightColumn);
+
+            var donut = new MacroDonutView(Context, protein, carbs, fats, fiber);
+            var donutParams = new LinearLayout.LayoutParams(300, 300)
+            {
+                LeftMargin = 20
+            };
+            donut.LayoutParameters = donutParams;
+
+            topRow.AddView(leftContainer);
+            topRow.AddView(donut);
+
+            var deleteBtn = new Button(Context)
+            {
+                Text = "Delete",
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+            deleteBtn.SetPadding(0, 20, 0, 20);
+            deleteBtn.Click += (s, e) =>
+            {
+                tableMeals.RemoveView(container);
+                DeleteMealEntry(Id);
+            };
+
+            container.AddView(topRow);
+            container.AddView(deleteBtn);
+
+            tableMeals.AddView(container);
         }
 
         private async Task<List<MealEntry>> LoadMealsFromDb(string userName)
@@ -92,7 +160,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             using var dbContext = CreateDbContext();
             var mealService = new MealEntryService(dbContext);
 
-            var mealEntry = await mealService.GetAllAsync(userName);
+            var mealEntry = await mealService.GetByDateAsync(DateOnly.FromDateTime(DateTime.Today), userName);
 
             return mealEntry;
         }
@@ -106,6 +174,44 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Toast.MakeText(Context, $"Food '{foodName}' not found", ToastLength.Short).Show();
                 return;
             }
+
+            var now = DateTime.Now.TimeOfDay;
+
+            string MealType =
+                (now >= TimeSpan.FromHours(0) && now < TimeSpan.FromHours(6)) ? "Snack" :
+                (now >= TimeSpan.FromHours(6) && now < TimeSpan.FromHours(12)) ? "Breakfast" :
+                (now >= TimeSpan.FromHours(12) && now < TimeSpan.FromHours(15)) ? "Lunch" :
+                (now >= TimeSpan.FromHours(15) && now < TimeSpan.FromHours(20)) ? "Dinner" :
+                "Snack";
+
+            var mealEntry = new MealEntry
+            {
+                MealName = macros.RecipeName,
+                PortionEaten = macros.Servings,
+                Calories = macros.CaloriesPerServing * macros.Servings,
+                Protein = macros.Protein * macros.Servings,
+                Carbs = macros.Carbs * macros.Servings,
+                Fats = macros.Fats * macros.Servings,
+                Fiber = macros.Fiber * macros.Servings,
+                Date = DateOnly.FromDateTime(DateTime.Today),
+                Day = DateTime.Today.DayOfWeek.ToString(),
+                MealType = MealType,
+                UserId = ""
+            };
+
+            SaveMealEntry(mealEntry);
+
+            AddMeal(
+                mealEntry.Id,
+                macros.RecipeName,
+                macros.Servings,
+                macros.CaloriesPerServing * macros.Servings,
+                macros.Protein * macros.Servings,
+                macros.Carbs * macros.Servings,
+                macros.Fats * macros.Servings,
+                macros.Fiber * macros.Servings,
+                MealType
+            );
         }
 
         private List<string> GetFoodItemList()
@@ -124,9 +230,25 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             return mealService.GetFoodItemByNameAsync(foodName).Result;
         }
 
+        private void SaveMealEntry(MealEntry mealEntry)
+        {
+            using var dbContext = CreateDbContext();
+            var mealService = new MealEntryService(dbContext);
+
+            mealService.AddAsync(mealEntry).Wait();
+        }
+
+        private void DeleteMealEntry(int Id)
+        {
+            using var dbContext = CreateDbContext();
+            var mealService = new MealEntryService(dbContext);
+
+            mealService.DeleteAsync(Id).Wait();
+        }
+
         private AppDbContext CreateDbContext()
         {
-            var dbPath = Path.Combine(
+            var dbPath = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "bulk_carnage.db"
             );
@@ -136,6 +258,14 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 .Options;
 
             return new AppDbContext(options);
+        }
+
+        void HideKeyboard()
+        {
+            var inputMethodManager = (InputMethodManager)Context.GetSystemService(Android.Content.Context.InputMethodService);
+            var token = txtFoodName.WindowToken; // your AutoCompleteTextView instance
+            if (token != null)
+                inputMethodManager.HideSoftInputFromWindow(token, HideSoftInputFlags.None);
         }
     }
 }
