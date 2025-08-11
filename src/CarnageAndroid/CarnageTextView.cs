@@ -1,0 +1,66 @@
+﻿using Android.Content;
+using Android.Graphics;
+using Android.Util;
+using Android.Widget;
+
+namespace CarnageAndroid
+{
+    public class CarnageTextView : TextView
+    {
+        public CarnageTextView(Context context) : base(context) => Init();
+        public CarnageTextView(Context context, IAttributeSet attrs) : base(context, attrs) => Init();
+        public CarnageTextView(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr) => Init();
+
+        private void Init()
+        {
+            SetStyle(CarnageTextViewStyle.Default);
+        }
+
+        public CarnageTextView WithText(string text)
+        {
+            Text = text;
+            return this;
+        }
+
+        public CarnageTextView AsTitle()
+        {
+            Typeface = Typeface.DefaultBold;
+            TextSize = CarnageStyle.FontSizeLarge;
+            SetTextColor(CarnageStyle.PrimaryColor);
+            return this;
+        }
+
+        public CarnageTextView AsSecondary()
+        {
+            SetTextColor(CarnageStyle.TextSecondaryColor);
+            return this;
+        }
+
+        public CarnageTextView WithTextSize(float size)
+        {
+            TextSize = size;
+            return this;
+        }
+
+        public CarnageTextView SetStyle(CarnageTextViewStyle style)
+        {
+            switch (style)
+            {
+                case CarnageTextViewStyle.Title:
+                    TextSize = CarnageStyle.FontSizeLarge;
+                    Typeface = Typeface.DefaultBold;
+                    SetTextColor(CarnageStyle.PrimaryColor);
+                    break;
+                case CarnageTextViewStyle.Secondary:
+                    TextSize = CarnageStyle.FontSizeSmall;
+                    SetTextColor(CarnageStyle.TextSecondaryColor);
+                    break;
+                default:
+                    TextSize = CarnageStyle.FontSizeMedium;
+                    SetTextColor(CarnageStyle.TextPrimaryColor);
+                    break;
+            }
+            return this;
+        }
+    }
+}

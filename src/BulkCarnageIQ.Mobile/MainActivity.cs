@@ -5,6 +5,7 @@ using Android.OS;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Mobile.Components.Pages;
+using CarnageAndroid;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -15,9 +16,10 @@ namespace BulkCarnageIQ.Mobile
     {
         FrameLayout fragmentContainer;
         LinearLayout drawerPanel;
-        Button btnHamburger;
-        Button btnHome;
-        Button btnTracker;
+        CarnageTextView txtAppTitle;
+        CarnageButton btnHamburger;
+        CarnageButton btnHome;
+        CarnageButton btnTracker;
         bool isDrawerOpen = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -27,21 +29,27 @@ namespace BulkCarnageIQ.Mobile
 
             fragmentContainer = FindViewById<FrameLayout>(Resource.Id.fragment_container);
             drawerPanel = FindViewById<LinearLayout>(Resource.Id.drawer_panel);
-            btnHamburger = FindViewById<Button>(Resource.Id.btn_hamburger);
-            btnHome = FindViewById<Button>(Resource.Id.btn_home);
-            btnTracker = FindViewById<Button>(Resource.Id.btn_tracker);
+            txtAppTitle = FindViewById<CarnageTextView>(Resource.Id.app_title);
+            btnHamburger = FindViewById<CarnageButton>(Resource.Id.btn_hamburger);
+            btnHome = FindViewById<CarnageButton>(Resource.Id.btn_home);
+            btnTracker = FindViewById<CarnageButton>(Resource.Id.btn_tracker);
 
+            txtAppTitle.AsTitle();
+
+            btnHamburger.SetStyle(CarnageButtonStyle.Primary);
             btnHamburger.Click += (s, e) =>
             {
                 ToggleDrawer();
             };
 
+            btnHome.SetStyle(CarnageButtonStyle.Primary);
             btnHome.Click += (s, e) =>
             {
                 LoadFragment(new HomeFragment());
                 ToggleDrawer();
             };
 
+            btnTracker.SetStyle(CarnageButtonStyle.Primary);
             btnTracker.Click += (s, e) =>
             {
                 LoadFragment(new TrackerFragment());

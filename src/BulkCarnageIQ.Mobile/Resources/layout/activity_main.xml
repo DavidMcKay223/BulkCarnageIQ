@@ -8,12 +8,12 @@
         android:id="@+id/top_app_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#000000"
+        android:background="@color/charcoalGray"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical">
 
-		<TextView
+		<CarnageAndroid.CarnageTextView
             android:id="@+id/app_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,13 +23,11 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true" />
 
-		<Button
+		<CarnageAndroid.CarnageButton
             android:id="@+id/btn_hamburger"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/app_btn_hamburger_text"
-            android:textSize="28sp"
-            android:background="?android:selectableItemBackgroundBorderless"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true" />
 
@@ -47,18 +45,17 @@
         android:id="@+id/drawer_panel"
         android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:background="#ff7043"
         android:orientation="vertical"
         android:translationX="-240dp"
         android:elevation="8dp">
 
-		<Button
+		<CarnageAndroid.CarnageButton
             android:id="@+id/btn_home"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/app_btn_home_text" />
 
-		<Button
+		<CarnageAndroid.CarnageButton
             android:id="@+id/btn_tracker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
