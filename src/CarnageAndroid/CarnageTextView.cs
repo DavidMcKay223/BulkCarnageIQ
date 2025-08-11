@@ -2,10 +2,13 @@
 using Android.Graphics;
 using Android.Util;
 using Android.Widget;
+using Google.Android.Material.TextView;
+using static Android.Webkit.WebSettings;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CarnageAndroid
 {
-    public class CarnageTextView : TextView
+    public class CarnageTextView : MaterialTextView
     {
         public CarnageTextView(Context context) : base(context) => Init();
         public CarnageTextView(Context context, IAttributeSet attrs) : base(context, attrs) => Init();

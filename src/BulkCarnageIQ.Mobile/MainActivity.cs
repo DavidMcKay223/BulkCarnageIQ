@@ -16,10 +16,10 @@ namespace BulkCarnageIQ.Mobile
     {
         FrameLayout fragmentContainer;
         LinearLayout drawerPanel;
-        CarnageTextView txtAppTitle;
-        CarnageButton btnHamburger;
-        CarnageButton btnHome;
-        CarnageButton btnTracker;
+
+        LinearLayout titleContainer;
+        LinearLayout hamburgerContainer;
+
         bool isDrawerOpen = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -29,38 +29,54 @@ namespace BulkCarnageIQ.Mobile
 
             fragmentContainer = FindViewById<FrameLayout>(Resource.Id.fragment_container);
             drawerPanel = FindViewById<LinearLayout>(Resource.Id.drawer_panel);
-            txtAppTitle = FindViewById<CarnageTextView>(Resource.Id.app_title);
-            btnHamburger = FindViewById<CarnageButton>(Resource.Id.btn_hamburger);
-            btnHome = FindViewById<CarnageButton>(Resource.Id.btn_home);
-            btnTracker = FindViewById<CarnageButton>(Resource.Id.btn_tracker);
 
-            txtAppTitle.AsTitle();
+            // These containers must exist in your XML (as in your last posted layout)
+            titleContainer = FindViewById<LinearLayout>(Resource.Id.title_container);
+            hamburgerContainer = FindViewById<LinearLayout>(Resource.Id.hamburger_container);
 
-            btnHamburger.SetStyle(CarnageButtonStyle.Primary);
-            btnHamburger.Click += (s, e) =>
-            {
-                ToggleDrawer();
-            };
+            // Inject CarnageTextView title dynamically
+            var txtAppTitle = new CarnageTextView(this)
+                .WithText(GetString(Resource.String.app_name))
+                .AsTitle();
+            titleContainer.AddView(txtAppTitle);
 
-            btnHome.SetStyle(CarnageButtonStyle.Primary);
-            btnHome.Click += (s, e) =>
-            {
-                LoadFragment(new HomeFragment());
-                ToggleDrawer();
-            };
+            // Inject Hamburger button dynamically
+            var btnHamburger = new CarnageButton(this)
+                .WithText(GetString(Resource.String.app_btn_hamburger_text))
+                .SetStyle(CarnageButtonStyle.Primary)
+                .OnClick(() => ToggleDrawer());
+            hamburgerContainer.AddView(btnHamburger);
 
-            btnTracker.SetStyle(CarnageButtonStyle.Primary);
-            btnTracker.Click += (s, e) =>
-            {
-                LoadFragment(new TrackerFragment());
-                ToggleDrawer();
-            };
+            // Build drawer buttons dynamically
+            BuildDrawerMenu();
 
             InitializeApp();
 
             if (savedInstanceState == null)
             {
                 LoadFragment(new HomeFragment());
+            }
+        }
+
+        void BuildDrawerMenu()
+        {
+            drawerPanel.RemoveAllViews();
+
+            var menuItems = new[]
+            {
+                new { Text = "Home", Click = new Action(() => { LoadFragment(new HomeFragment()); ToggleDrawer(); }) },
+                new { Text = "Food Tracker", Click = new Action(() => { LoadFragment(new TrackerFragment()); ToggleDrawer(); }) },
+                // Add more menu items here dynamically as needed
+            };
+
+            foreach (var item in menuItems)
+            {
+                var btn = new CarnageButton(this)
+                    .WithText(item.Text)
+                    .SetStyle(CarnageButtonStyle.Primary)
+                    .OnClick(item.Click);
+
+                drawerPanel.AddView(btn);
             }
         }
 

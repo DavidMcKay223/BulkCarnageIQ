@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">BulkCarnageIQ</string>
 
-    <string name="app_btn_home_text">Home</string>
-    <string name="app_btn_tracker_text">Tracker</string>
     <string name="app_btn_hamburger_text">≡</string>
 	
     <string name="app_fragment_widget1_text">Todays Macros</string>

@@ -10,4 +10,7 @@
     -->
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.12.0.4" />
+  </ItemGroup>
 </Project>
