@@ -25,7 +25,7 @@
             android:id="@+id/addTable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:stretchColumns="0,1"
+            android:stretchColumns="0"
             android:orientation="vertical" />
 	</LinearLayout>
 

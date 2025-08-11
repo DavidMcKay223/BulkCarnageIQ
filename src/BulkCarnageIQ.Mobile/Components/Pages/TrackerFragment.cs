@@ -30,6 +30,11 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         {
             base.OnViewCreated(view, savedInstanceState);
 
+            var row = new TableRow(Context)
+            {
+                LayoutParameters = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+
             tableMeals = view.FindViewById<TableLayout>(Resource.Id.tableMeals);
             tableAdd = view.FindViewById<TableLayout>(Resource.Id.addTable);
 
@@ -49,7 +54,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             var btnAddMeal = new CarnageButton(Context)
                 .WithText("Add")
                 .WithStyle(CarnageButtonStyle.Primary)
-                .WithWidth(50)
+                .WithWidth(25)
                 .OnClick(() =>
                     {
                         string foodName = txtFoodName.Text.Trim();
@@ -65,11 +70,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
                         HideKeyboard(txtFoodName);
                     });
-
-            var row = new TableRow(Context)
-            {
-                LayoutParameters = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-            };
 
             row.AddView(txtFoodName);
             row.AddView(btnAddMeal);

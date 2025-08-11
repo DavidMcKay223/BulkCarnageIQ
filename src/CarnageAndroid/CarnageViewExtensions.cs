@@ -36,7 +36,6 @@ namespace CarnageAndroid
             var pxWidth = view.Context.DpToPx(dpWidth);
             var lp = view.LayoutParameters ?? new ViewGroup.LayoutParams(pxWidth, ViewGroup.LayoutParams.WrapContent);
             lp.Width = pxWidth;
-            view.LayoutParameters = lp;
             return view;
         }
 
