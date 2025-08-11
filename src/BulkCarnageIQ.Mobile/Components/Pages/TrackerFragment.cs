@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
+using static Android.InputMethodServices.Keyboard;
 
 namespace BulkCarnageIQ.Mobile.Components.Pages
 {
     public class TrackerFragment : Fragment
     {
         private TableLayout tableMeals;
-        private AutoCompleteTextView txtFoodName;
-        private Button btnAddMeal;
+        private TableLayout tableAdd;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -31,9 +31,12 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             base.OnViewCreated(view, savedInstanceState);
 
             tableMeals = view.FindViewById<TableLayout>(Resource.Id.tableMeals);
+            tableAdd = view.FindViewById<TableLayout>(Resource.Id.addTable);
 
-            txtFoodName = view.FindViewById<AutoCompleteTextView>(Resource.Id.txtFoodName);
-            btnAddMeal = view.FindViewById<Button>(Resource.Id.btnAddMeal);
+            var txtFoodName = new AutoCompleteTextView(Context)
+            {
+                LayoutParameters = new TableRow.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
 
             var adapter = new ArrayAdapter<string>(
                 Context,
@@ -43,21 +46,35 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             
             txtFoodName.Adapter = adapter;
 
-            btnAddMeal.Click += (s, e) =>
+            var btnAddMeal = new CarnageButton(Context)
+                .WithText("Add")
+                .WithStyle(CarnageButtonStyle.Primary)
+                .WithWidth(50)
+                .OnClick(() =>
+                    {
+                        string foodName = txtFoodName.Text.Trim();
+
+                        if (string.IsNullOrWhiteSpace(foodName))
+                        {
+                            Toast.MakeText(Context, "Enter a food name", ToastLength.Short).Show();
+                            return;
+                        }
+
+                        AddMealByName(foodName);
+                        txtFoodName.Text = string.Empty;
+
+                        HideKeyboard(txtFoodName);
+                    });
+
+            var row = new TableRow(Context)
             {
-                string foodName = txtFoodName.Text.Trim();
-
-                if (string.IsNullOrWhiteSpace(foodName))
-                {
-                    Toast.MakeText(Context, "Enter a food name", ToastLength.Short).Show();
-                    return;
-                }
-
-                AddMealByName(foodName);
-                txtFoodName.Text = string.Empty;
-
-                HideKeyboard();
+                LayoutParameters = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
+
+            row.AddView(txtFoodName);
+            row.AddView(btnAddMeal);
+
+            tableAdd.AddView(row);
 
             // Load meals from DB/service
             var meals = LoadMealsFromDb("").Result;
@@ -95,14 +112,14 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             servingsCaloriesRow.AddView(new CarnageTextView(Context)
                 .WithText($"Servings: {portions:N1}")
-                .SetStyle(CarnageTextViewStyle.Default));
+                .WithStyle(CarnageTextViewStyle.Default));
             servingsCaloriesRow.AddView(new CarnageTextView(Context)
             {
                 Text = "  |  "  // separator with spaces
             });
             servingsCaloriesRow.AddView(new CarnageTextView(Context)
                 .WithText($"Calories: {calories:N0}")
-                .SetStyle(CarnageTextViewStyle.Default));
+                .WithStyle(CarnageTextViewStyle.Default));
 
             container.AddView(servingsCaloriesRow);
 
@@ -123,7 +140,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             // Delete button full width below
             var deleteBtn = new CarnageButton(Context)
                 .WithText("Delete")
-                .SetStyle(CarnageButtonStyle.Danger)
+                .WithStyle(CarnageButtonStyle.Danger)
                 .OnClick(() =>
                 {
                     tableMeals.RemoveView(container);
@@ -242,10 +259,10 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             return new AppDbContext(options);
         }
 
-        void HideKeyboard()
+        void HideKeyboard(AutoCompleteTextView control)
         {
             var inputMethodManager = (InputMethodManager)Context.GetSystemService(Android.Content.Context.InputMethodService);
-            var token = txtFoodName.WindowToken; // your AutoCompleteTextView instance
+            var token = control.WindowToken;
             if (token != null)
                 inputMethodManager.HideSoftInputFromWindow(token, HideSoftInputFlags.None);
         }

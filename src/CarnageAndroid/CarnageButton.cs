@@ -19,10 +19,10 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            SetStyle(CarnageButtonStyle.Default);
-            SetAllCaps(false); // Optional: disable all-caps default
+            WithStyle(CarnageButtonStyle.Default);
+            SetAllCaps(false);
             StrokeWidth = 0;
-            CornerRadius = DpToPx(CarnageStyle.CornerRadius);
+            CornerRadius = Context.DpToPx(CarnageStyle.CornerRadius);
             Elevation = CarnageStyle.Elevation;
         }
 
@@ -44,7 +44,7 @@ namespace CarnageAndroid
             return this;
         }
 
-        public CarnageButton SetStyle(CarnageButtonStyle style)
+        public CarnageButton WithStyle(CarnageButtonStyle style)
         {
             Color backgroundColor;
             Color textColor;
@@ -75,22 +75,13 @@ namespace CarnageAndroid
             }
 
             BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(backgroundColor);
-            SetTextColor(textColor);
-            SetTextSize(ComplexUnitType.Sp, CarnageStyle.FontSizeMedium);
-            SetPaddingDp(paddingDp);
+            
+            this
+                .WithTextColor(textColor)
+                .WithTextSize(ComplexUnitType.Sp, CarnageStyle.FontSizeMedium)
+                .WithPaddingDp(paddingDp);
+
             return this;
-        }
-
-        private void SetPaddingDp(int dp)
-        {
-            int px = DpToPx(dp);
-            SetPadding(px, px, px, px);
-        }
-
-        private int DpToPx(float dp)
-        {
-            float scale = Context.Resources.DisplayMetrics.Density;
-            return (int)(dp * scale + 0.5f);
         }
     }
 }

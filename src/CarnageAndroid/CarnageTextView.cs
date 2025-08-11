@@ -16,7 +16,7 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            SetStyle(CarnageTextViewStyle.Default);
+            WithStyle(CarnageTextViewStyle.Default);
         }
 
         public CarnageTextView WithText(string text)
@@ -45,7 +45,7 @@ namespace CarnageAndroid
             return this;
         }
 
-        public CarnageTextView SetStyle(CarnageTextViewStyle style)
+        public CarnageTextView WithStyle(CarnageTextViewStyle style)
         {
             switch (style)
             {

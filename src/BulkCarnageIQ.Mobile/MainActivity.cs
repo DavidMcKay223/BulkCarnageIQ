@@ -43,7 +43,7 @@ namespace BulkCarnageIQ.Mobile
             // Inject Hamburger button dynamically
             var btnHamburger = new CarnageButton(this)
                 .WithText(GetString(Resource.String.app_btn_hamburger_text))
-                .SetStyle(CarnageButtonStyle.Primary)
+                .WithStyle(CarnageButtonStyle.Primary)
                 .OnClick(() => ToggleDrawer());
             hamburgerContainer.AddView(btnHamburger);
 
@@ -73,7 +73,7 @@ namespace BulkCarnageIQ.Mobile
             {
                 var btn = new CarnageButton(this)
                     .WithText(item.Text)
-                    .SetStyle(CarnageButtonStyle.Primary)
+                    .WithStyle(CarnageButtonStyle.Primary)
                     .OnClick(item.Click);
 
                 drawerPanel.AddView(btn);
