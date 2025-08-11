@@ -83,8 +83,8 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 : $"{Math.Abs(diff):N0} calories under target this week";
 
             // Populate the TableLayouts dynamically
-            PopulateMacroTable(tableDailyMacros, todaySummary);
-            PopulateMacroTable(tableWeeklyMacros, weekSummary);
+            PopulateMacroTable(tableDailyMacros, todaySummary, 1);
+            PopulateMacroTable(tableWeeklyMacros, weekSummary, 7);
 
             // Clear and populate mini log for today
             miniLogContainer.RemoveAllViews();
@@ -95,11 +95,17 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             }
         }
 
-        private void PopulateMacroTable(TableLayout table, MacroSummary summary)
+        private void PopulateMacroTable(TableLayout table, MacroSummary summary, int weight)
         {
             table.RemoveAllViews();
 
             AddMacroRow(table, "Calories", summary.Calories);
+
+            table.AddView(new BulkCarnageIQ.Mobile.Components.Carnage.MacroProgressView(Context)
+                .Add("Protein", summary.Protein, currentUserProfile.ProteinGoal * weight)
+                .Add("Carbs", summary.Carbs, currentUserProfile.CarbsGoal * weight)
+                .Add("Fats", summary.Fats, currentUserProfile.FatGoal * weight)
+                .Add("Fiber", summary.Fiber, currentUserProfile.FiberGoal * weight));
         }
 
         private void AddMacroRow(TableLayout table, string label, float value)

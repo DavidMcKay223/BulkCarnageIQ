@@ -25,6 +25,7 @@ namespace CarnageAndroid
     {
         Default,
         Title,
+        Primary,
         Secondary
     }
 

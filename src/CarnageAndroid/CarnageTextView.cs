@@ -54,6 +54,10 @@ namespace CarnageAndroid
                     Typeface = Typeface.DefaultBold;
                     SetTextColor(CarnageStyle.PrimaryColor);
                     break;
+                case CarnageTextViewStyle.Primary:
+                    TextSize = CarnageStyle.FontSizeMedium;
+                    SetTextColor(CarnageStyle.TextPrimaryColor);
+                    break;
                 case CarnageTextViewStyle.Secondary:
                     TextSize = CarnageStyle.FontSizeSmall;
                     SetTextColor(CarnageStyle.TextSecondaryColor);
