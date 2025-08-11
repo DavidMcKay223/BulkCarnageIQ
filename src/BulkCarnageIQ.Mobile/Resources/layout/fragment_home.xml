@@ -10,12 +10,6 @@
         android:padding="16dp">
 
 		<!-- Widget 1: Daily Totals -->
-		<TextView
-            android:text="@string/app_fragment_widget1_text"
-            android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
 		<LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -39,13 +33,6 @@
 		</LinearLayout>
 
 		<!-- Widget 2: Weekly Summary -->
-		<TextView
-            android:text="@string/app_fragment_widget2_text"
-            android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp" />
-
 		<LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -67,27 +54,6 @@
 				android:layout_gravity="center" />
 
 		</LinearLayout>
-
-		<TextView
-            android:id="@+id/weeklySummaryText"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
-
-		<!-- Widget 4: Mini Log -->
-		<TextView
-            android:text="@string/app_fragment_widget4_text"
-            android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp" />
-
-		<LinearLayout
-            android:id="@+id/miniLogContainer"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
 	</LinearLayout>
 </ScrollView>

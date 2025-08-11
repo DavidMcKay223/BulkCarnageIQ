@@ -25,14 +25,14 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             SetPadding(context.DpToPx(8), context.DpToPx(8), context.DpToPx(8), context.DpToPx(8));
         }
 
-        public MacroProgressView Add(string name, float current, float goal)
+        public MacroProgressView Add(string name, float current, float goal, string format = " g")
         {
-            var itemView = CreateSingleMacroView(name, current, goal);
+            var itemView = CreateSingleMacroView(name, current, goal, format);
             AddView(itemView);
             return this;
         }
 
-        private View CreateSingleMacroView(string name, float current, float goal)
+        private View CreateSingleMacroView(string name, float current, float goal, string format = " g")
         {
             var container = new LinearLayout(Context)
             {
@@ -49,7 +49,7 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             topRow.SetPadding(0, 0, 0, Context.DpToPx(4));
 
             topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Title).WithText($"{name}"));
-            topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Secondary).WithText($"{current:F1} g / {goal:F1} g"));
+            topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Secondary).WithText($"{current:F1}{format} / {goal:F1}{format}"));
 
             container.AddView(topRow);
 

@@ -17,9 +17,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
         private MacroDonutView weeklyDonut;
         private TableLayout tableWeeklyMacros;
-        private TextView weeklySummaryText;
-
-        private LinearLayout miniLogContainer;
 
         private UserProfile currentUserProfile;
 
@@ -34,8 +31,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             dailyDonut = view.FindViewById<MacroDonutView>(Resource.Id.dailyDonut);
             weeklyDonut = view.FindViewById<MacroDonutView>(Resource.Id.weeklyDonut);
-            weeklySummaryText = view.FindViewById<TextView>(Resource.Id.weeklySummaryText);
-            miniLogContainer = view.FindViewById<LinearLayout>(Resource.Id.miniLogContainer);
 
             tableDailyMacros = view.FindViewById<TableLayout>(Resource.Id.tableDailyMacros);
             tableWeeklyMacros = view.FindViewById<TableLayout>(Resource.Id.tableWeeklyMacros);
@@ -78,85 +73,28 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             float weeklyCaloriesGoal = currentUserProfile.CalorieGoal * 7;
             float diff = weeklyCaloriesActual - weeklyCaloriesGoal;
 
-            weeklySummaryText.Text = diff > 0
-                ? $"+{diff:N0} calories over target this week"
-                : $"{Math.Abs(diff):N0} calories under target this week";
-
-            // Populate the TableLayouts dynamically
-            PopulateMacroTable(tableDailyMacros, todaySummary, 1);
-            PopulateMacroTable(tableWeeklyMacros, weekSummary, 7);
-
-            // Clear and populate mini log for today
-            miniLogContainer.RemoveAllViews();
-            var todayMeals = GetMealsForDate(DateOnly.FromDateTime(DateTime.Today));
-            foreach (var meal in todayMeals)
-            {
-                AddMiniLogItem(meal.MealName, meal.MealType);
-            }
+            PopulateMacroTable($"Today Macros:", $"{DateTime.Today.ToShortDateString()}", tableDailyMacros, todaySummary, 1);
+            PopulateMacroTable($"Weekly Summary:", $"{DateTime.Today.AddDays(-6).ToShortDateString()} - {DateTime.Today.ToShortDateString()}", tableWeeklyMacros, weekSummary, 7);
         }
 
-        private void PopulateMacroTable(TableLayout table, MacroSummary summary, int weight)
+        private void PopulateMacroTable(String Title, String DateStr, TableLayout table, MacroSummary summary, int weight)
         {
             table.RemoveAllViews();
 
-            AddMacroRow(table, "Calories", summary.Calories);
+            table.AddView(new CarnageAndroid.CarnageTextView(Context)
+                .WithStyle(CarnageAndroid.CarnageTextViewStyle.Title)
+                .WithText(Title));
+
+            table.AddView(new CarnageAndroid.CarnageTextView(Context)
+                .WithStyle(CarnageAndroid.CarnageTextViewStyle.Secondary)
+                .WithText(DateStr));
 
             table.AddView(new BulkCarnageIQ.Mobile.Components.Carnage.MacroProgressView(Context)
+                .Add("Calories", summary.Calories, currentUserProfile.CalorieGoal * weight, "")
                 .Add("Protein", summary.Protein, currentUserProfile.ProteinGoal * weight)
                 .Add("Carbs", summary.Carbs, currentUserProfile.CarbsGoal * weight)
                 .Add("Fats", summary.Fats, currentUserProfile.FatGoal * weight)
                 .Add("Fiber", summary.Fiber, currentUserProfile.FiberGoal * weight));
-        }
-
-        private void AddMacroRow(TableLayout table, string label, float value)
-        {
-            var row = new TableRow(Context);
-
-            var labelView = new TextView(Context)
-            {
-                Text = label,
-                TextSize = 16
-            };
-            labelView.SetPadding(10, 10, 10, 10);
-
-            var valueView = new TextView(Context)
-            {
-                Text = value.ToString("N1"),
-                TextSize = 16
-            };
-            valueView.SetPadding(10, 10, 10, 10);
-
-            row.AddView(labelView);
-            row.AddView(valueView);
-
-            table.AddView(row);
-        }
-
-        private void AddMiniLogItem(string mealName, string mealType)
-        {
-            var row = new LinearLayout(Context)
-            {
-                Orientation = Orientation.Horizontal
-            };
-            row.SetPadding(10, 10, 10, 10);
-
-            var nameView = new TextView(Context)
-            {
-                Text = mealName,
-                TextSize = 16
-            };
-
-            var typeView = new TextView(Context)
-            {
-                Text = mealType,
-                TextSize = 14
-            };
-            typeView.SetPadding(20, 0, 0, 0);
-
-            row.AddView(nameView);
-            row.AddView(typeView);
-
-            miniLogContainer.AddView(row);
         }
 
         private UserProfile GetUserProfile()
