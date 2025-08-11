@@ -75,60 +75,52 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             };
             container.SetPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
 
+            // Food Name (title)
             var nameView = new CarnageTextView(Context)
                 .WithText(name)
                 .AsTitle();
             container.AddView(nameView);
 
+            // Meal Type
             var mealTypeView = new CarnageTextView(Context)
                 .WithText(mealType);
             container.AddView(mealTypeView);
 
-            var topRow = new LinearLayout(Context)
+            // Servings + Calories row (horizontal)
+            var servingsCaloriesRow = new LinearLayout(Context)
             {
                 Orientation = Orientation.Horizontal,
-                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             };
 
-            var leftContainer = new LinearLayout(Context)
+            servingsCaloriesRow.AddView(new CarnageTextView(Context)
+                .WithText($"Servings: {portions:N1}")
+                .SetStyle(CarnageTextViewStyle.Default));
+            servingsCaloriesRow.AddView(new CarnageTextView(Context)
             {
-                Orientation = Orientation.Horizontal,
-                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
-            };
-            leftContainer.SetPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
+                Text = "  |  "  // separator with spaces
+            });
+            servingsCaloriesRow.AddView(new CarnageTextView(Context)
+                .WithText($"Calories: {calories:N0}")
+                .SetStyle(CarnageTextViewStyle.Default));
 
-            var leftColumn = new LinearLayout(Context)
+            container.AddView(servingsCaloriesRow);
+
+            // Donut chart below, centered
+            var donut = new MacroDonutView(Context)
             {
-                Orientation = Orientation.Vertical,
-                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
-            };
-            leftColumn.AddView(new CarnageTextView(Context).WithText($"Servings: {portions:N1}"));
-            leftColumn.AddView(new CarnageTextView(Context).WithText($"Protein: {protein:N1}"));
-            leftColumn.AddView(new CarnageTextView(Context).WithText($"Fiber: {fiber:N1}"));
-
-            var rightColumn = new LinearLayout(Context)
-            {
-                Orientation = Orientation.Vertical,
-                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
-            };
-            rightColumn.AddView(new CarnageTextView(Context).WithText($"Calories: {calories:N1}"));
-            rightColumn.AddView(new CarnageTextView(Context).WithText($"Carbs: {carbs:N1}"));
-            rightColumn.AddView(new CarnageTextView(Context).WithText($"Fats: {fats:N1}"));
-
-            leftContainer.AddView(leftColumn);
-            leftContainer.AddView(rightColumn);
-
-            var donut = new MacroDonutView(Context, protein, carbs, fats, fiber)
-            {
-                LayoutParameters = new LinearLayout.LayoutParams(300, 300)
+                LayoutParameters = new LinearLayout.LayoutParams(400, 400)
                 {
-                    LeftMargin = CarnageStyle.PaddingMedium
+                    Gravity = Android.Views.GravityFlags.CenterHorizontal,
+                    TopMargin = CarnageStyle.PaddingMedium,
+                    BottomMargin = CarnageStyle.PaddingMedium
                 }
             };
+            donut.SetMacros(protein, carbs, fats, fiber);
 
-            topRow.AddView(leftContainer);
-            topRow.AddView(donut);
+            container.AddView(donut);
 
+            // Delete button full width below
             var deleteBtn = new CarnageButton(Context)
                 .WithText("Delete")
                 .SetStyle(CarnageButtonStyle.Danger)
@@ -140,7 +132,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             deleteBtn.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             deleteBtn.SetPadding(0, CarnageStyle.PaddingMedium, 0, CarnageStyle.PaddingMedium);
 
-            container.AddView(topRow);
             container.AddView(deleteBtn);
 
             tableMeals.AddView(container);

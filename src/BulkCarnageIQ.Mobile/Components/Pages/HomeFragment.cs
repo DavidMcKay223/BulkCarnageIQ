@@ -100,10 +100,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             table.RemoveAllViews();
 
             AddMacroRow(table, "Calories", summary.Calories);
-            AddMacroRow(table, "Protein (g)", summary.Protein);
-            AddMacroRow(table, "Carbs (g)", summary.Carbs);
-            AddMacroRow(table, "Fats (g)", summary.Fats);
-            AddMacroRow(table, "Fiber (g)", summary.Fiber);
         }
 
         private void AddMacroRow(TableLayout table, string label, float value)

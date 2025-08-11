@@ -17,7 +17,7 @@
             android:layout_height="wrap_content" />
 
 		<LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -25,15 +25,16 @@
 
 			<TableLayout
 				android:id="@+id/tableDailyMacros"
-				android:layout_width="0dp"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1" />
 
 			<BulkCarnageIQ.Mobile.Components.Carnage.MacroDonutView
 				android:id="@+id/dailyDonut"
-				android:layout_width="150dp"
-				android:layout_height="150dp"
-				android:layout_marginStart="16dp" />
+				android:layout_width="240dp"
+				android:layout_height="240dp"
+				android:layout_marginStart="16dp"
+				android:layout_gravity="center" />
 
 		</LinearLayout>
 
@@ -46,7 +47,7 @@
             android:layout_marginTop="20dp" />
 
 		<LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -54,15 +55,16 @@
 
 			<TableLayout
 				android:id="@+id/tableWeeklyMacros"
-				android:layout_width="0dp"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1" />
 
 			<BulkCarnageIQ.Mobile.Components.Carnage.MacroDonutView
 				android:id="@+id/weeklyDonut"
-				android:layout_width="150dp"
-				android:layout_height="150dp"
-				android:layout_marginStart="16dp" />
+				android:layout_width="240dp"
+				android:layout_height="240dp"
+				android:layout_marginStart="16dp"
+				android:layout_gravity="center" />
 
 		</LinearLayout>
 

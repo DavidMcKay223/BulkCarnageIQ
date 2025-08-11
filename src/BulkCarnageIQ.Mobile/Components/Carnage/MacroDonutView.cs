@@ -1,89 +1,109 @@
 ﻿using Android.Content;
 using Android.Graphics;
-using Android.Hardware.Lights;
 using Android.Util;
-using Android.Views;
-using System;
+using Android.Widget;
+using MikePhil.Charting.Charts;
+using MikePhil.Charting.Components;
+using MikePhil.Charting.Data;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Android.Icu.Text.ListFormatter;
 
 namespace BulkCarnageIQ.Mobile.Components.Carnage
 {
-    public class MacroDonutView : View
+    public class MacroDonutView : FrameLayout
     {
-        private float protein;
-        private float carbs;
-        private float fats;
-        private float fiber;
-        private Paint paint;
+        private PieChart pieChart;
 
-        // Constructor for programmatic creation
-        public MacroDonutView(Context context, float protein, float carbs, float fats, float fiber) : base(context)
+        public MacroDonutView(Context context) : base(context)
         {
-            Init(protein, carbs, fats, fiber);
+            Init();
         }
 
-        // Constructor for XML inflation
         public MacroDonutView(Context context, IAttributeSet attrs) : base(context, attrs)
         {
-            Init(0, 0, 0, 0); // Start with 0s until set
+            Init();
         }
 
-        private void Init(float protein, float carbs, float fats, float fiber)
+        public MacroDonutView(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr)
         {
-            this.protein = protein;
-            this.carbs = carbs;
-            this.fats = fats;
-            this.fiber = fiber;
+            Init();
+        }
 
-            paint = new Paint { AntiAlias = true, StrokeWidth = 40, StrokeCap = Paint.Cap.Round, StrokeJoin = Paint.Join.Round };
-            paint.SetStyle(Paint.Style.Stroke);
+        private void Init()
+        {
+            pieChart = new PieChart(Context);
+
+            var layoutParams = new LayoutParams(LayoutParams.MatchParent, LayoutParams.MatchParent);
+            pieChart.LayoutParameters = layoutParams;
+
+            pieChart.Description.Enabled = false;
+            pieChart.SetUsePercentValues(true);
+            pieChart.SetExtraOffsets(5, 10, 5, 5);
+            pieChart.HoleRadius = 75f; // Donut hole size in %
+            pieChart.TransparentCircleRadius = 80f;
+            pieChart.SetDrawEntryLabels(false); // Hide labels on slices
+            pieChart.SetDrawCenterText(false);
+
+            // Legend setup
+            var legend = pieChart.Legend;
+            legend.VerticalAlignment = Legend.LegendVerticalAlignment.Center;
+            legend.HorizontalAlignment = Legend.LegendHorizontalAlignment.Right;
+            legend.Orientation = Legend.LegendOrientation.Vertical;
+            legend.SetDrawInside(false);
+            legend.Enabled = true;
+
+            pieChart.AnimateY(1000);
+
+            AddView(pieChart);
         }
 
         public void SetMacros(float protein, float carbs, float fats, float fiber)
         {
-            this.protein = protein;
-            this.carbs = carbs;
-            this.fats = fats;
-            this.fiber = fiber;
-            Invalidate(); // Redraw
-        }
+            var entries = new List<PieEntry>
+            {
+                new PieEntry(protein, "Protein"),
+                new PieEntry(carbs, "Carbs"),
+                new PieEntry(fats, "Fats"),
+                new PieEntry(fiber, "Fiber")
+            };
 
-        protected override void OnDraw(Canvas canvas)
-        {
-            base.OnDraw(canvas);
+            var dataSet = new PieDataSet(entries, "");
+            dataSet.SliceSpace = 3f;
+            dataSet.SelectionShift = 5f;
 
-            float total = protein + carbs + fats + fiber;
-            if (total <= 0) total = 1;
+            // Colors matching your scheme
+            dataSet.Colors = new List<Java.Lang.Integer> {
+                Java.Lang.Integer.ValueOf(Color.ParseColor("#FF9800")), // Orange
+                Java.Lang.Integer.ValueOf(Color.ParseColor("#4CAF50")), // Green
+                Java.Lang.Integer.ValueOf(Color.ParseColor("#2196F3")), // Blue
+                Java.Lang.Integer.ValueOf(Color.ParseColor("#9C27B0"))  // Purple
+            };
 
-            float startAngle = -90;
-            RectF bounds = new RectF(40, 40, Width - 40, Height - 40);
+            // Show values outside slices
+            dataSet.YValuePosition = PieDataSet.ValuePosition.OutsideSlice;
+            dataSet.ValueLinePart1Length = 0.5f;
+            dataSet.ValueLinePart2Length = 0.5f;
+            dataSet.ValueLineColor = Color.Gray;
+            dataSet.ValueTextColor = Color.Black;
+            dataSet.ValueTextSize = 14f;
+            dataSet.SetDrawValues(false);
 
-            // Protein (Orange)
-            paint.Color = Color.ParseColor("#FF9800");
-            float sweep = (protein / total) * 360f;
-            canvas.DrawArc(bounds, startAngle, sweep, false, paint);
-            startAngle += sweep;
+            var data = new PieData(dataSet);
 
-            // Carbs (Green)
-            paint.Color = Color.ParseColor("#4CAF50");
-            sweep = (carbs / total) * 360f;
-            canvas.DrawArc(bounds, startAngle, sweep, false, paint);
-            startAngle += sweep;
+            // Optional: disable default values on slices (if you want only legend to show grams)
+            // data.SetDrawValues(false);
 
-            // Fats (Blue)
-            paint.Color = Color.ParseColor("#2196F3");
-            sweep = (fats / total) * 360f;
-            canvas.DrawArc(bounds, startAngle, sweep, false, paint);
-            startAngle += sweep;
+            pieChart.Data = data;
 
-            // Fiber (Purple)
-            paint.Color = Color.ParseColor("#9C27B0");
-            sweep = (fiber / total) * 360f;
-            canvas.DrawArc(bounds, startAngle, sweep, false, paint);
+            // Customize legend to show grams
+            pieChart.Legend.SetCustom(new List<LegendEntry>
+            {
+                new LegendEntry { Label = $"Protein {protein}g", FormColor = Color.ParseColor("#FF9800") },
+                new LegendEntry { Label = $"Carbs {carbs}g", FormColor = Color.ParseColor("#4CAF50") },
+                new LegendEntry { Label = $"Fats {fats}g", FormColor = Color.ParseColor("#2196F3") },
+                new LegendEntry { Label = $"Fiber {fiber}g", FormColor = Color.ParseColor("#9C27B0") },
+            });
+
+            pieChart.Invalidate(); // Refresh chart
         }
     }
 }
