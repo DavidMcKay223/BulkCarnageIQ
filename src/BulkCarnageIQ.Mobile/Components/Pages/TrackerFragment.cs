@@ -51,6 +51,29 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             
             txtFoodName.Adapter = adapter;
 
+            CarnageButton btnDate = null;
+
+            btnDate = new CarnageButton(Context)
+                .WithText(DateTime.Today.ToString("MM/dd/yyyy"))
+                .WithStyle(CarnageButtonStyle.Secondary)
+                .WithWidth(35)
+                .OnClick(() =>
+                {
+                    var dpd = new DatePickerDialog(Context, (sender, e) =>
+                    {
+                        btnDate.Text = e.Date.ToString("MM/dd/yyyy");
+
+                        tableMeals.RemoveAllViews();
+
+                        var meals = LoadMealsFromDb("", DateOnly.Parse(btnDate.Text)).Result;
+
+                        foreach (var meal in meals)
+                            AddMeal(meal.Id, meal.MealName, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
+                    }, DateTime.Today.Year, DateTime.Today.Month - 1, DateTime.Today.Day);
+
+                    dpd.Show();
+                });
+
             var btnAddMeal = new CarnageButton(Context)
                 .WithText("Add")
                 .WithStyle(CarnageButtonStyle.Primary)
@@ -65,19 +88,18 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                             return;
                         }
 
-                        AddMealByName(foodName);
+                        AddMealByName(foodName, DateOnly.Parse(btnDate.Text));
                         txtFoodName.Text = string.Empty;
 
                         HideKeyboard(txtFoodName);
                     });
 
-            row.AddView(txtFoodName);
-            row.AddView(btnAddMeal);
-
-            tableAdd.AddView(row);
+            tableAdd.AddView(btnDate);
+            tableAdd.AddView(txtFoodName);
+            tableAdd.AddView(btnAddMeal);
 
             // Load meals from DB/service
-            var meals = LoadMealsFromDb("").Result;
+            var meals = LoadMealsFromDb("", DateOnly.Parse(btnDate.Text)).Result;
 
             foreach (var meal in meals)
                 AddMeal(meal.Id, meal.MealName, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
@@ -154,17 +176,17 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             tableMeals.AddView(container);
         }
 
-        private async Task<List<MealEntry>> LoadMealsFromDb(string userName)
+        private async Task<List<MealEntry>> LoadMealsFromDb(string userName, DateOnly date)
         {
             using var dbContext = CreateDbContext();
             var mealService = new MealEntryService(dbContext);
 
-            var mealEntry = await mealService.GetByDateAsync(DateOnly.FromDateTime(DateTime.Today), userName);
+            var mealEntry = await mealService.GetByDateAsync(date, userName);
 
             return mealEntry;
         }
 
-        private void AddMealByName(string foodName)
+        private void AddMealByName(string foodName, DateOnly date)
         {
             var macros = LookupFoodMacros(foodName);
 
@@ -178,8 +200,8 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             string MealType =
                 (now >= TimeSpan.FromHours(0) && now < TimeSpan.FromHours(6)) ? "Snack" :
-                (now >= TimeSpan.FromHours(6) && now < TimeSpan.FromHours(12)) ? "Breakfast" :
-                (now >= TimeSpan.FromHours(12) && now < TimeSpan.FromHours(15)) ? "Lunch" :
+                (now >= TimeSpan.FromHours(6) && now < TimeSpan.FromHours(11)) ? "Breakfast" :
+                (now >= TimeSpan.FromHours(11) && now < TimeSpan.FromHours(15)) ? "Lunch" :
                 (now >= TimeSpan.FromHours(15) && now < TimeSpan.FromHours(20)) ? "Dinner" :
                 "Snack";
 
@@ -192,8 +214,8 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Carbs = macros.Carbs * macros.Servings,
                 Fats = macros.Fats * macros.Servings,
                 Fiber = macros.Fiber * macros.Servings,
-                Date = DateOnly.FromDateTime(DateTime.Today),
-                Day = DateTime.Today.DayOfWeek.ToString(),
+                Date = date,
+                Day = date.DayOfWeek.ToString(),
                 MealType = MealType,
                 UserId = ""
             };

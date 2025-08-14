@@ -44,6 +44,7 @@ namespace BulkCarnageIQ.Mobile
             var btnHamburger = new CarnageButton(this)
                 .WithText(GetString(Resource.String.app_btn_hamburger_text))
                 .WithStyle(CarnageButtonStyle.Primary)
+                .WithColor(CarnageStyle.CharcoalGray)
                 .OnClick(() => ToggleDrawer());
             hamburgerContainer.AddView(btnHamburger);
 

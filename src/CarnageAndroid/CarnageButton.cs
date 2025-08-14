@@ -38,6 +38,12 @@ namespace CarnageAndroid
             return this;
         }
 
+        public CarnageButton WithColor(Color color)
+        {
+            BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(color);
+            return this;
+        }
+
         public CarnageButton OnClick(Action action)
         {
             Click += (s, e) => action();

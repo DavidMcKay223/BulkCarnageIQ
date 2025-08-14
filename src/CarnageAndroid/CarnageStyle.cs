@@ -29,6 +29,14 @@ namespace CarnageAndroid
         Secondary
     }
 
+    public enum CarnageProgressStyle
+    {
+        Default,
+        Primary,
+        Danger,
+        Secondary
+    }
+
     public static class CarnageStyle
     {
         // Colors
@@ -39,6 +47,7 @@ namespace CarnageAndroid
         public static readonly string TextPrimaryColorHex = "#212121";
         public static readonly string TextSecondaryColorHex = "#757575";
         public static readonly string HintTextColorHex = "#AA000000";
+        public static readonly string CharcoalGrayHex = "#121212";
 
         // Color objects (if you want direct Android.Graphics.Color)
         public static readonly Color PrimaryColor = Color.ParseColor(PrimaryColorHex);
@@ -48,6 +57,7 @@ namespace CarnageAndroid
         public static readonly Color TextPrimaryColor = Color.ParseColor(TextPrimaryColorHex);
         public static readonly Color TextSecondaryColor = Color.ParseColor(TextSecondaryColorHex);
         public static readonly Color HintTextColor = Color.ParseColor(HintTextColorHex);
+        public static readonly Color CharcoalGray = Color.ParseColor(CharcoalGrayHex);
 
         // Font sizes (in SP)
         public const float FontSizeSmall = 12f;

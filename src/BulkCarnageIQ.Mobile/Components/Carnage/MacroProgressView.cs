@@ -49,12 +49,12 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             topRow.SetPadding(0, 0, 0, Context.DpToPx(4));
 
             topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Title).WithText($"{name}"));
-            topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Secondary).WithText($"{current:F1}{format} / {goal:F1}{format}"));
+            topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Secondary).WithText($"{current:N1}{format} / {goal:N1}{format}"));
 
             container.AddView(topRow);
 
             // Progress bar
-            var progressBar = new ProgressBar(Context, null, Android.Resource.Attribute.ProgressBarStyleHorizontal)
+            var progressBar = new CarnageLinearProgress(Context)
             {
                 LayoutParameters = new LayoutParams(LayoutParams.MatchParent, Context.DpToPx(6)),
                 Max = 100
