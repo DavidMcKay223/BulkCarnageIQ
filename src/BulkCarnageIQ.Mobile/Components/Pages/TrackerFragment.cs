@@ -2,6 +2,7 @@
 using Android.Graphics.Text;
 using Android.Views;
 using Android.Views.InputMethods;
+using Android.Widget;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
@@ -68,11 +69,23 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                         var meals = LoadMealsFromDb("", DateOnly.Parse(btnDate.Text)).Result;
 
                         foreach (var meal in meals)
-                            AddMeal(meal.Id, meal.MealName, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
+                            AddMeal(meal.Id, meal.MealName, meal.MeasurementServings, meal.MeasurementType, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
                     }, DateTime.Today.Year, DateTime.Today.Month - 1, DateTime.Today.Day);
 
                     dpd.Show();
                 });
+
+            FoodPickerView foodPickerView = new FoodPickerView(Context); ;
+
+            txtFoodName.ItemClick += (s, e) =>
+            {
+                string selectedFood = txtFoodName.Adapter.GetItem(e.Position).ToString();
+                var macros = LookupFoodMacros(selectedFood);
+                if (macros != null)
+                {
+                    foodPickerView.UpdateFoodSelection(macros);
+                }
+            };
 
             var btnAddMeal = new CarnageButton(Context)
                 .WithText("Add")
@@ -88,24 +101,26 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                             return;
                         }
 
-                        AddMealByName(foodName, DateOnly.Parse(btnDate.Text));
+                        AddMealByName(foodName, DateOnly.Parse(btnDate.Text), foodPickerView.Progress);
                         txtFoodName.Text = string.Empty;
+                        foodPickerView.Progress = 2;
 
                         HideKeyboard(txtFoodName);
                     });
 
             tableAdd.AddView(btnDate);
             tableAdd.AddView(txtFoodName);
+            tableAdd.AddView(foodPickerView);
             tableAdd.AddView(btnAddMeal);
 
             // Load meals from DB/service
             var meals = LoadMealsFromDb("", DateOnly.Parse(btnDate.Text)).Result;
 
             foreach (var meal in meals)
-                AddMeal(meal.Id, meal.MealName, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
+                AddMeal(meal.Id, meal.MealName, meal.MeasurementServings, meal.MeasurementType, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
         }
 
-        private void AddMeal(int Id, string name, float portions, float calories, float protein, float carbs, float fats, float fiber, string mealType)
+        private void AddMeal(int Id, string name, float? measurementServings, string measurementType, float portions, float calories, float protein, float carbs, float fats, float fiber, string mealType)
         {
             var container = new LinearLayout(Context)
             {
@@ -133,7 +148,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             };
 
             servingsCaloriesRow.AddView(new CarnageTextView(Context)
-                .WithText($"Servings: {portions:N1}")
+                .WithText($"Servings: {measurementServings * portions:N1} {measurementType}")
                 .WithStyle(CarnageTextViewStyle.Default));
             servingsCaloriesRow.AddView(new CarnageTextView(Context)
             {
@@ -186,7 +201,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             return mealEntry;
         }
 
-        private void AddMealByName(string foodName, DateOnly date)
+        private void AddMealByName(string foodName, DateOnly date, float servings)
         {
             var macros = LookupFoodMacros(foodName);
 
@@ -208,12 +223,15 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             var mealEntry = new MealEntry
             {
                 MealName = macros.RecipeName,
-                PortionEaten = macros.Servings,
-                Calories = macros.CaloriesPerServing * macros.Servings,
-                Protein = macros.Protein * macros.Servings,
-                Carbs = macros.Carbs * macros.Servings,
-                Fats = macros.Fats * macros.Servings,
-                Fiber = macros.Fiber * macros.Servings,
+                PortionEaten = servings,
+                MeasurementServings = macros.MeasurementServings,
+                MeasurementType = macros.MeasurementType,
+                GroupName = macros.GroupName,
+                Calories = macros.CaloriesPerServing * servings,
+                Protein = macros.Protein * servings,
+                Carbs = macros.Carbs * servings,
+                Fats = macros.Fats * servings,
+                Fiber = macros.Fiber * servings,
                 Date = date,
                 Day = date.DayOfWeek.ToString(),
                 MealType = MealType,
@@ -225,12 +243,14 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             AddMeal(
                 mealEntry.Id,
                 macros.RecipeName,
-                macros.Servings,
-                macros.CaloriesPerServing * macros.Servings,
-                macros.Protein * macros.Servings,
-                macros.Carbs * macros.Servings,
-                macros.Fats * macros.Servings,
-                macros.Fiber * macros.Servings,
+                macros.MeasurementServings,
+                macros.MeasurementType,
+                servings,
+                macros.CaloriesPerServing * servings,
+                macros.Protein * servings,
+                macros.Carbs * servings,
+                macros.Fats * servings,
+                macros.Fiber * servings,
                 MealType
             );
         }
