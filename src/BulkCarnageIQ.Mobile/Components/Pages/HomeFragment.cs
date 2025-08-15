@@ -7,6 +7,9 @@ using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
 using BulkCarnageIQ.Mobile.Components.Carnage;
 using Microsoft.EntityFrameworkCore;
+using CarnageAndroid.UI;
+using BulkCarnageIQ.Core.Contracts;
+using BulkCarnageIQ.Mobile.Utility;
 
 namespace BulkCarnageIQ.Mobile.Components.Pages
 {
@@ -19,6 +22,13 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         private TableLayout tableWeeklyMacros;
 
         private UserProfile currentUserProfile;
+        private MealEntryService mealEntryService;
+
+        public HomeFragment(AppDbContext db, UserProfile userProfile) : base()
+        {
+            currentUserProfile = userProfile;
+            mealEntryService = new MealEntryService(db);
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -35,8 +45,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             tableDailyMacros = view.FindViewById<TableLayout>(Resource.Id.tableDailyMacros);
             tableWeeklyMacros = view.FindViewById<TableLayout>(Resource.Id.tableWeeklyMacros);
 
-            currentUserProfile = GetUserProfile();
-
             LoadData();
         }
 
@@ -46,7 +54,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             var start = DateOnly.FromDateTime(DateTime.Today).AddDays(-6);
             var end = DateOnly.FromDateTime(DateTime.Today);
 
-            var weeklySummaries = LookupFoodMacros(start, end);
+            var weeklySummaries = mealEntryService.GetMacroSummariesByDateRangeAsync(start, end, currentUserProfile.UserName).Result;
 
             // Today's macros
             weeklySummaries.TryGetValue(todayDayName, out var todaySummary);
@@ -95,44 +103,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 .Add("Carbs", summary.Carbs, currentUserProfile.CarbsGoal * weight)
                 .Add("Fats", summary.Fats, currentUserProfile.FatGoal * weight)
                 .Add("Fiber", summary.Fiber, currentUserProfile.FiberGoal * weight));
-        }
-
-        private UserProfile GetUserProfile()
-        {
-            using var dbContext = CreateDbContext();
-            var userService = new UserProfileService(dbContext);
-
-            return userService.GetUserProfile("").Result;
-        }
-
-        private List<MealEntry> GetMealsForDate(DateOnly date)
-        {
-            using var dbContext = CreateDbContext();
-            var mealService = new MealEntryService(dbContext);
-
-            return mealService.GetByDateAsync(date, "").Result;
-        }
-
-        private Dictionary<string, MacroSummary> LookupFoodMacros(DateOnly start, DateOnly end)
-        {
-            using var dbContext = CreateDbContext();
-            var mealService = new MealEntryService(dbContext);
-
-            return mealService.GetMacroSummariesByDateRangeAsync(start, end, "").Result;
-        }
-
-        private AppDbContext CreateDbContext()
-        {
-            var dbPath = System.IO.Path.Combine(
-                System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
-                "bulk_carnage.db"
-            );
-
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite($"Data Source={dbPath}")
-                .Options;
-
-            return new AppDbContext(options);
         }
     }
 }

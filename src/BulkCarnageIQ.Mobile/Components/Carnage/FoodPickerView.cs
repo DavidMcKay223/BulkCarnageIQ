@@ -65,8 +65,9 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             if (_currentFood != null)
             {
                 ServingsSeekBar.Progress = (int)(_currentFood.Servings / StepSize);
-                UpdateCalories();
             }
+
+            UpdateCalories();
         }
 
         public float Progress {             

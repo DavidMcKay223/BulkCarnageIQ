@@ -4,8 +4,10 @@ using Android.Content;
 using Android.OS;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
+using BulkCarnageIQ.Infrastructure.Repositories;
 using BulkCarnageIQ.Mobile.Components.Pages;
 using CarnageAndroid;
+using CarnageAndroid.UI;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -20,6 +22,9 @@ namespace BulkCarnageIQ.Mobile
         LinearLayout titleContainer;
         LinearLayout hamburgerContainer;
 
+        UserProfile userProfile;
+        AppDbContext dbContext;
+
         bool isDrawerOpen = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -30,32 +35,30 @@ namespace BulkCarnageIQ.Mobile
             fragmentContainer = FindViewById<FrameLayout>(Resource.Id.fragment_container);
             drawerPanel = FindViewById<LinearLayout>(Resource.Id.drawer_panel);
 
-            // These containers must exist in your XML (as in your last posted layout)
             titleContainer = FindViewById<LinearLayout>(Resource.Id.title_container);
             hamburgerContainer = FindViewById<LinearLayout>(Resource.Id.hamburger_container);
 
             // Inject CarnageTextView title dynamically
-            var txtAppTitle = new CarnageTextView(this)
-                .WithText(GetString(Resource.String.app_name))
-                .AsTitle();
-            titleContainer.AddView(txtAppTitle);
+            titleContainer.AddView(this.CarnageTextView(text: GetString(Resource.String.app_name)).AsTitle());
 
             // Inject Hamburger button dynamically
-            var btnHamburger = new CarnageButton(this)
-                .WithText(GetString(Resource.String.app_btn_hamburger_text))
-                .WithStyle(CarnageButtonStyle.Primary)
-                .WithColor(CarnageStyle.CharcoalGray)
-                .OnClick(() => ToggleDrawer());
-            hamburgerContainer.AddView(btnHamburger);
+            hamburgerContainer.AddView(
+                this.CarnageButton(CarnageButtonStyle.Primary, 
+                    GetString(Resource.String.app_btn_hamburger_text),
+                    () => ToggleDrawer())
+                .WithColor(CarnageStyle.CharcoalGray));
 
             // Build drawer buttons dynamically
             BuildDrawerMenu();
 
             InitializeApp();
 
+            userProfile = GetUserProfile();
+            dbContext = CreateDbContext();
+
             if (savedInstanceState == null)
             {
-                LoadFragment(new HomeFragment());
+                LoadFragment(new HomeFragment(dbContext, userProfile));
             }
         }
 
@@ -65,19 +68,14 @@ namespace BulkCarnageIQ.Mobile
 
             var menuItems = new[]
             {
-                new { Text = "Home", Click = new Action(() => { LoadFragment(new HomeFragment()); ToggleDrawer(); }) },
-                new { Text = "Food Tracker", Click = new Action(() => { LoadFragment(new TrackerFragment()); ToggleDrawer(); }) },
+                new { Text = "Home", Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Food Tracker", Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
                 // Add more menu items here dynamically as needed
             };
 
             foreach (var item in menuItems)
             {
-                var btn = new CarnageButton(this)
-                    .WithText(item.Text)
-                    .WithStyle(CarnageButtonStyle.Primary)
-                    .OnClick(item.Click);
-
-                drawerPanel.AddView(btn);
+                drawerPanel.AddView(this.CarnageButton(CarnageButtonStyle.Primary, item.Text, item.Click));
             }
         }
 
@@ -112,6 +110,28 @@ namespace BulkCarnageIQ.Mobile
             }
         }
 
+        private AppDbContext CreateDbContext()
+        {
+            var dbPath = System.IO.Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
+                "bulk_carnage.db"
+            );
+
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlite($"Data Source={dbPath}")
+                .Options;
+
+            return new AppDbContext(options);
+        }
+
+        private UserProfile GetUserProfile()
+        {
+            using var dbContext = CreateDbContext();
+            var userService = new UserProfileService(dbContext);
+
+            return userService.GetUserProfile("").Result;
+        }
+
         private void InitializeApp()
         {
             var dbPath = Path.Combine(
@@ -132,7 +152,7 @@ namespace BulkCarnageIQ.Mobile
             //dbContext.Database.Migrate();
 
             // Optional: Seed initial data
-            if (!dbContext.FoodItems.Any())
+            if (true)
             {
                 string jsonText;
 
@@ -144,12 +164,42 @@ namespace BulkCarnageIQ.Mobile
 
                 var seedItems = JsonSerializer.Deserialize<SeedData>(jsonText);
 
-                dbContext.FoodItems.AddRange(seedItems.FoodItems);
-                dbContext.SaveChanges();
-            }
+                if (dbContext.FoodItems.Count() < seedItems.FoodItems.Count())
+                {
+                    foreach (var item in seedItems.FoodItems)
+                    {
+                        var existing = dbContext.FoodItems
+                            .FirstOrDefault(f => f.RecipeName == item.RecipeName);
 
-            // Optional: call API to sync fresh data
-            // SyncDataFromServer(dbContext);
+                        if (existing != null)
+                        {
+                            // Update existing item
+                            existing.Servings = item.Servings;
+                            existing.CaloriesPerServing = item.CaloriesPerServing;
+                            existing.MeasurementServings = item.MeasurementServings;
+                            existing.MeasurementType = item.MeasurementType;
+                            existing.Protein = item.Protein;
+                            existing.Carbs = item.Carbs;
+                            existing.Fats = item.Fats;
+                            existing.Fiber = item.Fiber;
+                            existing.GroupName = item.GroupName;
+                            existing.IsBreakfast = item.IsBreakfast;
+                            existing.IsLunch = item.IsLunch;
+                            existing.IsDinner = item.IsDinner;
+                            existing.IsSnack = item.IsSnack;
+                            existing.Link = item.Link;
+                            existing.PictureLink = item.PictureLink;
+                        }
+                        else
+                        {
+                            // Insert new item
+                            dbContext.FoodItems.Add(item);
+                        }
+                    }
+
+                    dbContext.SaveChanges();
+                }
+            }
         }
     }
 

@@ -24,6 +24,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
         {
             return await _db.FoodItems
                 .Where(f => f.RecipeName.Equals(foodName))
+                .OrderBy(f => f.RecipeName)
                 .FirstOrDefaultAsync();
         }
 

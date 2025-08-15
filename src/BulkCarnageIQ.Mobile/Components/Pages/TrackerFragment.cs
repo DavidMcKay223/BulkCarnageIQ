@@ -21,6 +21,17 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         private TableLayout tableMeals;
         private TableLayout tableAdd;
 
+        private UserProfile currentUserProfile;
+        private MealEntryService mealEntryService;
+        private FoodItemService foodItemService;
+
+        public TrackerFragment(AppDbContext db, UserProfile userProfile) : base()
+        {
+            currentUserProfile = userProfile;
+            mealEntryService = new MealEntryService(db);
+            foodItemService = new FoodItemService(db);
+        }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             // Inflate the fragment layout
@@ -66,7 +77,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
                         tableMeals.RemoveAllViews();
 
-                        var meals = LoadMealsFromDb("", DateOnly.Parse(btnDate.Text)).Result;
+                        var meals = LoadMealsFromDb(currentUserProfile.UserName, DateOnly.Parse(btnDate.Text)).Result;
 
                         foreach (var meal in meals)
                             AddMeal(meal.Id, meal.MealName, meal.MeasurementServings, meal.MeasurementType, meal.PortionEaten, meal.Calories, meal.Protein, meal.Carbs, meal.Fats, meal.Fiber, meal.MealType);
@@ -81,10 +92,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             {
                 string selectedFood = txtFoodName.Adapter.GetItem(e.Position).ToString();
                 var macros = LookupFoodMacros(selectedFood);
-                if (macros != null)
-                {
-                    foodPickerView.UpdateFoodSelection(macros);
-                }
+                foodPickerView.UpdateFoodSelection(macros);
             };
 
             var btnAddMeal = new CarnageButton(Context)
@@ -103,6 +111,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
                         AddMealByName(foodName, DateOnly.Parse(btnDate.Text), foodPickerView.Progress);
                         txtFoodName.Text = string.Empty;
+                        foodPickerView.UpdateFoodSelection(null);
                         foodPickerView.Progress = 2;
 
                         HideKeyboard(txtFoodName);
@@ -193,12 +202,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
         private async Task<List<MealEntry>> LoadMealsFromDb(string userName, DateOnly date)
         {
-            using var dbContext = CreateDbContext();
-            var mealService = new MealEntryService(dbContext);
-
-            var mealEntry = await mealService.GetByDateAsync(date, userName);
-
-            return mealEntry;
+            return await mealEntryService.GetByDateAsync(date, userName);
         }
 
         private void AddMealByName(string foodName, DateOnly date, float servings)
@@ -257,48 +261,22 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
         private List<string> GetFoodItemList()
         {
-            using var dbContext = CreateDbContext();
-            var foodService = new FoodItemService(dbContext);
-
-            return foodService.GetAllAsync().Result.Select(x => x.RecipeName).ToList();
+            return foodItemService.GetAllAsync().Result.Select(x => x.RecipeName).ToList();
         }
 
         private FoodItem? LookupFoodMacros(string foodName)
         {
-            using var dbContext = CreateDbContext();
-            var mealService = new MealEntryService(dbContext);
-
-            return mealService.GetFoodItemByNameAsync(foodName).Result;
+            return mealEntryService.GetFoodItemByNameAsync(foodName).Result;
         }
 
         private void SaveMealEntry(MealEntry mealEntry)
         {
-            using var dbContext = CreateDbContext();
-            var mealService = new MealEntryService(dbContext);
-
-            mealService.AddAsync(mealEntry).Wait();
+            mealEntryService.AddAsync(mealEntry).Wait();
         }
 
         private void DeleteMealEntry(int Id)
         {
-            using var dbContext = CreateDbContext();
-            var mealService = new MealEntryService(dbContext);
-
-            mealService.DeleteAsync(Id).Wait();
-        }
-
-        private AppDbContext CreateDbContext()
-        {
-            var dbPath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "bulk_carnage.db"
-            );
-
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite($"Data Source={dbPath}")
-                .Options;
-
-            return new AppDbContext(options);
+            mealEntryService.DeleteAsync(Id).Wait();
         }
 
         void HideKeyboard(AutoCompleteTextView control)
