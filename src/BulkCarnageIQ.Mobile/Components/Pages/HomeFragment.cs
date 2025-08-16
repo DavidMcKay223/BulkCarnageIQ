@@ -9,7 +9,6 @@ using BulkCarnageIQ.Mobile.Components.Carnage;
 using Microsoft.EntityFrameworkCore;
 using CarnageAndroid.UI;
 using BulkCarnageIQ.Core.Contracts;
-using BulkCarnageIQ.Mobile.Utility;
 
 namespace BulkCarnageIQ.Mobile.Components.Pages
 {
