@@ -30,6 +30,7 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
         public async Task<List<FoodItem>> GetAllAsync()
         {
             return await _db.FoodItems
+                .OrderBy(f => f.RecipeName)
                 .ToListAsync();
         }
 

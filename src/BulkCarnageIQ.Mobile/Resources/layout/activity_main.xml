@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+	<!-- Top app bar -->
+	<RelativeLayout
+        android:id="@+id/top_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/charcoalGray"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical">
+
+		<LinearLayout
+            android:id="@+id/title_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+			android:orientation="horizontal"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+		
+		<LinearLayout
+            android:id="@+id/hamburger_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+			android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+
+	</RelativeLayout>
+	
+	<FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_below="@id/top_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+	<LinearLayout
+        android:id="@+id/drawer_panel"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+		android:layout_marginTop="56dp"
+        android:orientation="vertical"
+        android:translationX="-240dp"
+        android:elevation="8dp" />
+
+</RelativeLayout>

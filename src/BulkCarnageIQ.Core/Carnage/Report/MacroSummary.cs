@@ -8,6 +8,7 @@ namespace BulkCarnageIQ.Core.Carnage.Report
 {
     public class MacroSummary
     {
+        public float Calories { get; set; }
         public float Protein { get; set; }
         public float Carbs { get; set; }
         public float Fats { get; set; }

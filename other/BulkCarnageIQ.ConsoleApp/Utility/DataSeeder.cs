@@ -1,9 +1,11 @@
 ﻿using BulkCarnageIQ.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -69,7 +71,11 @@ namespace BulkCarnageIQ.ConsoleApp.Utility
 
         private void SaveSeedDataToJson(string filePath, SeedData seedData)
         {
-            string json = JsonConvert.SerializeObject(seedData, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(seedData, Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new InlineResolver()
+                });
             File.WriteAllText(filePath, json);
         }
 
@@ -84,5 +90,12 @@ namespace BulkCarnageIQ.ConsoleApp.Utility
 
             return seedData;
         }
+    }
+
+    class InlineResolver : DefaultContractResolver
+    {
+        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization) =>
+            base.CreateProperties(type, memberSerialization)
+                .Where(p => p.Writable).ToList();
     }
 }
