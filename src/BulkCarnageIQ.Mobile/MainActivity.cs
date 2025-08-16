@@ -39,7 +39,7 @@ namespace BulkCarnageIQ.Mobile
             hamburgerContainer = FindViewById<LinearLayout>(Resource.Id.hamburger_container);
 
             // Inject CarnageTextView title dynamically
-            titleContainer.AddView(this.CarnageTextView(text: GetString(Resource.String.app_name)).AsTitle());
+            titleContainer.AddView(this.CarnageTextView(CarnageTextViewStyle.Title, GetString(Resource.String.app_name)));
 
             // Inject Hamburger button dynamically
             hamburgerContainer.AddView(

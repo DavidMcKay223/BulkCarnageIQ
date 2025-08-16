@@ -59,7 +59,10 @@ namespace CarnageAndroid
 
         public CarnageButton AsPill()
         {
-            Post(() => CornerRadius = Height / 2);
+            ViewTreeObserver.GlobalLayout += (sender, e) =>
+            {
+                CornerRadius = Height / 2;
+            };
             return this;
         }
 

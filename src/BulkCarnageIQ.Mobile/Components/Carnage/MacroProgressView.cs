@@ -4,6 +4,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using CarnageAndroid;
+using CarnageAndroid.UI;
 
 namespace BulkCarnageIQ.Mobile.Components.Carnage
 {
@@ -48,17 +49,13 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             };
             topRow.SetPadding(0, 0, 0, Context.DpToPx(4));
 
-            topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Title).WithText($"{name}"));
-            topRow.AddView(new CarnageTextView(Context).WithStyle(CarnageTextViewStyle.Secondary).WithText($"{current:N1}{format} / {goal:N1}{format}"));
+            topRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Title, name));
+            topRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, $"{current:N1}{format} / {goal:N1}{format}"));
 
             container.AddView(topRow);
 
             // Progress bar
-            var progressBar = new CarnageLinearProgress(Context)
-            {
-                LayoutParameters = new LayoutParams(LayoutParams.MatchParent, Context.DpToPx(6)),
-                Max = 100
-            };
+            var progressBar = Context.CarnageLinearProgress(CarnageProgressStyle.Primary);
 
             float ratio = current / goal;
             int progressPercent = (int)(ratio * 100);
@@ -74,7 +71,7 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             var statusText = new TextView(Context)
             {
                 LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent),
-                Text = GetStatusText(ratio, current, goal),
+                Text = GetStatusText(ratio, current, goal, format),
                 TextSize = 12f
             };
             statusText.SetTextColor(color);
@@ -94,10 +91,10 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             return new Color(Color.ParseColor("#388E3C"));     // Green
         }
 
-        private string GetStatusText(float ratio, float current, float goal)
+        private string GetStatusText(float ratio, float current, float goal, string format = "g")
         {
             if (ratio > 1.0f)
-                return $"Over Limit by {(current - goal):F1}g";
+                return $"Over Limit by {(current - goal):F1}{format}";
             if (ratio >= 0.85f)
                 return "Getting Close";
             return "On Track";

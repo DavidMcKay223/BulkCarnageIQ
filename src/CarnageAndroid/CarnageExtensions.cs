@@ -177,4 +177,12 @@ namespace CarnageAndroid
             return view;
         }
     }
+
+    public static class CarnageColorExtensions
+    {
+        public static Color SetAlpha(this Color color, int alpha)
+        {
+            return new Color(color.R, color.G, color.B, alpha);
+        }
+    }
 }

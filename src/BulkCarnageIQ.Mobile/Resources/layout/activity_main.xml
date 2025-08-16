@@ -41,6 +41,7 @@
         android:id="@+id/drawer_panel"
         android:layout_width="240dp"
         android:layout_height="match_parent"
+		android:layout_marginTop="56dp"
         android:orientation="vertical"
         android:translationX="-240dp"
         android:elevation="8dp" />

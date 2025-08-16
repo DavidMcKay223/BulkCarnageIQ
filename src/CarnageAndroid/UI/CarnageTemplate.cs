@@ -35,5 +35,17 @@ namespace CarnageAndroid.UI
                 .WithStyle(style)
                 .WithText(text);
         }
+
+        public static CarnageLinearProgress CarnageLinearProgress(this Context context, CarnageProgressStyle style = CarnageProgressStyle.Default)
+        {
+            return new CarnageLinearProgress(context)
+                .WithStyle(style);
+        }
+
+        public static CarnageCircularProgress CarnageCircularProgress(this Context context, CarnageProgressStyle style = CarnageProgressStyle.Default)
+        {
+            return new CarnageCircularProgress(context)
+                .WithStyle(style);
+        }
     }
 }

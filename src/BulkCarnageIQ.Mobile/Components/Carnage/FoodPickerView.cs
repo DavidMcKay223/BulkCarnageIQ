@@ -4,6 +4,7 @@ using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
 using CarnageAndroid;
+using CarnageAndroid.UI;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -44,14 +45,12 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             };
             servingContainer.AddView(ServingsSeekBar);
 
-            ServingsPreview = new CarnageTextView(context)
-                .WithText("Servings: 0")
-                .WithStyle(CarnageTextViewStyle.Secondary);
+            ServingsPreview = context.CarnageTextView(CarnageTextViewStyle.Secondary, "Servings: 0");
+            
             servingContainer.AddView(ServingsPreview);
 
-            CaloriesPreview = new CarnageTextView(context)
-                .WithText("Calories: 0")
-                .WithStyle(CarnageTextViewStyle.Secondary);
+            CaloriesPreview = context.CarnageTextView(CarnageTextViewStyle.Secondary, "Calories: 0");
+
             servingContainer.AddView(CaloriesPreview);
 
             AddView(servingContainer);

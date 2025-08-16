@@ -9,6 +9,7 @@ using BulkCarnageIQ.Mobile.Components.Carnage;
 using Microsoft.EntityFrameworkCore;
 using CarnageAndroid.UI;
 using BulkCarnageIQ.Core.Contracts;
+using CarnageAndroid;
 
 namespace BulkCarnageIQ.Mobile.Components.Pages
 {
@@ -88,13 +89,8 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         {
             table.RemoveAllViews();
 
-            table.AddView(new CarnageAndroid.CarnageTextView(Context)
-                .WithStyle(CarnageAndroid.CarnageTextViewStyle.Title)
-                .WithText(Title));
-
-            table.AddView(new CarnageAndroid.CarnageTextView(Context)
-                .WithStyle(CarnageAndroid.CarnageTextViewStyle.Secondary)
-                .WithText(DateStr));
+            table.AddView(Context.CarnageTextView(CarnageTextViewStyle.Title, Title));
+            table.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, DateStr));
 
             table.AddView(new BulkCarnageIQ.Mobile.Components.Carnage.MacroProgressView(Context)
                 .Add("Calories", summary.Calories, currentUserProfile.CalorieGoal * weight, "")

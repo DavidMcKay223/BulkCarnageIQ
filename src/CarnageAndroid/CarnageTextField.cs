@@ -19,7 +19,6 @@ namespace CarnageAndroid
         private void Init()
         {
             WithStyle(CarnageTextFieldStyle.Default);
-            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.PrimaryColor);
         }
 
         public CarnageTextField WithHint(string hint)
@@ -56,6 +55,9 @@ namespace CarnageAndroid
                     SetTextColor(CarnageStyle.TextPrimaryColor);
                     break;
             }
+
+            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.PrimaryColor);
+
             return this;
         }
     }

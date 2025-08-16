@@ -53,7 +53,8 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             var txtFoodName = new AutoCompleteTextView(Context)
             {
-                LayoutParameters = new TableRow.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new TableRow.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                Hint = "Search for food",
             };
 
             var adapter = new ArrayAdapter<string>(
@@ -134,14 +135,13 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             container.SetPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
 
             // Food Name (title)
-            var nameView = new CarnageTextView(Context)
-                .WithText(name)
-                .AsTitle();
+            var nameView = Context.CarnageTextView(CarnageTextViewStyle.Title, name);
+
             container.AddView(nameView);
 
             // Meal Type
-            var mealTypeView = new CarnageTextView(Context)
-                .WithText(mealType);
+            var mealTypeView = Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: mealType);
+
             container.AddView(mealTypeView);
 
             // Servings + Calories row (horizontal)
@@ -151,16 +151,9 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             };
 
-            servingsCaloriesRow.AddView(new CarnageTextView(Context)
-                .WithText($"Servings: {measurementServings * portions:N1} {measurementType}")
-                .WithStyle(CarnageTextViewStyle.Default));
-            servingsCaloriesRow.AddView(new CarnageTextView(Context)
-            {
-                Text = "  |  "  // separator with spaces
-            });
-            servingsCaloriesRow.AddView(new CarnageTextView(Context)
-                .WithText($"Calories: {calories:N0}")
-                .WithStyle(CarnageTextViewStyle.Default));
+            servingsCaloriesRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: $"Servings: {measurementServings * portions:N1} {measurementType}"));
+            servingsCaloriesRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: "  |  "));
+            servingsCaloriesRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: $"Calories: {calories:N0}"));
 
             container.AddView(servingsCaloriesRow);
 

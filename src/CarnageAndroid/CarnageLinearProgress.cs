@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.Graphics;
 using Android.Util;
 using Google.Android.Material.ProgressIndicator;
 using System;
@@ -20,25 +21,42 @@ namespace CarnageAndroid
         public CarnageLinearProgress(Context context, IAttributeSet attrs, int defStyleAttr)
             : base(context, attrs, defStyleAttr) => Init();
 
-        private void Init() => WithStyle(CarnageProgressStyle.Default);
+        private void Init()
+        {
+            TrackCornerRadius = Context.DpToPx(CarnageStyle.CornerRadius);
+            TrackThickness = Context.DpToPx(8);
+
+            WithStyle(CarnageProgressStyle.Default);
+        }
 
         public CarnageLinearProgress WithStyle(CarnageProgressStyle style)
         {
+            Color indicatorColor;
+            Color trackColor;
+
             switch (style)
             {
                 case CarnageProgressStyle.Primary:
-                    SetIndicatorColor(CarnageStyle.PrimaryColor);
+                    indicatorColor = CarnageStyle.PrimaryColor;
+                    trackColor = CarnageStyle.PrimaryColor.SetAlpha(60);
                     break;
                 case CarnageProgressStyle.Danger:
-                    SetIndicatorColor(CarnageStyle.DangerColor);
+                    indicatorColor = CarnageStyle.DangerColor;
+                    trackColor = CarnageStyle.DangerColor.SetAlpha(60);
                     break;
                 case CarnageProgressStyle.Secondary:
-                    SetIndicatorColor(CarnageStyle.SecondaryColor);
+                    indicatorColor = CarnageStyle.SecondaryColor;
+                    trackColor = CarnageStyle.SecondaryColor.SetAlpha(60);
                     break;
                 default:
-                    SetIndicatorColor(CarnageStyle.PrimaryColor);
+                    indicatorColor = CarnageStyle.PrimaryColor;
+                    trackColor = CarnageStyle.PrimaryColor.SetAlpha(60);
                     break;
             }
+
+            SetIndicatorColor(indicatorColor);
+            TrackColor = trackColor;
+
             return this;
         }
 
@@ -57,6 +75,24 @@ namespace CarnageAndroid
         public CarnageLinearProgress WithProgressRatio(float ratio)
         {
             Progress = (int)(ratio * Max);
+            return this;
+        }
+
+        public CarnageLinearProgress WithThickness(int dp)
+        {
+            TrackThickness = Context.DpToPx(dp);
+            return this;
+        }
+
+        public CarnageLinearProgress WithCorners(float dp)
+        {
+            TrackCornerRadius = Context.DpToPx(dp);
+            return this;
+        }
+
+        public CarnageLinearProgress WithTrackColor(Color color)
+        {
+            TrackColor = color;
             return this;
         }
     }
