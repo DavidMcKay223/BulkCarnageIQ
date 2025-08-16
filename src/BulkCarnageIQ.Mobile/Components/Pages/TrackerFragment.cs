@@ -8,6 +8,7 @@ using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
 using BulkCarnageIQ.Mobile.Components.Carnage;
 using CarnageAndroid;
+using CarnageAndroid.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -65,10 +66,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             CarnageButton btnDate = null;
 
-            btnDate = new CarnageButton(Context)
-                .WithText(DateTime.Today.ToString("MM/dd/yyyy"))
-                .WithStyle(CarnageButtonStyle.Secondary)
-                .WithWidth(35)
+            btnDate = Context.CarnageButton(CarnageButtonStyle.Secondary, DateTime.Today.ToString("MM/dd/yyyy"))
                 .OnClick(() =>
                 {
                     var dpd = new DatePickerDialog(Context, (sender, e) =>
@@ -95,10 +93,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 foodPickerView.UpdateFoodSelection(macros);
             };
 
-            var btnAddMeal = new CarnageButton(Context)
-                .WithText("Add")
-                .WithStyle(CarnageButtonStyle.Primary)
-                .WithWidth(25)
+            var btnAddMeal = Context.CarnageButton(CarnageButtonStyle.Primary, "Add")
                 .OnClick(() =>
                     {
                         string foodName = txtFoodName.Text.Trim();
@@ -184,9 +179,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             container.AddView(donut);
 
             // Delete button full width below
-            var deleteBtn = new CarnageButton(Context)
-                .WithText("Delete")
-                .WithStyle(CarnageButtonStyle.Danger)
+            var deleteBtn = Context.CarnageButton(CarnageButtonStyle.Danger, "Delete")
                 .OnClick(() =>
                 {
                     tableMeals.RemoveView(container);

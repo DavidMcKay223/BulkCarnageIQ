@@ -1,5 +1,7 @@
 using Android.Content;
+using Android.Content.Res;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.Util;
 using Google.Android.Material.Button;
 using System;
@@ -19,11 +21,16 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            WithStyle(CarnageButtonStyle.Default);
+            // Set base style properties
             SetAllCaps(false);
             StrokeWidth = 0;
             CornerRadius = Context.DpToPx(CarnageStyle.CornerRadius);
             Elevation = CarnageStyle.Elevation;
+            LetterSpacing = 0.05f;
+            Typeface = Typeface.Create("sans-serif-medium", TypefaceStyle.Normal);
+
+            // Apply a default modern look
+            WithStyle(CarnageButtonStyle.Default);
         }
 
         public CarnageButton WithText(string text)
@@ -50,6 +57,12 @@ namespace CarnageAndroid
             return this;
         }
 
+        public CarnageButton AsPill()
+        {
+            Post(() => CornerRadius = Height / 2);
+            return this;
+        }
+
         public CarnageButton WithStyle(CarnageButtonStyle style)
         {
             Color backgroundColor;
@@ -62,6 +75,7 @@ namespace CarnageAndroid
                     backgroundColor = CarnageStyle.PrimaryColor;
                     textColor = CarnageStyle.BackgroundColor;
                     paddingDp = CarnageStyle.PaddingMedium;
+                    WithLiquidEffect(CarnageStyle.PrimaryColor, CarnageStyle.PrimaryColorDark);
                     break;
                 case CarnageButtonStyle.Danger:
                     backgroundColor = CarnageStyle.DangerColor;
@@ -80,12 +94,37 @@ namespace CarnageAndroid
                     break;
             }
 
-            BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(backgroundColor);
-            
+            BackgroundTintList = ColorStateList.ValueOf(backgroundColor);
+
             this
                 .WithTextColor(textColor)
                 .WithTextSize(ComplexUnitType.Sp, CarnageStyle.FontSizeMedium)
                 .WithPaddingDp(paddingDp);
+
+            return this;
+        }
+
+        public CarnageButton WithLiquidEffect(Color startColor, Color pressedColor)
+        {
+            var stateList = new int[][]
+            {
+                new int[] { Android.Resource.Attribute.StatePressed },
+                new int[] { }
+            };
+
+            var colorStateList = new ColorStateList(
+                stateList,
+                new int[]
+                {
+                    pressedColor,
+                    startColor
+                }
+            );
+
+            BackgroundTintList = colorStateList;
+
+            SetStrokeColorResource(Resource.Color.mtrl_btn_transparent_bg_color); // or a very subtle dark color
+            SetRippleColorResource(Resource.Color.m3_ref_palette_white); // a clean, subtle ripple
 
             return this;
         }

@@ -13,7 +13,8 @@ namespace CarnageAndroid.UI
         {
             var btn = new CarnageButton(context)
                           .WithStyle(style)
-                          .WithText(text);
+                          .WithText(text)
+                          .AsPill();
 
             if (onClick != null)
                 btn.OnClick(onClick);
