@@ -5,6 +5,7 @@ using Android.Views;
 using Android.Widget;
 using CarnageAndroid;
 using CarnageAndroid.UI;
+using Google.Android.Material.Card;
 
 namespace BulkCarnageIQ.Mobile.Components.Carnage
 {
@@ -35,48 +36,82 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
 
         private View CreateSingleMacroView(string name, float current, float goal, string format = " g")
         {
-            var container = new LinearLayout(Context)
+            // Create a vertical LinearLayout to hold the inner content (grid, progress bar, status text).
+            // This ensures they are stacked correctly.
+            var verticalLayout = new LinearLayout(Context)
             {
                 Orientation = Orientation.Vertical,
-                LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent)
+                LayoutParameters = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MatchParent,
+                    LinearLayout.LayoutParams.WrapContent
+                )
             };
+            // Add padding to the vertical layout for a clean appearance.
+            verticalLayout.SetPadding(Context.DpToPx(16), Context.DpToPx(12), Context.DpToPx(16), Context.DpToPx(12));
 
-            // Top row: name + amounts
-            var topRow = new LinearLayout(Context)
+            // Grid inside the vertical layout for the first row of text.
+            var grid = new GridLayout(Context)
             {
-                Orientation = Orientation.Vertical,
-                LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent)
+                ColumnCount = 2,
+                LayoutParameters = new GridLayout.LayoutParams(
+                    new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MatchParent,
+                        ViewGroup.LayoutParams.WrapContent
+                    )
+                )
             };
-            topRow.SetPadding(0, 0, 0, Context.DpToPx(4));
 
-            topRow.AddView(Context.CarnageTextView(name).AsTitle());
-            topRow.AddView(Context.CarnageTextView($"{current:N1}{format} / {goal:N1}{format}"));
+            // Left text (takes the first column and expands using weight)
+            var leftText = Context.CarnageTextView(name).AsTitle();
+            var leftParams = new GridLayout.LayoutParams(
+                GridLayout.InvokeSpec(0, GridLayout.Fill),
+                GridLayout.InvokeSpec(0, GridLayout.Center)
+            )
+            {
+                // Setting width to 0 and weight to 1f makes it span the available space.
+                Width = 0,
+                Height = ViewGroup.LayoutParams.WrapContent,
+                ColumnSpec = GridLayout.InvokeSpec(0, 1, 1f)
+            };
+            leftText.LayoutParameters = leftParams;
 
-            container.AddView(topRow);
+            // Right text (second column, wraps normally)
+            var rightText = Context.CarnageTextView($"{current:N1}{format} / {goal:N1}{format}");
+            var rightParams = new GridLayout.LayoutParams(
+                GridLayout.InvokeSpec(0, GridLayout.Center),
+                GridLayout.InvokeSpec(1, GridLayout.Center)
+            )
+            {
+                Width = ViewGroup.LayoutParams.WrapContent,
+                Height = ViewGroup.LayoutParams.WrapContent
+            };
+            rightText.LayoutParameters = rightParams;
+
+            // Add both text views to the grid.
+            grid.AddView(leftText);
+            grid.AddView(rightText);
+
+            // Add the grid to our vertical layout.
+            verticalLayout.AddView(grid);
 
             // Progress bar
             var progressBar = Context.CarnageLinearProgress();
-
             float ratio = current / goal;
             int progressPercent = (int)(ratio * 100);
             progressPercent = progressPercent > 100 ? 100 : progressPercent;
             progressBar.Progress = progressPercent;
 
-            container.AddView(progressBar);
+            // Add the progress bar to the vertical layout.
+            verticalLayout.AddView(progressBar);
 
             // Status text
-            var statusText = new TextView(Context)
-            {
-                LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent),
-                Text = GetStatusText(ratio, current, goal, format),
-                TextSize = 12f
-            };
-            statusText.SetTextColor(CarnageStyle.White);
-            statusText.SetPadding(0, Context.DpToPx(4), 0, 0);
+            var statusText = Context.CarnageTextView(GetStatusText(ratio, current, goal, format))
+                .WithColor(CarnageStyle.White);
 
-            container.AddView(statusText);
+            // Add the status text to the vertical layout.
+            verticalLayout.AddView(statusText);
 
-            return container;
+            return verticalLayout;
         }
 
         private string GetStatusText(float ratio, float current, float goal, string format = "g")

@@ -45,7 +45,7 @@ namespace BulkCarnageIQ.Mobile
             hamburgerContainer.AddView(
                 this.CarnageButton(GetString(Resource.String.app_btn_hamburger_text),
                     () => ToggleDrawer())
-                .WithColor(CarnageStyle.DarkestBrown)
+                .WithColor(CarnageStyle.Charcoal)
                 .WithTextColor(CarnageStyle.PaleRose));
 
             // Build drawer buttons dynamically
@@ -68,14 +68,14 @@ namespace BulkCarnageIQ.Mobile
 
             var menuItems = new[]
             {
-                new { Text = "Home", Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
-                new { Text = "Food Tracker", Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Home", CarnageIcon = CarnageIcon.Home, Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Food Tracker", CarnageIcon = CarnageIcon.Home, Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
                 // Add more menu items here dynamically as needed
             };
 
             foreach (var item in menuItems)
             {
-                drawerPanel.AddView(this.CarnageButton(item.Text, item.Click));
+                drawerPanel.AddView(this.CarnageButtonIcon(item.CarnageIcon, item.Text, item.Click));
             }
         }
 

@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
-	<style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-		<item name="android:windowBackground">#331A1A</item>
+	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+		<item name="android:windowBackground">@color/darkestBrown</item>
+		<item name="colorPrimary">@color/primaryRed</item>
+		<item name="colorOnPrimary">@color/white</item>
+		<item name="colorSecondary">@color/paleRose</item>
+		<item name="colorOnSecondary">@color/white</item>
+		<item name="colorSurface">@color/deepBrown</item>
+		<item name="colorOnSurface">@color/white</item>
+		<item name="colorError">@color/primaryRed</item>
 	</style>
 </resources>

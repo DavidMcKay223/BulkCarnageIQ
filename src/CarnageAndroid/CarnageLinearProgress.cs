@@ -23,9 +23,6 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            TrackCornerRadius = Context.DpToPx(CarnageStyle.CornerRadius);
-            TrackThickness = Context.DpToPx(8);
-
             SetIndicatorColor(CarnageStyle.PrimaryRed);
             TrackColor = CarnageStyle.PaleRose;
         }
