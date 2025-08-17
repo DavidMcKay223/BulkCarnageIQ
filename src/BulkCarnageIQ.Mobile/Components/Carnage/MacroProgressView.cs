@@ -117,7 +117,7 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
         private string GetStatusText(float ratio, float current, float goal, string format = "g")
         {
             if (ratio > 1.0f)
-                return $"Over Limit by {(current - goal):F1}{format}";
+                return $"Over Limit by {(current - goal):N1}{format}";
             if (ratio >= 0.85f)
                 return "Getting Close";
             return "On Track";

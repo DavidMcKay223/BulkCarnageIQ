@@ -17,7 +17,13 @@ namespace CarnageAndroid
     {
         Home,
         Settings,
-        Favorite
+        Favorite,
+        FoodTracker,
+        Tracker,
+        Fitness,
+        Profile,
+        Trash,
+        Delete
     }
 
     public static class CarnageIconResolver
@@ -26,6 +32,14 @@ namespace CarnageAndroid
         {
 
             CarnageIcon.Home => Resource.Drawable.ic_home,
+            //CarnageIcon.Settings => Resource.Drawable.ic_settings,
+            //CarnageIcon.Favorite => Resource.Drawable.ic_favorite,
+            CarnageIcon.FoodTracker => Resource.Drawable.ic_food_tracker,
+            CarnageIcon.Tracker => Resource.Drawable.ic_tracker,
+            CarnageIcon.Fitness => Resource.Drawable.ic_fitness,
+            //CarnageIcon.Profile => Resource.Drawable.ic_profile,
+            CarnageIcon.Trash => Resource.Drawable.ic_trash,
+            CarnageIcon.Delete => Resource.Drawable.ic_delete,
             _ => Resource.Drawable.ic_home,
         };
     }

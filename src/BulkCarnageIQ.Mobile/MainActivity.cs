@@ -69,8 +69,7 @@ namespace BulkCarnageIQ.Mobile
             var menuItems = new[]
             {
                 new { Text = "Home", CarnageIcon = CarnageIcon.Home, Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
-                new { Text = "Food Tracker", CarnageIcon = CarnageIcon.Home, Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
-                // Add more menu items here dynamically as needed
+                new { Text = "Food Tracker", CarnageIcon = CarnageIcon.FoodTracker, Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
             };
 
             foreach (var item in menuItems)

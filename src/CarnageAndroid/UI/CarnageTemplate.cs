@@ -25,6 +25,7 @@ namespace CarnageAndroid.UI
         public static CarnageButtonIcon CarnageButtonIcon(this Context context, CarnageIcon icon, string text = "", Action? onClick = null)
         {
             var btn = new CarnageButtonIcon(context)
+                .WithPosition(CarnageIconPosition.Left)
                 .WithIcon(icon, CarnageStyle.White)
                 .WithText(text, CarnageStyle.White);
 
