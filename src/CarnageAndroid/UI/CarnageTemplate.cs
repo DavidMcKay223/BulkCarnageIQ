@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,9 @@ namespace CarnageAndroid.UI
 {
     public static class CarnageTemplate
     {
-        public static CarnageButton CarnageButton(this Context context, CarnageButtonStyle style = CarnageButtonStyle.Default, string text = "", Action? onClick = null)
+        public static CarnageButton CarnageButton(this Context context, string text = "", Action? onClick = null)
         {
             var btn = new CarnageButton(context)
-                          .WithStyle(style)
                           .WithText(text)
                           .AsPill();
 
@@ -22,30 +22,38 @@ namespace CarnageAndroid.UI
             return btn;
         }
 
-        public static CarnageTextView CarnageTextView(this Context context, CarnageTextViewStyle style = CarnageTextViewStyle.Default, string text = "")
+        public static CarnageButtonIcon CarnageButtonIcon(this Context context, CarnageIcon icon, string text = "", Action? onClick = null)
+        {
+            var btn = new CarnageButtonIcon(context)
+                .WithIcon(icon, CarnageStyle.White)
+                .WithText(text, CarnageStyle.White);
+
+            if (onClick != null)
+                btn.OnClick(onClick);
+
+            return btn;
+        }
+
+        public static CarnageTextView CarnageTextView(this Context context, string text = "")
         {
             return new CarnageTextView(context)
-                .WithStyle(style)
                 .WithText(text);
         }
 
-        public static CarnageTextField CarnageTextField(this Context context, CarnageTextFieldStyle style = CarnageTextFieldStyle.Default, string text = "")
+        public static CarnageTextField CarnageTextField(this Context context, string text = "")
         {
             return new CarnageTextField(context)
-                .WithStyle(style)
                 .WithText(text);
         }
 
-        public static CarnageLinearProgress CarnageLinearProgress(this Context context, CarnageProgressStyle style = CarnageProgressStyle.Default)
+        public static CarnageLinearProgress CarnageLinearProgress(this Context context)
         {
-            return new CarnageLinearProgress(context)
-                .WithStyle(style);
+            return new CarnageLinearProgress(context);
         }
 
-        public static CarnageCircularProgress CarnageCircularProgress(this Context context, CarnageProgressStyle style = CarnageProgressStyle.Default)
+        public static CarnageCircularProgress CarnageCircularProgress(this Context context)
         {
-            return new CarnageCircularProgress(context)
-                .WithStyle(style);
+            return new CarnageCircularProgress(context);
         }
     }
 }

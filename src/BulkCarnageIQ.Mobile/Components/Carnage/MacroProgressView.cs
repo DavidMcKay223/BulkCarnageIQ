@@ -49,21 +49,18 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             };
             topRow.SetPadding(0, 0, 0, Context.DpToPx(4));
 
-            topRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Title, name));
-            topRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, $"{current:N1}{format} / {goal:N1}{format}"));
+            topRow.AddView(Context.CarnageTextView(name).AsTitle());
+            topRow.AddView(Context.CarnageTextView($"{current:N1}{format} / {goal:N1}{format}"));
 
             container.AddView(topRow);
 
             // Progress bar
-            var progressBar = Context.CarnageLinearProgress(CarnageProgressStyle.Primary);
+            var progressBar = Context.CarnageLinearProgress();
 
             float ratio = current / goal;
             int progressPercent = (int)(ratio * 100);
             progressPercent = progressPercent > 100 ? 100 : progressPercent;
             progressBar.Progress = progressPercent;
-
-            Color color = GetColorForRatio(ratio);
-            progressBar.ProgressDrawable.SetColorFilter(color, PorterDuff.Mode.SrcIn);
 
             container.AddView(progressBar);
 
@@ -74,21 +71,12 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
                 Text = GetStatusText(ratio, current, goal, format),
                 TextSize = 12f
             };
-            statusText.SetTextColor(color);
+            statusText.SetTextColor(CarnageStyle.White);
             statusText.SetPadding(0, Context.DpToPx(4), 0, 0);
 
             container.AddView(statusText);
 
             return container;
-        }
-
-        private Color GetColorForRatio(float ratio)
-        {
-            if (ratio > 1.0f)
-                return new Color(Color.ParseColor("#D32F2F")); // Red
-            if (ratio >= 0.85f)
-                return new Color(Color.ParseColor("#FBC02D")); // Yellow
-            return new Color(Color.ParseColor("#388E3C"));     // Green
         }
 
         private string GetStatusText(float ratio, float current, float goal, string format = "g")

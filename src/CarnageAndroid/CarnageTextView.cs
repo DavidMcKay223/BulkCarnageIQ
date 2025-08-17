@@ -16,7 +16,9 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            WithStyle(CarnageTextViewStyle.Default);
+            TextSize = CarnageStyle.FontSizeMedium;
+            Typeface = Typeface.Default;
+            SetTextColor(CarnageStyle.PaleRose);
         }
 
         public CarnageTextView WithText(string text)
@@ -37,31 +39,12 @@ namespace CarnageAndroid
             return this;
         }
 
-        public CarnageTextView WithStyle(CarnageTextViewStyle style)
+        public CarnageTextView AsTitle()
         {
-            switch (style)
-            {
-                case CarnageTextViewStyle.Title:
-                    TextSize = CarnageStyle.FontSizeLarge;
-                    Typeface = Typeface.DefaultBold;
-                    SetTextColor(CarnageStyle.PrimaryColor);
-                    break;
-                case CarnageTextViewStyle.Primary:
-                    TextSize = CarnageStyle.FontSizeMedium;
-                    Typeface = Typeface.Default;
-                    SetTextColor(CarnageStyle.TextPrimaryColor);
-                    break;
-                case CarnageTextViewStyle.Secondary:
-                    TextSize = CarnageStyle.FontSizeSmall;
-                    Typeface = Typeface.Default;
-                    SetTextColor(CarnageStyle.TextSecondaryColor);
-                    break;
-                default:
-                    TextSize = CarnageStyle.FontSizeMedium;
-                    Typeface = Typeface.Default;
-                    SetTextColor(CarnageStyle.TextPrimaryColor);
-                    break;
-            }
+            SetTextColor(CarnageStyle.PrimaryRed);
+            TextSize = CarnageStyle.FontSizeLarge;
+            Typeface = Typeface.DefaultBold;
+
             return this;
         }
     }

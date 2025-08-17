@@ -26,38 +26,8 @@ namespace CarnageAndroid
             TrackCornerRadius = Context.DpToPx(CarnageStyle.CornerRadius);
             TrackThickness = Context.DpToPx(8);
 
-            WithStyle(CarnageProgressStyle.Default);
-        }
-
-        public CarnageLinearProgress WithStyle(CarnageProgressStyle style)
-        {
-            Color indicatorColor;
-            Color trackColor;
-
-            switch (style)
-            {
-                case CarnageProgressStyle.Primary:
-                    indicatorColor = CarnageStyle.PrimaryColor;
-                    trackColor = CarnageStyle.PrimaryColor.SetAlpha(60);
-                    break;
-                case CarnageProgressStyle.Danger:
-                    indicatorColor = CarnageStyle.DangerColor;
-                    trackColor = CarnageStyle.DangerColor.SetAlpha(60);
-                    break;
-                case CarnageProgressStyle.Secondary:
-                    indicatorColor = CarnageStyle.SecondaryColor;
-                    trackColor = CarnageStyle.SecondaryColor.SetAlpha(60);
-                    break;
-                default:
-                    indicatorColor = CarnageStyle.PrimaryColor;
-                    trackColor = CarnageStyle.PrimaryColor.SetAlpha(60);
-                    break;
-            }
-
-            SetIndicatorColor(indicatorColor);
-            TrackColor = trackColor;
-
-            return this;
+            SetIndicatorColor(CarnageStyle.PrimaryRed);
+            TrackColor = CarnageStyle.PaleRose;
         }
 
         public CarnageLinearProgress WithMax(int max)

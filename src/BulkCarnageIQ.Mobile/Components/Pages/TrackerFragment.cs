@@ -1,4 +1,5 @@
-﻿using Android.Graphics;
+﻿using Android.Content.Res;
+using Android.Graphics;
 using Android.Graphics.Text;
 using Android.Views;
 using Android.Views.InputMethods;
@@ -9,6 +10,7 @@ using BulkCarnageIQ.Infrastructure.Repositories;
 using BulkCarnageIQ.Mobile.Components.Carnage;
 using CarnageAndroid;
 using CarnageAndroid.UI;
+using Google.Android.Material.DatePicker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -62,12 +64,16 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Android.Resource.Layout.SimpleDropDownItem1Line,
                 GetFoodItemList()
             );
-            
+
+            txtFoodName.SetHintTextColor(CarnageAndroid.CarnageStyle.PaleRose);
+            txtFoodName.SetTextColor(CarnageAndroid.CarnageStyle.White);
+            txtFoodName.BackgroundTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.PaleRose);
+
             txtFoodName.Adapter = adapter;
 
             CarnageButton btnDate = null;
 
-            btnDate = Context.CarnageButton(CarnageButtonStyle.Secondary, DateTime.Today.ToString("MM/dd/yyyy"))
+            btnDate = Context.CarnageButton(DateTime.Today.ToString("MM/dd/yyyy"))
                 .OnClick(() =>
                 {
                     var dpd = new DatePickerDialog(Context, (sender, e) =>
@@ -94,7 +100,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 foodPickerView.UpdateFoodSelection(macros);
             };
 
-            var btnAddMeal = Context.CarnageButton(CarnageButtonStyle.Primary, "Add")
+            var btnAddMeal = Context.CarnageButton("Add")
                 .OnClick(() =>
                     {
                         string foodName = txtFoodName.Text.Trim();
@@ -129,50 +135,36 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         {
             var container = new LinearLayout(Context)
             {
-                Orientation = Orientation.Vertical,
+                Orientation = Android.Widget.Orientation.Vertical,
                 LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             container.SetPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
 
             // Food Name (title)
-            var nameView = Context.CarnageTextView(CarnageTextViewStyle.Title, name);
+            var nameView = Context.CarnageTextView(name).AsTitle();
 
             container.AddView(nameView);
 
             // Meal Type
-            var mealTypeView = Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: mealType);
+            var mealTypeView = Context.CarnageTextView(text: mealType);
 
             container.AddView(mealTypeView);
 
             // Servings + Calories row (horizontal)
             var servingsCaloriesRow = new LinearLayout(Context)
             {
-                Orientation = Orientation.Horizontal,
+                Orientation = Android.Widget.Orientation.Horizontal,
                 LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
             };
 
-            servingsCaloriesRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: $"Servings: {measurementServings * portions:N1} {measurementType}"));
-            servingsCaloriesRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: "  |  "));
-            servingsCaloriesRow.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, text: $"Calories: {calories:N0}"));
+            servingsCaloriesRow.AddView(Context.CarnageTextView(text: $"Servings: {measurementServings * portions:N1} {measurementType}"));
+            servingsCaloriesRow.AddView(Context.CarnageTextView(text: "  |  "));
+            servingsCaloriesRow.AddView(Context.CarnageTextView(text: $"Calories: {calories:N0}"));
 
             container.AddView(servingsCaloriesRow);
 
-            // Donut chart below, centered
-            var donut = new MacroDonutView(Context)
-            {
-                LayoutParameters = new LinearLayout.LayoutParams(400, 400)
-                {
-                    Gravity = Android.Views.GravityFlags.CenterHorizontal,
-                    TopMargin = CarnageStyle.PaddingMedium,
-                    BottomMargin = CarnageStyle.PaddingMedium
-                }
-            };
-            donut.SetMacros(protein, carbs, fats, fiber);
-
-            container.AddView(donut);
-
             // Delete button full width below
-            var deleteBtn = Context.CarnageButton(CarnageButtonStyle.Danger, "Delete")
+            var deleteBtn = Context.CarnageButton("Delete")
                 .OnClick(() =>
                 {
                     tableMeals.RemoveView(container);

@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.Content.Res;
 using Android.Util;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
@@ -29,12 +30,12 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
 
         private void Init(Context context)
         {
-            Orientation = Orientation.Vertical;
+            Orientation = Android.Widget.Orientation.Vertical;
             SetPadding(context.DpToPx(8), context.DpToPx(8), context.DpToPx(8), context.DpToPx(8));
 
             var servingContainer = new LinearLayout(context)
             {
-                Orientation = Orientation.Vertical,
+                Orientation = Android.Widget.Orientation.Vertical,
                 LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent)
             };
 
@@ -45,17 +46,19 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             };
             servingContainer.AddView(ServingsSeekBar);
 
-            ServingsPreview = context.CarnageTextView(CarnageTextViewStyle.Secondary, "Servings: 0");
+            ServingsPreview = context.CarnageTextView("Servings: 0");
             
             servingContainer.AddView(ServingsPreview);
 
-            CaloriesPreview = context.CarnageTextView(CarnageTextViewStyle.Secondary, "Calories: 0");
+            CaloriesPreview = context.CarnageTextView("Calories: 0");
 
             servingContainer.AddView(CaloriesPreview);
 
             AddView(servingContainer);
 
             ServingsSeekBar.ProgressChanged += (s, e) => UpdateCalories();
+            ServingsSeekBar.ProgressTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.PaleRose);
+            ServingsSeekBar.ThumbTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.PrimaryRed);
         }
 
         public void UpdateFoodSelection(FoodItem selectedFood)

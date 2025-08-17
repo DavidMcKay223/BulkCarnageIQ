@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
 	<!-- Header -->
 	<TextView
@@ -12,7 +11,9 @@
         android:layout_height="wrap_content"
         android:text="@string/app_fragment_tracker_header"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/primaryRed"
+		android:padding="8dp" />
 
 	<!-- Add meal controls -->
 	<LinearLayout

@@ -15,10 +15,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 {
     public class HomeFragment : Fragment
     {
-        private MacroDonutView dailyDonut;
         private TableLayout tableDailyMacros;
-
-        private MacroDonutView weeklyDonut;
         private TableLayout tableWeeklyMacros;
 
         private UserProfile currentUserProfile;
@@ -38,9 +35,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
-
-            dailyDonut = view.FindViewById<MacroDonutView>(Resource.Id.dailyDonut);
-            weeklyDonut = view.FindViewById<MacroDonutView>(Resource.Id.weeklyDonut);
 
             tableDailyMacros = view.FindViewById<TableLayout>(Resource.Id.tableDailyMacros);
             tableWeeklyMacros = view.FindViewById<TableLayout>(Resource.Id.tableWeeklyMacros);
@@ -75,9 +69,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 weeklyCaloriesActual += daySummary.Calories;
             }
 
-            dailyDonut.SetMacros(todaySummary.Protein, todaySummary.Carbs, todaySummary.Fats, todaySummary.Fiber);
-            weeklyDonut.SetMacros(weekSummary.Protein, weekSummary.Carbs, weekSummary.Fats, weekSummary.Fiber);
-
             float weeklyCaloriesGoal = currentUserProfile.CalorieGoal * 7;
             float diff = weeklyCaloriesActual - weeklyCaloriesGoal;
 
@@ -89,8 +80,8 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         {
             table.RemoveAllViews();
 
-            table.AddView(Context.CarnageTextView(CarnageTextViewStyle.Title, Title));
-            table.AddView(Context.CarnageTextView(CarnageTextViewStyle.Secondary, DateStr));
+            table.AddView(Context.CarnageTextView(Title).AsTitle());
+            table.AddView(Context.CarnageTextView(DateStr));
 
             table.AddView(new BulkCarnageIQ.Mobile.Components.Carnage.MacroProgressView(Context)
                 .Add("Calories", summary.Calories, currentUserProfile.CalorieGoal * weight, "")

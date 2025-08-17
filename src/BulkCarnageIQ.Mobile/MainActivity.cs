@@ -39,14 +39,14 @@ namespace BulkCarnageIQ.Mobile
             hamburgerContainer = FindViewById<LinearLayout>(Resource.Id.hamburger_container);
 
             // Inject CarnageTextView title dynamically
-            titleContainer.AddView(this.CarnageTextView(CarnageTextViewStyle.Title, GetString(Resource.String.app_name)));
+            titleContainer.AddView(this.CarnageTextView(GetString(Resource.String.app_name)).AsTitle());
 
             // Inject Hamburger button dynamically
             hamburgerContainer.AddView(
-                this.CarnageButton(CarnageButtonStyle.Primary, 
-                    GetString(Resource.String.app_btn_hamburger_text),
+                this.CarnageButton(GetString(Resource.String.app_btn_hamburger_text),
                     () => ToggleDrawer())
-                .WithColor(CarnageStyle.CharcoalGray));
+                .WithColor(CarnageStyle.DarkestBrown)
+                .WithTextColor(CarnageStyle.PaleRose));
 
             // Build drawer buttons dynamically
             BuildDrawerMenu();
@@ -75,7 +75,7 @@ namespace BulkCarnageIQ.Mobile
 
             foreach (var item in menuItems)
             {
-                drawerPanel.AddView(this.CarnageButton(CarnageButtonStyle.Primary, item.Text, item.Click));
+                drawerPanel.AddView(this.CarnageButton(item.Text, item.Click));
             }
         }
 
