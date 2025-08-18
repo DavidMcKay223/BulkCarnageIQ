@@ -7,7 +7,9 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:padding="8dp"
+		android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
 		<!-- Widget 1: Daily Totals -->
 		<LinearLayout

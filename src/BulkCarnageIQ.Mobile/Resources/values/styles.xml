@@ -9,5 +9,11 @@
 		<item name="colorSurface">@color/darkCharcoal</item>
 		<item name="colorOnSurface">@color/offWhite</item>
 		<item name="colorError">@color/vividBlue</item>
+		<item name="colorPrimaryContainer">@color/vividBlue</item>
+		<item name="colorOnPrimaryContainer">@color/offWhite</item>
+		<item name="colorSurfaceVariant">@color/slateGray</item>
+		<item name="colorOnSurfaceVariant">@color/offWhite</item>
+		<item name="colorSurfaceInverse">@color/vividBlue</item>
+		<item name="colorOnSurfaceInverse">@color/midnightBlue</item>
 	</style>
 </resources>

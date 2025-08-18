@@ -15,6 +15,7 @@ using Google.Android.Material.DatePicker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using static Android.InputMethodServices.Keyboard;
 
@@ -117,7 +118,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                         foodPickerView.UpdateFoodSelection(null);
                         foodPickerView.Progress = 2;
 
-                        HideKeyboard(txtFoodName);
+                        HideKeyboard();
                     });
 
             tableAdd.AddView(btnDate);
@@ -134,14 +135,18 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
         private void AddMeal(int Id, string name, float? measurementServings, string measurementType, float portions, float calories, float protein, float carbs, float fats, float fiber, string mealType)
         {
+            var lp = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            lp.SetMargins(0, Context.DpToPx(8), 0, Context.DpToPx(8));
+
             // Create the card
             var card = new MaterialCardView(Context)
             {
-                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                LayoutParameters = lp,
                 Radius = Context.DpToPx(8),
                 CardElevation = Context.DpToPx(4),
             };
             card.SetCardBackgroundColor(CarnageStyle.DarkCharcoal);
+            card.SetPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
 
             // Inner vertical layout inside the card
             var contentLayout = new LinearLayout(Context)
@@ -151,19 +156,20 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             };
             contentLayout.SetPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
 
-            // Top row: Recipe Name | Meal Type | Delete
-            var topRow = new LinearLayout(Context)
+            // Top layout: Name on top, MealType underneath
+            var topColumn = new LinearLayout(Context)
             {
-                Orientation = Android.Widget.Orientation.Horizontal,
-                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                Orientation = Android.Widget.Orientation.Vertical,
+                LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 3f) // give most space to name+mealType
             };
 
             var nameView = Context.CarnageTextView(name).AsTitle();
-            nameView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 2f); // more space
-
             var mealTypeView = Context.CarnageTextView(mealType);
-            mealTypeView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
 
+            topColumn.AddView(nameView);
+            topColumn.AddView(mealTypeView);
+
+            // Delete button stays to the right
             var deleteBtnTop = Context.CarnageButtonIcon(CarnageIcon.Trash, "")
                 .OnClick(() =>
                 {
@@ -172,8 +178,14 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 });
             deleteBtnTop.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
 
-            topRow.AddView(nameView);
-            topRow.AddView(mealTypeView);
+            // Top row now contains: vertical column + delete button
+            var topRow = new LinearLayout(Context)
+            {
+                Orientation = Android.Widget.Orientation.Horizontal,
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+
+            topRow.AddView(topColumn);
             topRow.AddView(deleteBtnTop);
 
             // Bottom row: Servings | Calories | Optional Button
@@ -282,12 +294,18 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             mealEntryService.DeleteAsync(Id).Wait();
         }
 
-        void HideKeyboard(AutoCompleteTextView control)
+        void HideKeyboard()
         {
-            var inputMethodManager = (InputMethodManager)Context.GetSystemService(Android.Content.Context.InputMethodService);
-            var token = control.WindowToken;
-            if (token != null)
-                inputMethodManager.HideSoftInputFromWindow(token, HideSoftInputFlags.None);
+            if (Activity == null)
+                return;
+
+            var currentFocus = Activity.CurrentFocus;
+            if (currentFocus != null)
+            {
+                var imm = (InputMethodManager)Activity.GetSystemService(Android.Content.Context.InputMethodService);
+                imm?.HideSoftInputFromWindow(currentFocus.WindowToken, HideSoftInputFlags.None);
+                currentFocus.ClearFocus();
+            }
         }
     }
 }
