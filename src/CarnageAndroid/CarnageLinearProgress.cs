@@ -23,8 +23,8 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            SetIndicatorColor(CarnageStyle.PrimaryRed);
-            TrackColor = CarnageStyle.PaleRose;
+            SetIndicatorColor(CarnageStyle.VividBlue);
+            TrackColor = CarnageStyle.SlateGray;
         }
 
         public CarnageLinearProgress WithMax(int max)

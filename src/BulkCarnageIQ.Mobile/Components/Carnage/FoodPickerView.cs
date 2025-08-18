@@ -57,8 +57,8 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             AddView(servingContainer);
 
             ServingsSeekBar.ProgressChanged += (s, e) => UpdateCalories();
-            ServingsSeekBar.ProgressTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.PaleRose);
-            ServingsSeekBar.ThumbTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.PrimaryRed);
+            ServingsSeekBar.ProgressTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.VividBlue);
+            ServingsSeekBar.ThumbTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.VividBlue);
         }
 
         public void UpdateFoodSelection(FoodItem selectedFood)

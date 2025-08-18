@@ -84,8 +84,8 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             dataSet.YValuePosition = PieDataSet.ValuePosition.OutsideSlice;
             dataSet.ValueLinePart1Length = 0.5f;
             dataSet.ValueLinePart2Length = 0.5f;
-            dataSet.ValueLineColor = CarnageStyle.White;
-            dataSet.ValueTextColor = CarnageStyle.White;
+            dataSet.ValueLineColor = CarnageStyle.OffWhite;
+            dataSet.ValueTextColor = CarnageStyle.OffWhite;
             dataSet.ValueTextSize = 14f;
             dataSet.SetDrawValues(false);
 

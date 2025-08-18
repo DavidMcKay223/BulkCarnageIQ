@@ -25,8 +25,8 @@ namespace CarnageAndroid
         {
             TrackThickness = Context.DpToPx(8);
 
-            SetIndicatorColor(CarnageStyle.PrimaryRed);
-            TrackColor = CarnageStyle.PaleRose;
+            SetIndicatorColor(CarnageStyle.VividBlue);
+            TrackColor = CarnageStyle.SlateGray;
         }
 
         public CarnageCircularProgress WithMax(int max)

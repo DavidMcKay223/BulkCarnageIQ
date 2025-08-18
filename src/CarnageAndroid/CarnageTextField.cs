@@ -18,10 +18,10 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            SetBackgroundColor(CarnageStyle.PrimaryRed);
-            SetTextColor(CarnageStyle.White);
+            SetBackgroundColor(CarnageStyle.VividBlue);
+            SetTextColor(CarnageStyle.OffWhite);
 
-            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.PrimaryRed);
+            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.VividBlue);
         }
 
         public CarnageTextField WithHint(string hint)

@@ -28,10 +28,10 @@ namespace CarnageAndroid
             LetterSpacing = 0.05f;
             Typeface = Typeface.Create("sans-serif-medium", TypefaceStyle.Normal);
 
-            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.PrimaryRed);
+            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.VividBlue);
 
             this
-                .WithTextColor(CarnageStyle.White)
+                .WithTextColor(CarnageStyle.OffWhite)
                 .WithTextSize(ComplexUnitType.Sp, CarnageStyle.FontSizeMedium)
                 .WithPaddingDp(CarnageStyle.PaddingMedium);
         }

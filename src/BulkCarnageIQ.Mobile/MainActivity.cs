@@ -45,8 +45,8 @@ namespace BulkCarnageIQ.Mobile
             hamburgerContainer.AddView(
                 this.CarnageButton(GetString(Resource.String.app_btn_hamburger_text),
                     () => ToggleDrawer())
-                .WithColor(CarnageStyle.Charcoal)
-                .WithTextColor(CarnageStyle.PaleRose));
+                .WithColor(CarnageStyle.MidnightBlue)
+                .WithTextColor(CarnageStyle.OffWhite));
 
             // Build drawer buttons dynamically
             BuildDrawerMenu();

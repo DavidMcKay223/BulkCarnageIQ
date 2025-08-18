@@ -9,4 +9,10 @@
 	<color name="darkMaroon">#663333</color>
 	<color name="paleRose">#C99191</color>
 	<color name="darkestBrown">#331A1A</color>
+
+	<color name="midnightBlue">#1E2533</color>
+	<color name="vividBlue">#3B72F4</color>
+	<color name="darkCharcoal">#2B3344</color>
+	<color name="offWhite">#E0E0E0</color>
+	<color name="slateGray">#384256</color>
 </resources>

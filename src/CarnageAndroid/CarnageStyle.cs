@@ -1,7 +1,7 @@
 ﻿using Android.Content;
+using Android.Graphics;
 using Android.Util;
 using Android.Widget;
-using Android.Graphics;
 
 namespace CarnageAndroid
 {
@@ -57,6 +57,13 @@ namespace CarnageAndroid
         public static readonly Color DarkMaroon = Color.ParseColor("#663333");
         public static readonly Color PaleRose = Color.ParseColor("#C99191");
         public static readonly Color DarkestBrown = Color.ParseColor("#331A1A");
+
+        // Accent Palette (Blues)
+        public static readonly Color MidnightBlue = Color.ParseColor("#1E2533");
+        public static readonly Color VividBlue = Color.ParseColor("#3B72F4");
+        public static readonly Color DarkCharcoal = Color.ParseColor("#2B3344");
+        public static readonly Color OffWhite = Color.ParseColor("#E0E0E0");
+        public static readonly Color SlateGray = Color.ParseColor("#384256");
 
         // Font sizes (in SP)
         public const float FontSizeSmall = 12f;

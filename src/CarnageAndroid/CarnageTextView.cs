@@ -18,7 +18,7 @@ namespace CarnageAndroid
         {
             TextSize = CarnageStyle.FontSizeMedium;
             Typeface = Typeface.Default;
-            SetTextColor(CarnageStyle.PaleRose);
+            SetTextColor(CarnageStyle.OffWhite);
         }
 
         public CarnageTextView WithText(string text)
@@ -41,7 +41,7 @@ namespace CarnageAndroid
 
         public CarnageTextView AsTitle()
         {
-            SetTextColor(CarnageStyle.PrimaryRed);
+            SetTextColor(CarnageStyle.VividBlue);
             TextSize = CarnageStyle.FontSizeLarge;
             Typeface = Typeface.DefaultBold;
 

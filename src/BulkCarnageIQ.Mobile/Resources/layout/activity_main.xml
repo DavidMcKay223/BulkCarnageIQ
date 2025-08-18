@@ -8,7 +8,7 @@
         android:id="@+id/top_app_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/charcoal"
+        android:background="@color/midnightBlue"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical">
@@ -42,7 +42,7 @@
         android:layout_width="240dp"
         android:layout_height="match_parent"
 		android:layout_marginTop="56dp"
-		android:background="@color/charcoal"
+		android:background="@color/midnightBlue"
         android:orientation="vertical"
         android:translationX="-240dp"
         android:elevation="8dp" />

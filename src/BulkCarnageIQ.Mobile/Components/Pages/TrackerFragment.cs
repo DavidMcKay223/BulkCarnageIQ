@@ -66,9 +66,9 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 GetFoodItemList()
             );
 
-            txtFoodName.SetHintTextColor(CarnageAndroid.CarnageStyle.PaleRose);
-            txtFoodName.SetTextColor(CarnageAndroid.CarnageStyle.White);
-            txtFoodName.BackgroundTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.PaleRose);
+            txtFoodName.SetHintTextColor(CarnageAndroid.CarnageStyle.OffWhite);
+            txtFoodName.SetTextColor(CarnageAndroid.CarnageStyle.OffWhite);
+            txtFoodName.BackgroundTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.OffWhite);
 
             txtFoodName.Adapter = adapter;
 
@@ -141,7 +141,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Radius = Context.DpToPx(8),
                 CardElevation = Context.DpToPx(4),
             };
-            card.SetCardBackgroundColor(CarnageStyle.DeepBrown);
+            card.SetCardBackgroundColor(CarnageStyle.DarkCharcoal);
 
             // Inner vertical layout inside the card
             var contentLayout = new LinearLayout(Context)

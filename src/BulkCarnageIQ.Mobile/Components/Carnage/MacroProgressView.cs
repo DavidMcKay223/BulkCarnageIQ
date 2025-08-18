@@ -106,7 +106,7 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
 
             // Status text
             var statusText = Context.CarnageTextView(GetStatusText(ratio, current, goal, format))
-                .WithColor(CarnageStyle.White);
+                .WithColor(CarnageStyle.OffWhite);
 
             // Add the status text to the vertical layout.
             verticalLayout.AddView(statusText);

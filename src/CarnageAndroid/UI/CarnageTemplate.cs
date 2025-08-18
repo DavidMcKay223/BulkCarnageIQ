@@ -26,8 +26,8 @@ namespace CarnageAndroid.UI
         {
             var btn = new CarnageButtonIcon(context)
                 .WithPosition(CarnageIconPosition.Left)
-                .WithIcon(icon, CarnageStyle.White)
-                .WithText(text, CarnageStyle.White);
+                .WithIcon(icon, CarnageStyle.VividBlue)
+                .WithText(text, CarnageStyle.VividBlue);
 
             if (onClick != null)
                 btn.OnClick(onClick);

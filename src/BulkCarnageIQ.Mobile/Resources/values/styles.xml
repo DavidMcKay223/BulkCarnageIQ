@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
 	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-		<item name="android:windowBackground">@color/darkestBrown</item>
-		<item name="colorPrimary">@color/primaryRed</item>
-		<item name="colorOnPrimary">@color/white</item>
-		<item name="colorSecondary">@color/paleRose</item>
-		<item name="colorOnSecondary">@color/white</item>
-		<item name="colorSurface">@color/deepBrown</item>
-		<item name="colorOnSurface">@color/white</item>
-		<item name="colorError">@color/primaryRed</item>
+		<item name="android:windowBackground">@color/midnightBlue</item>
+		<item name="colorPrimary">@color/vividBlue</item>
+		<item name="colorOnPrimary">@color/offWhite</item>
+		<item name="colorSecondary">@color/offWhite</item>
+		<item name="colorOnSecondary">@color/midnightBlue</item>
+		<item name="colorSurface">@color/darkCharcoal</item>
+		<item name="colorOnSurface">@color/offWhite</item>
+		<item name="colorError">@color/vividBlue</item>
 	</style>
 </resources>

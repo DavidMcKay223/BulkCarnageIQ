@@ -12,7 +12,7 @@
         android:text="@string/app_fragment_tracker_header"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/primaryRed"
+        android:textColor="@color/vividBlue"
 		android:padding="8dp" />
 
 	<!-- Add meal controls -->
