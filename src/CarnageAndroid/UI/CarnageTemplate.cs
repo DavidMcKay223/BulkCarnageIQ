@@ -47,6 +47,11 @@ namespace CarnageAndroid.UI
                 .WithText(text);
         }
 
+        public static CarnageSpinner CarnageSpinner(this Context context, List<string> items, string selected = "")
+        {
+            return new CarnageSpinner(context, items, selected);
+        }
+
         public static CarnageLinearProgress CarnageLinearProgress(this Context context)
         {
             return new CarnageLinearProgress(context);
