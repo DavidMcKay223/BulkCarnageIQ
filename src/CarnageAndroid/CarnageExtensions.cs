@@ -3,11 +3,12 @@ using Android.Content.Res;
 using Android.Graphics;
 using Android.Util;
 using Android.Views;
+using Android.Widget;
 using static Android.Icu.Text.ListFormatter;
 
 namespace CarnageAndroid
 {
-    public static class CarnageViewExtensions
+    public static class CarnageViewFluentExtensions
     {
         public static int DpToPx(this Context context, float dp)
         {
@@ -15,22 +16,6 @@ namespace CarnageAndroid
             return (int)(dp * scale + 0.5f);
         }
 
-        public static T WithPaddingDp<T>(this T view, int dp) where T : View
-        {
-            var px = view.Context.DpToPx(dp);
-            view.SetPadding(px, px, px, px);
-            return view;
-        }
-
-        public static T WithBackgroundColor<T>(this T view, Color color) where T : View
-        {
-            view.SetBackgroundColor(color);
-            return view;
-        }
-    }
-
-    public static class CarnageViewFluentExtensions
-    {
         public static T WithWidth<T>(this T view, int dpWidth) where T : View
         {
             var pxWidth = view.Context.DpToPx(dpWidth);
@@ -73,7 +58,7 @@ namespace CarnageAndroid
             }
             else
             {
-                var lp = new ViewGroup.MarginLayoutParams(view.LayoutParameters ?? new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
+                var lp = new ViewGroup.MarginLayoutParams(view.LayoutParameters ?? new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
                 lp.SetMargins(left, top, right, bottom);
                 view.LayoutParameters = lp;
             }
@@ -161,19 +146,26 @@ namespace CarnageAndroid
             }
             return view;
         }
-    }
 
-    public static class CarnageTextViewFluentExtensions
-    {
-        public static T WithTextColor<T>(this T view, Color color) where T : TextView
+        public static T WithTextColor<T>(this T view, Color color) where T : View
         {
-            view.SetTextColor(color);
+            if (view is TextView tv)
+                tv.SetTextColor(color);
+
+            if (view is CarnageTextField ctf)
+                ctf.SetTextColor(color);
+
             return view;
         }
 
-        public static T WithTextSize<T>(this T view, ComplexUnitType unit, float size) where T : TextView
+        public static T WithTextSize<T>(this T view, ComplexUnitType unit, float size) where T : View
         {
-            view.SetTextSize(unit, size);
+            if (view is TextView tv)
+                tv.SetTextSize(unit, size);
+
+            if (view is CarnageTextField ctf)
+                ctf.SetTextSize(unit, size);
+
             return view;
         }
     }

@@ -22,6 +22,12 @@ namespace CarnageAndroid
             SetTextColor(CarnageStyle.OffWhite);
 
             BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.SlateGray);
+
+            this
+                .WithBackgroundColor(CarnageStyle.SlateGray)
+                .WithTextColor(CarnageStyle.OffWhite)
+                .WithPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium)
+                .WithMargins(0, CarnageStyle.PaddingSmall, 0, CarnageStyle.PaddingSmall);
         }
 
         public CarnageTextField WithHint(string hint)

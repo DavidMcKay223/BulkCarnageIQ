@@ -33,7 +33,7 @@ namespace CarnageAndroid
             this
                 .WithTextColor(CarnageStyle.OffWhite)
                 .WithTextSize(ComplexUnitType.Sp, CarnageStyle.FontSizeMedium)
-                .WithPaddingDp(CarnageStyle.PaddingMedium);
+                .WithPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
         }
 
         public CarnageButton WithText(string text)

@@ -16,11 +16,7 @@ namespace CarnageAndroid
         public CarnageSpinner(Context context, List<string> items, string selected = "")
             : base(context)
         {
-            adapter = new CarnageSpinnerAdapter(
-                context,
-                items
-            );
-
+            adapter = new CarnageSpinnerAdapter(context, items);
             Adapter = adapter;
 
             if (!string.IsNullOrEmpty(selected))
@@ -29,8 +25,12 @@ namespace CarnageAndroid
                 if (index >= 0) SetSelection(index);
             }
 
-            SetBackgroundColor(CarnageStyle.SlateGray);
-            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.SlateGray);
+            this
+                .WithBackgroundColor(CarnageStyle.SlateGray)
+                .WithPadding(0, CarnageStyle.PaddingMedium, 0, CarnageStyle.PaddingMedium)
+                .WithMargins(0, CarnageStyle.PaddingSmall, 0, CarnageStyle.PaddingSmall);
+
+            DropDownWidth = LayoutParams.MatchParent;
         }
 
         public string Text { get { return SelectedItem?.ToString() ?? ""; } }
@@ -47,15 +47,21 @@ namespace CarnageAndroid
         public override View GetView(int position, View convertView, ViewGroup parent)
         {
             var view = base.GetView(position, convertView, parent) as TextView;
-            view.SetTextColor(CarnageStyle.OffWhite);
+
+            view
+                .WithTextColor(CarnageStyle.OffWhite);
+
             return view;
         }
 
         public override View GetDropDownView(int position, View convertView, ViewGroup parent)
         {
             var view = base.GetDropDownView(position, convertView, parent) as TextView;
-            view.SetTextColor(CarnageStyle.OffWhite);
-            view.SetBackgroundColor(CarnageStyle.SlateGray);
+
+            view
+                .WithTextColor(CarnageStyle.OffWhite)
+                .WithBackgroundColor(CarnageStyle.SlateGray);
+
             return view;
         }
     }
