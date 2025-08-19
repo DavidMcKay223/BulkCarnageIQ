@@ -3,7 +3,7 @@
 	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
 		<item name="android:windowBackground">@color/midnightBlue</item>
 		<item name="colorPrimary">@color/vividBlue</item>
-		<item name="colorOnPrimary">@color/offWhite</item>
+		<!--<item name="colorOnPrimary">@color/offWhite</item>
 		<item name="colorSecondary">@color/offWhite</item>
 		<item name="colorOnSecondary">@color/midnightBlue</item>
 		<item name="colorSurface">@color/darkCharcoal</item>
@@ -14,6 +14,6 @@
 		<item name="colorSurfaceVariant">@color/slateGray</item>
 		<item name="colorOnSurfaceVariant">@color/offWhite</item>
 		<item name="colorSurfaceInverse">@color/vividBlue</item>
-		<item name="colorOnSurfaceInverse">@color/midnightBlue</item>
+		<item name="colorOnSurfaceInverse">@color/midnightBlue</item>-->
 	</style>
 </resources>

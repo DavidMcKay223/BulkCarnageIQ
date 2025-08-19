@@ -18,10 +18,8 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            SetBackgroundColor(CarnageStyle.SlateGray);
-            SetTextColor(CarnageStyle.OffWhite);
-
             BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.SlateGray);
+            SetHintTextColor(CarnageStyle.OffWhite);
 
             this
                 .WithBackgroundColor(CarnageStyle.SlateGray)

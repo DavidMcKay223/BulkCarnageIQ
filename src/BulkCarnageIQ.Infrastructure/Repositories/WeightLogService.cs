@@ -80,11 +80,6 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
 
         public async Task AddOrUpdateLogAsync(string userId, DateOnly date, float weightLbs)
         {
-            if(string.IsNullOrWhiteSpace(userId))
-            {
-                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-            }
-
             var log = await _db.WeightLogs.FirstOrDefaultAsync(w => w.UserId == userId && w.Date == date);
             if (log is null)
             {
