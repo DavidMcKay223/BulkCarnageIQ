@@ -14,7 +14,7 @@ namespace BulkCarnageIQ.Core.Carnage.Report
         public bool IsKeto { get; set; }
         public bool IsBulkMeal { get; set; }
         public bool IsHighCarb { get; set; }
-        public bool IsLowFiber { get; set; }
+        public bool IsHighFiber { get; set; }
         public bool IsHighFat { get; set; }
         public bool IsBalancedMeal { get; set; }
         public bool IsLowProtein { get; set; }
@@ -32,7 +32,7 @@ namespace BulkCarnageIQ.Core.Carnage.Report
             IsKeto = false;
             IsBulkMeal = false;
             IsHighCarb = false;
-            IsLowFiber = false;
+            IsHighFiber = false;
             IsHighFat = false;
             IsBalancedMeal = false;
             IsLowProtein = false;
@@ -45,19 +45,24 @@ namespace BulkCarnageIQ.Core.Carnage.Report
         public IEnumerable<FoodItem> ApplyFilters(IEnumerable<FoodItem> foodItems)
         {
             return foodItems.Where(item =>
-                (string.IsNullOrEmpty(SelectedRecipeName) || item.RecipeName == SelectedRecipeName) &&
-                (string.IsNullOrEmpty(SelectedBrandType) || item.BrandType == SelectedBrandType) &&
-                (string.IsNullOrEmpty(SelectedGroupName) || item.GroupName == SelectedGroupName) &&
+                (string.IsNullOrEmpty(SelectedRecipeName) || item.RecipeName.Contains(SelectedRecipeName, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(SelectedBrandType) || item.BrandType.Contains(SelectedBrandType, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(SelectedGroupName) || (item.GroupName != null && item.GroupName.Contains(SelectedGroupName, StringComparison.OrdinalIgnoreCase))) &&
                 (!IsHighProtein || item.IsHighProtein) &&
                 (!IsLowCarb || item.IsLowCarb) &&
                 (!IsKeto || item.IsKeto) &&
                 (!IsBulkMeal || item.IsBulkMeal) &&
                 (!IsHighCarb || item.IsHighCarb) &&
-                (!IsLowFiber || item.IsLowFiber) &&
+                (!IsHighFiber || !item.IsLowFiber) &&
                 (!IsHighFat || item.IsHighFat) &&
                 (!IsBalancedMeal || item.IsBalancedMeal) &&
                 (!IsLowProtein || item.IsLowProtein)
-            );
+            )
+            .OrderByDescending(f => f.Protein)
+            .ThenByDescending(f => f.Fiber)
+            .ThenByDescending(f => f.TotalCalories)
+            .ThenByDescending(f => f.Fats)
+            .ThenByDescending(f => f.Carbs);
         }
     }
 }
