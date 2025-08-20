@@ -71,6 +71,7 @@ namespace BulkCarnageIQ.Mobile
                 new { Text = "Home", CarnageIcon = CarnageIcon.Home, Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
                 new { Text = "Food Tracker", CarnageIcon = CarnageIcon.FoodTracker, Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
                 new { Text = "Food List", CarnageIcon = CarnageIcon.FoodList, Click = new Action(() => { LoadFragment(new FoodListFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Food Suggestion", CarnageIcon = CarnageIcon.FoodSuggestion, Click = new Action(() => { LoadFragment(new FoodSuggestionListFragment(dbContext, userProfile)); ToggleDrawer(); }) },
                 new { Text = "Weight Log", CarnageIcon = CarnageIcon.Tracker, Click = new Action(() => { LoadFragment(new WeightTrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
                 new { Text = "User Profile", CarnageIcon = CarnageIcon.Profile, Click = new Action(() => { LoadFragment(new UserProfileFragment(dbContext, userProfile)); ToggleDrawer(); }) },
             };
