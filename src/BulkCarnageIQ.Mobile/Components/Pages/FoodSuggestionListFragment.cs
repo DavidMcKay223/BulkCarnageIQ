@@ -50,7 +50,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             fixedContentLayout = view.FindViewById<LinearLayout>(Resource.Id.fixed_content);
             dynamicContentLayout = view.FindViewById<LinearLayout>(Resource.Id.dynamic_content);
 
-            fixedContentLayout.AddView(Context.CarnageTextView("Food List").AsTitle());
+            fixedContentLayout.AddView(Context.CarnageTextView("Food Suggestion").AsTitle());
 
             var macroSummary = mealEntryService.GetMacroSummariesByDateRangeAsync(DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today), currentUserProfile.UserName).Result.TryGetValue(DateOnly.FromDateTime(DateTime.Today).DayOfWeek.ToString(), out MacroSummary ms) ? ms : new MacroSummary();
             var mealEntries = mealEntryService.GetByDateAsync(DateOnly.FromDateTime(DateTime.Today), currentUserProfile.UserName).Result;
