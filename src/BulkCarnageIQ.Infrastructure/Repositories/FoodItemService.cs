@@ -34,6 +34,15 @@ namespace BulkCarnageIQ.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<FoodItem>> GetPagingAsync(int pageNumber = 1, int pageSize = 10)
+        {
+            return await _db.FoodItems
+                .OrderBy(f => f.RecipeName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<Dictionary<string, FoodItem>> GetAllDictionaryAsync(List<string> recipeNames)
         {
             if (recipeNames == null || !recipeNames.Any())

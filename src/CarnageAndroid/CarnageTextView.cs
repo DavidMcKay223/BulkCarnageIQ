@@ -18,12 +18,17 @@ namespace CarnageAndroid
         {
             TextSize = CarnageStyle.FontSizeMedium;
             Typeface = Typeface.Default;
-            SetTextColor(CarnageStyle.OffWhite);
         }
 
         public CarnageTextView WithText(string text)
         {
             Text = text;
+            return this;
+        }
+
+        public CarnageTextView WithTextSize(float size)
+        {
+            SetTextSize(ComplexUnitType.Sp, size);
             return this;
         }
 

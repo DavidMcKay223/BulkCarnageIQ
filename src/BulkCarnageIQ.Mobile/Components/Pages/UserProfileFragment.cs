@@ -50,9 +50,11 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             var activityOptions = new List<string> { "sedentary", "lightly active", "moderately active", "very active", "super active" };
             var goalOptions = new List<string> { "maintain", "lose0.5", "lose1", "lose2", "gain0.5", "gain1" };
             var dietOptions = Enum.GetNames(typeof(DietType)).ToList();
+            var sexOptions = Enum.GetNames(typeof(Sex)).ToList();
 
             //var usernameField = Context.CarnageTextField(currentUserProfile.UserName);
             var ageField = Context.CarnageTextField(currentUserProfile.Age.ToString());
+            var sexSpinnerField = Context.CarnageSpinner(sexOptions, currentUserProfile.Sex.ToString());
             var heightField = Context.CarnageTextField(currentUserProfile.HeightInches.ToString());
             var weightField = Context.CarnageTextField(currentUserProfile.WeightPounds.ToString());
             var activitySpinnerField = Context.CarnageSpinner(activityOptions, currentUserProfile.ActivityLevel);
@@ -64,6 +66,9 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             dynamicContentLayout.AddView(Context.CarnageTextView("Age:"));
             dynamicContentLayout.AddView(ageField);
+
+            dynamicContentLayout.AddView(Context.CarnageTextView("Sex:"));
+            dynamicContentLayout.AddView(sexSpinnerField);
 
             dynamicContentLayout.AddView(Context.CarnageTextView("Height (inches):"));
             dynamicContentLayout.AddView(heightField);
@@ -84,6 +89,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             {
                 //currentUserProfile.UserName = usernameField.Text;
                 currentUserProfile.Age = float.TryParse(ageField.Text, out var age) ? age : currentUserProfile.Age;
+                currentUserProfile.Sex = Enum.TryParse<Sex>(sexSpinnerField.Text, true, out var sex) ? sex : Sex.Male;
                 currentUserProfile.HeightInches = float.TryParse(heightField.Text, out var h) ? h : currentUserProfile.HeightInches;
                 currentUserProfile.WeightPounds = float.TryParse(weightField.Text, out var w) ? w : currentUserProfile.WeightPounds;
                 currentUserProfile.ActivityLevel = string.IsNullOrWhiteSpace(activitySpinnerField.Text) ? "sedentary" : activitySpinnerField.Text;

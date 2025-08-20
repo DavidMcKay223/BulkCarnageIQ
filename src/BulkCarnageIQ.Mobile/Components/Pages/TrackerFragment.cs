@@ -102,6 +102,19 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 foodPickerView.UpdateFoodSelection(macros);
             };
 
+            List<string> mealTypes = new List<string> { "Breakfast", "Lunch", "Dinner", "Snack" };
+
+            var now = DateTime.Now.TimeOfDay;
+
+            string MealType =
+                (now >= TimeSpan.FromHours(0) && now < TimeSpan.FromHours(6)) ? "Snack" :
+                (now >= TimeSpan.FromHours(6) && now < TimeSpan.FromHours(11)) ? "Breakfast" :
+                (now >= TimeSpan.FromHours(11) && now < TimeSpan.FromHours(15)) ? "Lunch" :
+                (now >= TimeSpan.FromHours(15) && now < TimeSpan.FromHours(20)) ? "Dinner" :
+                "Snack";
+
+            var mealTypeSpinner = Context.CarnageSpinner(mealTypes, MealType);
+
             var btnAddMeal = Context.CarnageButton("Add")
                 .OnClick(() =>
                     {
@@ -113,7 +126,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                             return;
                         }
 
-                        AddMealByName(foodName, DateOnly.Parse(btnDate.Text), foodPickerView.Progress);
+                        AddMealByName(foodName, DateOnly.Parse(btnDate.Text), foodPickerView.Progress, mealTypeSpinner.Text);
                         txtFoodName.Text = string.Empty;
                         foodPickerView.UpdateFoodSelection(null);
                         foodPickerView.Progress = 2;
@@ -220,7 +233,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             return await mealEntryService.GetByDateAsync(date, userName);
         }
 
-        private void AddMealByName(string foodName, DateOnly date, float servings)
+        private void AddMealByName(string foodName, DateOnly date, float servings, string mealType)
         {
             var macros = LookupFoodMacros(foodName);
 
@@ -229,15 +242,6 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Toast.MakeText(Context, $"Food '{foodName}' not found", ToastLength.Short).Show();
                 return;
             }
-
-            var now = DateTime.Now.TimeOfDay;
-
-            string MealType =
-                (now >= TimeSpan.FromHours(0) && now < TimeSpan.FromHours(6)) ? "Snack" :
-                (now >= TimeSpan.FromHours(6) && now < TimeSpan.FromHours(11)) ? "Breakfast" :
-                (now >= TimeSpan.FromHours(11) && now < TimeSpan.FromHours(15)) ? "Lunch" :
-                (now >= TimeSpan.FromHours(15) && now < TimeSpan.FromHours(20)) ? "Dinner" :
-                "Snack";
 
             var mealEntry = new MealEntry
             {
@@ -253,7 +257,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Fiber = macros.Fiber * servings,
                 Date = date,
                 Day = date.DayOfWeek.ToString(),
-                MealType = MealType,
+                MealType = mealType,
                 UserId = ""
             };
 
@@ -270,7 +274,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 macros.Carbs * servings,
                 macros.Fats * servings,
                 macros.Fiber * servings,
-                MealType
+                mealType
             );
         }
 

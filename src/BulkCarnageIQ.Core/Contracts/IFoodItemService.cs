@@ -11,6 +11,7 @@ namespace BulkCarnageIQ.Core.Contracts
     {
         Task<FoodItem?> GetFoodItemByName(string recipeName);
         Task<List<FoodItem>> GetAllAsync();
+        Task<List<FoodItem>> GetPagingAsync(int pageNumber, int pageSize);
         Task<Dictionary<string, FoodItem>> GetAllDictionaryAsync(List<string> recipeName);
     }
 }

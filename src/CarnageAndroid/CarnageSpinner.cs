@@ -25,11 +25,6 @@ namespace CarnageAndroid
                 if (index >= 0) SetSelection(index);
             }
 
-            this
-                .WithBackgroundColor(CarnageStyle.SlateGray)
-                .WithPadding(0, CarnageStyle.PaddingMedium, 0, CarnageStyle.PaddingMedium)
-                .WithMargins(0, CarnageStyle.PaddingSmall, 0, CarnageStyle.PaddingSmall);
-
             DropDownWidth = LayoutParams.MatchParent;
         }
 

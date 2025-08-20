@@ -29,11 +29,6 @@ namespace CarnageAndroid
             Typeface = Typeface.Create("sans-serif-medium", TypefaceStyle.Normal);
 
             BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.VividBlue);
-
-            this
-                .WithTextColor(CarnageStyle.OffWhite)
-                .WithTextSize(ComplexUnitType.Sp, CarnageStyle.FontSizeMedium)
-                .WithPadding(CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
         }
 
         public CarnageButton WithText(string text)

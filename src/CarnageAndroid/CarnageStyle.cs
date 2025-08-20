@@ -23,7 +23,8 @@ namespace CarnageAndroid
         Fitness,
         Profile,
         Trash,
-        Delete
+        Delete,
+        FoodList,
     }
 
     public static class CarnageIconResolver
@@ -38,6 +39,7 @@ namespace CarnageAndroid
             CarnageIcon.Tracker => Resource.Drawable.ic_tracker,
             CarnageIcon.Fitness => Resource.Drawable.ic_fitness,
             //CarnageIcon.Profile => Resource.Drawable.ic_profile,
+            //CarnageIcon.FoodList => Resource.Drawable.ic_food_list,
             CarnageIcon.Trash => Resource.Drawable.ic_trash,
             CarnageIcon.Delete => Resource.Drawable.ic_delete,
             _ => Resource.Drawable.ic_home,
