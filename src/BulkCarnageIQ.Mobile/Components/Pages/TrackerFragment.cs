@@ -210,18 +210,43 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
 
-            var servingsView = Context.CarnageTextView($"Servings: {measurementServings * portions:N1} {measurementType}");
+            var servingsView = Context.CarnageTextView($"Servings:\n{measurementServings * portions:N1} {measurementType}");
             servingsView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
 
-            var caloriesView = Context.CarnageTextView($"Calories: {calories:N0}");
+            var caloriesView = Context.CarnageTextView($"Calories:\n{calories:N0}");
             caloriesView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
 
             bottomRow.AddView(servingsView);
             bottomRow.AddView(caloriesView);
-            
+
+            // Macro Row: Protein | Carbs | Fats | Fiber
+            var macroRow = new LinearLayout(Context)
+            {
+                Orientation = Android.Widget.Orientation.Horizontal,
+                LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+            };
+
+            var proteinView = Context.CarnageTextView($"Protein:\n{protein:N1} g");
+            proteinView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
+
+            var carbsView = Context.CarnageTextView($"Carbs:\n{carbs:N1} g");
+            carbsView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
+
+            var fatsView = Context.CarnageTextView($"Fats:\n{fats:N1} g");
+            fatsView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
+
+            var fiberView = Context.CarnageTextView($"Fiber:\n{fiber:N1} g");
+            fiberView.LayoutParameters = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f);
+
+            macroRow.AddView(proteinView);
+            macroRow.AddView(carbsView);
+            macroRow.AddView(fatsView);
+            macroRow.AddView(fiberView);
+
             // Add rows to the content layout
             contentLayout.AddView(topRow);
             contentLayout.AddView(bottomRow);
+            contentLayout.AddView(macroRow);
 
             // Add content layout to the card
             card.AddView(contentLayout);

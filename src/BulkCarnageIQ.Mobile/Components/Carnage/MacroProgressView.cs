@@ -1,11 +1,9 @@
 ﻿using Android.Content;
-using Android.Graphics;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
 using CarnageAndroid;
 using CarnageAndroid.UI;
-using Google.Android.Material.Card;
 
 namespace BulkCarnageIQ.Mobile.Components.Carnage
 {
@@ -13,105 +11,74 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
     {
         public MacroProgressView(Context context) : base(context)
         {
-            Initialize(context);
+            Initialize();
         }
 
         public MacroProgressView(Context context, IAttributeSet attrs) : base(context, attrs)
         {
-            Initialize(context);
+            Initialize();
         }
 
-        private void Initialize(Context context)
+        private void Initialize()
         {
             Orientation = Orientation.Vertical;
-            SetPadding(context.DpToPx(8), context.DpToPx(8), context.DpToPx(8), context.DpToPx(8));
         }
 
         public MacroProgressView Add(string name, float current, float goal, string format = " g")
         {
-            var itemView = CreateSingleMacroView(name, current, goal, format);
-            AddView(itemView);
+            AddView(CreateMacroRow(name, current, goal, format));
             return this;
         }
 
-        private View CreateSingleMacroView(string name, float current, float goal, string format = " g")
+        private View CreateMacroRow(string name, float current, float goal, string format)
         {
-            var verticalLayout = new LinearLayout(Context)
+            var container = new LinearLayout(Context)
             {
                 Orientation = Orientation.Vertical,
                 LayoutParameters = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MatchParent,
-                    LinearLayout.LayoutParams.WrapContent
-                )
+                    LayoutParams.MatchParent, LayoutParams.WrapContent)
             };
-            verticalLayout.SetPadding(Context.DpToPx(16), Context.DpToPx(12), Context.DpToPx(16), Context.DpToPx(12));
 
-            var grid = new GridLayout(Context)
+            // Row: name on left, progress text on right
+            var row = new LinearLayout(Context)
             {
-                ColumnCount = 2,
-                LayoutParameters = new GridLayout.LayoutParams(
-                    new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MatchParent,
-                        ViewGroup.LayoutParams.WrapContent
-                    )
-                )
+                Orientation = Orientation.Horizontal,
+                LayoutParameters = new LinearLayout.LayoutParams(
+                    LayoutParams.MatchParent, LayoutParams.WrapContent)
             };
 
-            var leftText = Context.CarnageTextView(name).AsTitle();
-            var leftParams = new GridLayout.LayoutParams(
-                GridLayout.InvokeSpec(0, GridLayout.Fill),
-                GridLayout.InvokeSpec(0, GridLayout.Center)
-            )
-            {
-                Width = 0,
-                Height = ViewGroup.LayoutParams.WrapContent,
-                ColumnSpec = GridLayout.InvokeSpec(0, 1, 1f)
-            };
-            leftText.LayoutParameters = leftParams;
+            var nameText = Context.CarnageTextView(name).AsTitle();
+            var progressText = Context.CarnageTextView($"{current:N1}{format} / {goal:N1}{format}");
 
-            var displayGoal = goal;
+            var lpName = new LinearLayout.LayoutParams(0, LayoutParams.WrapContent, 1f);
+            var lpProgress = new LinearLayout.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
 
-            float safeGoal = goal > 0 ? goal : 1f;
+            row.AddView(nameText, lpName);
+            row.AddView(progressText, lpProgress);
 
-            var rightText = Context.CarnageTextView($"{current:N1}{format} / {displayGoal:N1}{format}");
-            var rightParams = new GridLayout.LayoutParams(
-                GridLayout.InvokeSpec(0, GridLayout.Center),
-                GridLayout.InvokeSpec(1, GridLayout.Center)
-            )
-            {
-                Width = ViewGroup.LayoutParams.WrapContent,
-                Height = ViewGroup.LayoutParams.WrapContent
-            };
-            rightText.LayoutParameters = rightParams;
+            container.AddView(row);
 
-            grid.AddView(leftText);
-            grid.AddView(rightText);
-            verticalLayout.AddView(grid);
-
+            // Progress bar
             var progressBar = Context.CarnageLinearProgress();
+            float safeGoal = goal > 0 ? goal : 1f;
+            int progress = (int)Math.Clamp((current / safeGoal) * 100, 0, 100);
+            progressBar.Progress = progress;
+            container.AddView(progressBar);
 
-            float ratio = current / safeGoal;
-            int progressPercent = (int)(ratio * 100);
-            progressPercent = Math.Clamp(progressPercent, 0, 100);
-
-            progressBar.Progress = progressPercent;
-            verticalLayout.AddView(progressBar);
-
+            // Status text
             var statusText = Context.CarnageTextView(GetStatusText(current, goal, format))
                 .WithColor(CarnageStyle.OffWhite);
-            verticalLayout.AddView(statusText);
+            container.AddView(statusText);
 
-            return verticalLayout;
+            return container;
         }
 
-        private string GetStatusText(float current, float goal, string format = "g")
+        private string GetStatusText(float current, float goal, string format)
         {
             float remaining = goal - current;
 
-            if (remaining < 0)
-                return $"Over Limit by {Math.Abs(remaining):N1}{format}";
-            if (current / (goal > 0 ? goal : 1f) >= 0.85f)
-                return "Getting Close";
+            if (remaining < 0) return $"Over Limit by {Math.Abs(remaining):N1}{format}";
+            if (current / (goal > 0 ? goal : 1f) >= 0.85f) return "Getting Close";
             return "On Track";
         }
     }
