@@ -37,6 +37,7 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
         private void Init(Context context)
         {
             var container = new LinearLayout(context) { Orientation = Android.Widget.Orientation.Vertical };
+            container.WithPadding(CarnageStyle.PaddingMedium, 0, CarnageStyle.PaddingMedium, CarnageStyle.PaddingMedium);
             container.SetBackgroundColor(CarnageStyle.DarkCharcoal);
 
             AddView(container);
@@ -44,7 +45,7 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             container.AddView(context.CarnageTextView(_currentFood.RecipeName).AsTitle().WithMargins(0, CarnageStyle.PaddingSmall, 0, CarnageStyle.PaddingSmall));
             if (!string.IsNullOrEmpty(_currentFood.BrandType)) container.AddView(context.CarnageTextView($"Brand: {_currentFood.BrandType}"));
             if (!string.IsNullOrEmpty(_currentFood.GroupName)) container.AddView(context.CarnageTextView($"Group: {_currentFood.GroupName}"));
-            container.AddView(context.CarnageTextView($"Servings: {_currentFood.Servings} {_currentFood.MeasurementType} ({_currentFood.MeasurementServings}x)"));
+            container.AddView(context.CarnageTextView($"Servings: {_currentFood.Servings} x {_currentFood.MeasurementServings} {_currentFood.MeasurementType}"));
             container.AddView(context.CarnageTextView($"Calories: {_currentFood.TotalCalories} (per serving {_currentFood.CaloriesPerServing})"));
             container.AddView(context.CarnageTextView($"Protein: {_currentFood.Protein}g"));
             container.AddView(context.CarnageTextView($"Carbs: {_currentFood.Carbs}g"));
