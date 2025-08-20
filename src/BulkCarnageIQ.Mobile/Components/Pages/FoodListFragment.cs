@@ -49,7 +49,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             fixedContentLayout.AddView(Context.CarnageTextView("Food List").AsTitle());
 
-            var foodList = foodItemService.GetAllAsync().Result;
+            var foodList = filter.ApplyFilters(foodItemService.GetAllAsync().Result).ToList();
 
             if (foodList == null || !foodList.Any())
             {
