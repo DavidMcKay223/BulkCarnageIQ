@@ -61,10 +61,11 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                 Hint = "Search for food",
             };
 
-            var adapter = new ArrayAdapter<string>(
+            var adapter = new CarnageArrayAdapter(
                 Context,
+                GetFoodItemList(),
                 Android.Resource.Layout.SimpleDropDownItem1Line,
-                GetFoodItemList()
+                Android.Resource.Layout.SimpleDropDownItem1Line
             );
 
             txtFoodName.SetHintTextColor(CarnageAndroid.CarnageStyle.OffWhite);
@@ -135,6 +136,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
                     });
 
             tableAdd.AddView(btnDate);
+            tableAdd.AddView(mealTypeSpinner);
             tableAdd.AddView(txtFoodName);
             tableAdd.AddView(foodPickerView);
             tableAdd.AddView(btnAddMeal);
