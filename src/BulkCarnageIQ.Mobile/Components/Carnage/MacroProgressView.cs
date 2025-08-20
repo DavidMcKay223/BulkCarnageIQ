@@ -36,8 +36,6 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
 
         private View CreateSingleMacroView(string name, float current, float goal, string format = " g")
         {
-            // Create a vertical LinearLayout to hold the inner content (grid, progress bar, status text).
-            // This ensures they are stacked correctly.
             var verticalLayout = new LinearLayout(Context)
             {
                 Orientation = Orientation.Vertical,
@@ -46,10 +44,8 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
                     LinearLayout.LayoutParams.WrapContent
                 )
             };
-            // Add padding to the vertical layout for a clean appearance.
             verticalLayout.SetPadding(Context.DpToPx(16), Context.DpToPx(12), Context.DpToPx(16), Context.DpToPx(12));
 
-            // Grid inside the vertical layout for the first row of text.
             var grid = new GridLayout(Context)
             {
                 ColumnCount = 2,
@@ -61,22 +57,23 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
                 )
             };
 
-            // Left text (takes the first column and expands using weight)
             var leftText = Context.CarnageTextView(name).AsTitle();
             var leftParams = new GridLayout.LayoutParams(
                 GridLayout.InvokeSpec(0, GridLayout.Fill),
                 GridLayout.InvokeSpec(0, GridLayout.Center)
             )
             {
-                // Setting width to 0 and weight to 1f makes it span the available space.
                 Width = 0,
                 Height = ViewGroup.LayoutParams.WrapContent,
                 ColumnSpec = GridLayout.InvokeSpec(0, 1, 1f)
             };
             leftText.LayoutParameters = leftParams;
 
-            // Right text (second column, wraps normally)
-            var rightText = Context.CarnageTextView($"{current:N1}{format} / {goal:N1}{format}");
+            var displayGoal = goal;
+
+            float safeGoal = goal > 0 ? goal : 1f;
+
+            var rightText = Context.CarnageTextView($"{current:N1}{format} / {displayGoal:N1}{format}");
             var rightParams = new GridLayout.LayoutParams(
                 GridLayout.InvokeSpec(0, GridLayout.Center),
                 GridLayout.InvokeSpec(1, GridLayout.Center)
@@ -87,38 +84,33 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             };
             rightText.LayoutParameters = rightParams;
 
-            // Add both text views to the grid.
             grid.AddView(leftText);
             grid.AddView(rightText);
-
-            // Add the grid to our vertical layout.
             verticalLayout.AddView(grid);
 
-            // Progress bar
             var progressBar = Context.CarnageLinearProgress();
-            float ratio = current / goal;
-            int progressPercent = (int)(ratio * 100);
-            progressPercent = progressPercent > 100 ? 100 : progressPercent;
-            progressBar.Progress = progressPercent;
 
-            // Add the progress bar to the vertical layout.
+            float ratio = current / safeGoal;
+            int progressPercent = (int)(ratio * 100);
+            progressPercent = Math.Clamp(progressPercent, 0, 100);
+
+            progressBar.Progress = progressPercent;
             verticalLayout.AddView(progressBar);
 
-            // Status text
-            var statusText = Context.CarnageTextView(GetStatusText(ratio, current, goal, format))
+            var statusText = Context.CarnageTextView(GetStatusText(current, goal, format))
                 .WithColor(CarnageStyle.OffWhite);
-
-            // Add the status text to the vertical layout.
             verticalLayout.AddView(statusText);
 
             return verticalLayout;
         }
 
-        private string GetStatusText(float ratio, float current, float goal, string format = "g")
+        private string GetStatusText(float current, float goal, string format = "g")
         {
-            if (ratio > 1.0f)
-                return $"Over Limit by {(current - goal):N1}{format}";
-            if (ratio >= 0.85f)
+            float remaining = goal - current;
+
+            if (remaining < 0)
+                return $"Over Limit by {Math.Abs(remaining):N1}{format}";
+            if (current / (goal > 0 ? goal : 1f) >= 0.85f)
                 return "Getting Close";
             return "On Track";
         }

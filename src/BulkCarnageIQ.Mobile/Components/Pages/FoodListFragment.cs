@@ -2,6 +2,7 @@
 using AndroidX.RecyclerView.Widget;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Core.Carnage.Report;
+using BulkCarnageIQ.Core.Contracts;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
 using BulkCarnageIQ.Mobile.Components.Carnage.Feed;
@@ -24,6 +25,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
         private UserProfile currentUserProfile;
         private FoodItemService foodItemService;
+        private MealEntryService mealEntryService;
 
         private FoodAdapter adapter;
         private FoodItemFilter filter;
@@ -32,6 +34,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
         {
             currentUserProfile = userProfile;
             foodItemService = new FoodItemService(db);
+            mealEntryService = new MealEntryService(db);
             filter = new FoodItemFilter();
         }
 
@@ -49,7 +52,88 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
 
             fixedContentLayout.AddView(Context.CarnageTextView("Food List").AsTitle());
 
-            var foodList = filter.ApplyFilters(foodItemService.GetAllAsync().Result).ToList();
+            var macroSummary = mealEntryService.GetMacroSummariesByDateRangeAsync(DateOnly.FromDateTime(DateTime.Today), DateOnly.FromDateTime(DateTime.Today), currentUserProfile.UserName).Result.TryGetValue(DateOnly.FromDateTime(DateTime.Today).DayOfWeek.ToString(), out MacroSummary ms) ? ms : new MacroSummary();
+
+            var foodList = filter.ApplyFilters(foodItemService.GetAllAsync().Result)
+                .OrderByDescending(f => {
+                    // We don't want to see zero-macro foods first.
+                    // If a food has no protein, fiber, or calories, it gets a minimum score.
+                    if (f.Protein <= 0 && f.Fiber <= 0 && f.TotalCalories <= 0)
+                    {
+                        return float.MinValue;
+                    }
+
+                    // Current macro status
+                    float remainingProtein = currentUserProfile.ProteinGoal - macroSummary.Protein;
+                    float remainingFiber = currentUserProfile.FiberGoal - macroSummary.Fiber;
+                    float remainingCalories = currentUserProfile.CalorieGoal - macroSummary.Calories;
+                    float remainingFat = currentUserProfile.FatGoal - macroSummary.Fats;
+                    float remainingCarbs = currentUserProfile.CarbsGoal - macroSummary.Carbs;
+
+                    float score = 0;
+
+                    // Use multipliers to define priority
+                    const float proteinMultiplier = 1000000000;
+                    const float fiberMultiplier = 1000000000; // Giving fiber top priority in this scenario
+                    const float calorieMultiplier = 10000;
+                    const float fatMultiplier = 1000;
+                    const float carbMultiplier = 100;
+
+                    // 1. Fiber Priority: This is the only macro you're under on, so it gets top priority.
+                    if (remainingFiber > 0)
+                    {
+                        score += Math.Min(f.Fiber, remainingFiber) * fiberMultiplier;
+                    }
+                    else
+                    {
+                        // Even if over, we assume fiber is beneficial, so we still reward it.
+                        score += f.Fiber * fiberMultiplier;
+                    }
+
+                    // 2. Calorie Penalty: You are over on calories, so we heavily penalize high-calorie foods.
+                    if (remainingCalories <= 0)
+                    {
+                        score -= f.TotalCalories * calorieMultiplier;
+                    }
+                    else
+                    {
+                        // If you were under, this would be the logic to reward low-calorie foods
+                        score -= f.TotalCalories * calorieMultiplier;
+                    }
+
+                    // 3. Protein Penalty: You are over on protein.
+                    if (remainingProtein <= 0)
+                    {
+                        score -= f.Protein * proteinMultiplier;
+                    }
+                    else
+                    {
+                        score += Math.Min(f.Protein, remainingProtein) * proteinMultiplier;
+                    }
+
+                    // 4. Fat Penalty: You are over on fat.
+                    if (remainingFat <= 0)
+                    {
+                        score -= f.Fats * fatMultiplier;
+                    }
+                    else
+                    {
+                        score -= f.Fats * fatMultiplier;
+                    }
+
+                    // 5. Carb Penalty: You are over on carbs.
+                    if (remainingCarbs <= 0)
+                    {
+                        score -= f.Carbs * carbMultiplier;
+                    }
+                    else
+                    {
+                        score -= f.Carbs * carbMultiplier;
+                    }
+
+                    return score;
+                })
+                .ToList();
 
             if (foodList == null || !foodList.Any())
             {
@@ -60,7 +144,7 @@ namespace BulkCarnageIQ.Mobile.Components.Pages
             // RecyclerView setup
             var recycler = new RecyclerView(Context);
             recycler.SetLayoutManager(new LinearLayoutManager(Context));
-            adapter = new FoodAdapter(Context, foodList, currentUserProfile);
+            adapter = new FoodAdapter(Context, foodList, macroSummary, currentUserProfile);
             recycler.SetAdapter(adapter);
             dynamicContentLayout.AddView(recycler);
 
