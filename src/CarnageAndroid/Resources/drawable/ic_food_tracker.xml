@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#e3e3e3">
+
+	<!-- Glass outline -->
+	<path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,2h10l-1.5,16.5c-0.1,1.1 -1,2 -2.1,2h-2.8c-1.1,0 -2,-0.9 -2.1,-2L7,2z" />
+
+	<!-- Liquid inside -->
+	<path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8.5,6h7l-0.8,9.5c-0.1,0.5 -0.5,0.9 -1,0.9h-3.4c-0.5,0 -0.9,-0.4 -1,-0.9L8.5,6z" />
+
+	<!-- Straw -->
+	<path
+        android:fillColor="#FFFFFF"
+        android:pathData="M15,2v2.5h-2V2h2z" />
+</vector>

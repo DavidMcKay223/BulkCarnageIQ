@@ -18,7 +18,8 @@ namespace CarnageAndroid
 
         private void Init()
         {
-            WithStyle(CarnageTextFieldStyle.Default);
+            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.SlateGray);
+            SetHintTextColor(CarnageStyle.OffWhite);
         }
 
         public CarnageTextField WithHint(string hint)
@@ -30,34 +31,6 @@ namespace CarnageAndroid
         public CarnageTextField WithText(string text)
         {
             Text = text;
-            return this;
-        }
-
-        public CarnageTextField WithStyle(CarnageTextFieldStyle style)
-        {
-            switch (style)
-            {
-                case CarnageTextFieldStyle.Filled:
-                    // Usually TextInputLayout manages background but you can tweak here
-                    SetBackgroundColor(CarnageStyle.SecondaryColor);
-                    SetTextColor(CarnageStyle.TextPrimaryColor);
-                    break;
-                case CarnageTextFieldStyle.Outline:
-                    SetBackgroundColor(CarnageStyle.BackgroundColor);
-                    SetTextColor(CarnageStyle.TextPrimaryColor);
-                    break;
-                case CarnageTextFieldStyle.Error:
-                    SetBackgroundColor(CarnageStyle.DangerColor);
-                    SetTextColor(CarnageStyle.BackgroundColor);
-                    break;
-                default:
-                    SetBackgroundColor(CarnageStyle.BackgroundColor);
-                    SetTextColor(CarnageStyle.TextPrimaryColor);
-                    break;
-            }
-
-            BackgroundTintList = ColorStateList.ValueOf(CarnageStyle.PrimaryColor);
-
             return this;
         }
     }

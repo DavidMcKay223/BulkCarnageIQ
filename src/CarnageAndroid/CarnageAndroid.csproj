@@ -13,4 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Xamarin.Google.Android.Material" Version="1.12.0.4" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\drawable\" />
+  </ItemGroup>
 </Project>

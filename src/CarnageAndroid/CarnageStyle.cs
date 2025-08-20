@@ -1,54 +1,73 @@
 ﻿using Android.Content;
+using Android.Graphics;
 using Android.Util;
 using Android.Widget;
-using Android.Graphics;
 
 namespace CarnageAndroid
 {
-    public enum CarnageButtonStyle
+    public enum CarnageIconPosition
     {
-        Default,
-        Primary,
-        Danger,
-        Secondary
+        Top,
+        Bottom,
+        Left,
+        Right
     }
 
-    public enum CarnageTextFieldStyle
+    public enum CarnageIcon
     {
-        Default,
-        Filled,
-        Outline,
-        Error
+        Home,
+        Settings,
+        Favorite,
+        FoodTracker,
+        Tracker,
+        Fitness,
+        Profile,
+        Trash,
+        Delete,
+        FoodList,
+        FoodSuggestion
     }
 
-    public enum CarnageTextViewStyle
+    public static class CarnageIconResolver
     {
-        Default,
-        Title,
-        Primary,
-        Secondary
-    }
+        public static int GetResource(CarnageIcon icon) => icon switch
+        {
 
-    public enum CarnageProgressStyle
-    {
-        Default,
-        Primary,
-        Danger,
-        Secondary
+            CarnageIcon.Home => Resource.Drawable.ic_home,
+            CarnageIcon.Settings => Resource.Drawable.ic_settings,
+            CarnageIcon.Favorite => Resource.Drawable.ic_favorite,
+            CarnageIcon.FoodTracker => Resource.Drawable.ic_food_tracker,
+            CarnageIcon.Tracker => Resource.Drawable.ic_tracker,
+            CarnageIcon.Fitness => Resource.Drawable.ic_fitness,
+            CarnageIcon.Profile => Resource.Drawable.ic_profile,
+            CarnageIcon.FoodList => Resource.Drawable.ic_food_list,
+            CarnageIcon.FoodSuggestion => Resource.Drawable.ic_food_suggestion,
+            CarnageIcon.Trash => Resource.Drawable.ic_trash,
+            CarnageIcon.Delete => Resource.Drawable.ic_delete,
+            _ => Resource.Drawable.ic_home,
+        };
     }
 
     public static class CarnageStyle
     {
-        // Color objects
-        public static readonly Color PrimaryColor = Color.ParseColor("#FF5722");
-        public static readonly Color PrimaryColorDark = Color.ParseColor("#BF360C");
-        public static readonly Color SecondaryColor = Color.ParseColor("#03DAC6");
-        public static readonly Color DangerColor = Color.ParseColor("#B00020");
-        public static readonly Color BackgroundColor = Color.ParseColor("#FFFFFF");
-        public static readonly Color TextPrimaryColor = Color.ParseColor("#212121");
-        public static readonly Color TextSecondaryColor = Color.ParseColor("#757575");
-        public static readonly Color HintTextColor = Color.ParseColor("#AA000000");
-        public static readonly Color CharcoalGray = Color.ParseColor("#121212");
+        // Base Palette
+        public static readonly Color White = Color.ParseColor("#FFFFFF");
+        public static readonly Color Charcoal = Color.ParseColor("#211212");
+        public static readonly Color MediumGray = Color.ParseColor("#757575");
+        public static readonly Color DeepBrown = Color.ParseColor("#472424");
+
+        // Accent Palette (Reds)
+        public static readonly Color PrimaryRed = Color.ParseColor("#BD0F0F");
+        public static readonly Color DarkMaroon = Color.ParseColor("#663333");
+        public static readonly Color PaleRose = Color.ParseColor("#C99191");
+        public static readonly Color DarkestBrown = Color.ParseColor("#331A1A");
+
+        // Accent Palette (Blues)
+        public static readonly Color MidnightBlue = Color.ParseColor("#1E2533");
+        public static readonly Color VividBlue = Color.ParseColor("#3B72F4");
+        public static readonly Color DarkCharcoal = Color.ParseColor("#2B3344");
+        public static readonly Color OffWhite = Color.ParseColor("#E0E0E0");
+        public static readonly Color SlateGray = Color.ParseColor("#384256");
 
         // Font sizes (in SP)
         public const float FontSizeSmall = 12f;

@@ -2,6 +2,7 @@
 using Android.Graphics;
 using Android.Util;
 using Android.Widget;
+using CarnageAndroid;
 using MikePhil.Charting.Charts;
 using MikePhil.Charting.Components;
 using MikePhil.Charting.Data;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 
 namespace BulkCarnageIQ.Mobile.Components.Carnage
 {
+    [Obsolete()]
     public class MacroDonutView : FrameLayout
     {
         private PieChart pieChart;
@@ -82,8 +84,8 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
             dataSet.YValuePosition = PieDataSet.ValuePosition.OutsideSlice;
             dataSet.ValueLinePart1Length = 0.5f;
             dataSet.ValueLinePart2Length = 0.5f;
-            dataSet.ValueLineColor = Color.Gray;
-            dataSet.ValueTextColor = Color.Black;
+            dataSet.ValueLineColor = CarnageStyle.OffWhite;
+            dataSet.ValueTextColor = CarnageStyle.OffWhite;
             dataSet.ValueTextSize = 14f;
             dataSet.SetDrawValues(false);
 

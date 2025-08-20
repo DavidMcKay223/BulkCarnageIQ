@@ -1,5 +1,7 @@
 ﻿using Android.Content;
+using Android.Content.Res;
 using Android.Util;
+using Android.Views;
 using BulkCarnageIQ.Core.Carnage;
 using BulkCarnageIQ.Infrastructure.Persistence;
 using BulkCarnageIQ.Infrastructure.Repositories;
@@ -29,29 +31,47 @@ namespace BulkCarnageIQ.Mobile.Components.Carnage
 
         private void Init(Context context)
         {
-            Orientation = Orientation.Vertical;
+            Orientation = Android.Widget.Orientation.Vertical;
             SetPadding(context.DpToPx(8), context.DpToPx(8), context.DpToPx(8), context.DpToPx(8));
 
             var servingContainer = new LinearLayout(context)
             {
-                Orientation = Orientation.Vertical,
+                Orientation = Android.Widget.Orientation.Vertical,
                 LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent)
             };
 
+            // Top row: Servings (left) + Calories (right)
+            var topRow = new LinearLayout(context)
+            {
+                Orientation = Android.Widget.Orientation.Horizontal,
+                LayoutParameters = new LayoutParams(LayoutParams.MatchParent, LayoutParams.WrapContent)
+            };
+
+            ServingsPreview = context.CarnageTextView("Servings: 0");
+            CaloriesPreview = context.CarnageTextView("Calories: 0");
+
+            var lpLeft = new LinearLayout.LayoutParams(0, LayoutParams.WrapContent, 1f);
+            var lpRight = new LinearLayout.LayoutParams(0, LayoutParams.WrapContent, 1f);
+
+            ServingsPreview.LayoutParameters = lpLeft;
+            CaloriesPreview.LayoutParameters = lpRight;
+            CaloriesPreview.Gravity = GravityFlags.End;
+
+            topRow.AddView(ServingsPreview);
+            topRow.AddView(CaloriesPreview);
+
+            servingContainer.AddView(topRow);
+
+            // SeekBar under row
             ServingsSeekBar = new SeekBar(context)
             {
                 Max = 20,
                 Progress = 2
             };
+            ServingsSeekBar.ProgressTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.VividBlue);
+            ServingsSeekBar.ThumbTintList = ColorStateList.ValueOf(CarnageAndroid.CarnageStyle.VividBlue);
+
             servingContainer.AddView(ServingsSeekBar);
-
-            ServingsPreview = context.CarnageTextView(CarnageTextViewStyle.Secondary, "Servings: 0");
-            
-            servingContainer.AddView(ServingsPreview);
-
-            CaloriesPreview = context.CarnageTextView(CarnageTextViewStyle.Secondary, "Calories: 0");
-
-            servingContainer.AddView(CaloriesPreview);
 
             AddView(servingContainer);
 

@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
 	<!-- Header -->
 	<TextView
@@ -11,15 +10,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_fragment_tracker_header"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/vividBlue"
+		android:padding="8dp"
+		android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
 
 	<!-- Add meal controls -->
 	<LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+		android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
 		<TableLayout
             android:id="@+id/addTable"
@@ -31,7 +36,9 @@
 	<ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+		android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
 		<TableLayout
 			android:id="@+id/tableMeals"

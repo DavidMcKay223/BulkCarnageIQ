@@ -39,14 +39,14 @@ namespace BulkCarnageIQ.Mobile
             hamburgerContainer = FindViewById<LinearLayout>(Resource.Id.hamburger_container);
 
             // Inject CarnageTextView title dynamically
-            titleContainer.AddView(this.CarnageTextView(CarnageTextViewStyle.Title, GetString(Resource.String.app_name)));
+            titleContainer.AddView(this.CarnageTextView(GetString(Resource.String.app_name)).AsTitle());
 
             // Inject Hamburger button dynamically
             hamburgerContainer.AddView(
-                this.CarnageButton(CarnageButtonStyle.Primary, 
-                    GetString(Resource.String.app_btn_hamburger_text),
+                this.CarnageButton(GetString(Resource.String.app_btn_hamburger_text),
                     () => ToggleDrawer())
-                .WithColor(CarnageStyle.CharcoalGray));
+                .WithColor(CarnageStyle.MidnightBlue)
+                .WithTextColor(CarnageStyle.OffWhite));
 
             // Build drawer buttons dynamically
             BuildDrawerMenu();
@@ -68,14 +68,17 @@ namespace BulkCarnageIQ.Mobile
 
             var menuItems = new[]
             {
-                new { Text = "Home", Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
-                new { Text = "Food Tracker", Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
-                // Add more menu items here dynamically as needed
+                new { Text = "Home", CarnageIcon = CarnageIcon.Home, Click = new Action(() => { LoadFragment(new HomeFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Food Tracker", CarnageIcon = CarnageIcon.FoodTracker, Click = new Action(() => { LoadFragment(new TrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Food List", CarnageIcon = CarnageIcon.FoodList, Click = new Action(() => { LoadFragment(new FoodListFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Food Suggestion", CarnageIcon = CarnageIcon.FoodSuggestion, Click = new Action(() => { LoadFragment(new FoodSuggestionListFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "Weight Log", CarnageIcon = CarnageIcon.Tracker, Click = new Action(() => { LoadFragment(new WeightTrackerFragment(dbContext, userProfile)); ToggleDrawer(); }) },
+                new { Text = "User Profile", CarnageIcon = CarnageIcon.Profile, Click = new Action(() => { LoadFragment(new UserProfileFragment(dbContext, userProfile)); ToggleDrawer(); }) },
             };
 
             foreach (var item in menuItems)
             {
-                drawerPanel.AddView(this.CarnageButton(CarnageButtonStyle.Primary, item.Text, item.Click));
+                drawerPanel.AddView(this.CarnageButtonIcon(item.CarnageIcon, item.Text, item.Click));
             }
         }
 

@@ -7,7 +7,9 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="8dp"
+		android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
 		<!-- Widget 1: Daily Totals -->
 		<LinearLayout
@@ -22,14 +24,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1" />
-
-			<BulkCarnageIQ.Mobile.Components.Carnage.MacroDonutView
-				android:id="@+id/dailyDonut"
-				android:layout_width="240dp"
-				android:layout_height="240dp"
-				android:layout_marginStart="16dp"
-				android:layout_gravity="center" />
-
+			
 		</LinearLayout>
 
 		<!-- Widget 2: Weekly Summary -->
@@ -45,13 +40,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1" />
-
-			<BulkCarnageIQ.Mobile.Components.Carnage.MacroDonutView
-				android:id="@+id/weeklyDonut"
-				android:layout_width="240dp"
-				android:layout_height="240dp"
-				android:layout_marginStart="16dp"
-				android:layout_gravity="center" />
 
 		</LinearLayout>
 
