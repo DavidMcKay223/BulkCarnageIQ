@@ -38,6 +38,10 @@ It’s **built for lifters, grinders, and tacticians** who want to cut the noise
 
 ## 📸 Sneak Peek
 
+### Android Mobile
+
+<img width="3019" height="2595" alt="BulkCarnageIQ-Mobile-Implemented" src="https://github.com/user-attachments/assets/8ee408a8-193d-468e-846b-67600774a995" />
+
 ---
 
 ## 🛠️ Tech Stack
